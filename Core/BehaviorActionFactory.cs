@@ -1,0 +1,38 @@
+﻿using System;
+using DG.Tweening;
+
+namespace Scrips.StateBehavior
+{
+    [Serializable]
+    public enum BehaviorActionTypes
+    {
+        None,
+        Simple,
+        OneShot,
+        Looping,
+        Sequencer,
+    }
+    public static class BehaviorActionFactory
+    {
+        public static void Set(BehaviorActionTypes type, Tweener Tweener)
+        {
+            switch (type)
+            {
+                case BehaviorActionTypes.None:
+                    break;
+                case BehaviorActionTypes.Simple:
+                    Tweener.SetAutoKill(false)
+                        .SetLoops(1, LoopType.Yoyo);
+                    return;
+                case BehaviorActionTypes.Looping:
+                    break;
+                case BehaviorActionTypes.Sequencer:
+                    break;
+                case BehaviorActionTypes.OneShot:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        } 
+    }
+}

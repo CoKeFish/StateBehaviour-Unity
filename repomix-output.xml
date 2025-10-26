@@ -1,0 +1,505 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+Action.cs
+Action.cs.meta
+ActionSelectable.cs
+ActionSelectable.cs.meta
+ActionData.cs
+ActionData.cs.meta
+ActionDataContainer.cs
+ActionDataContainer.cs.meta
+ActionDataSimpleContainer.cs
+ActionDataSimpleContainer.cs.meta
+BehaviorActionBase.cs
+BehaviorActionBase.cs.meta
+BehaviorActionFactory.cs
+BehaviorActionFactory.cs.meta
+ButtonState.cs
+ButtonState.cs.meta
+Element.cs
+Element.cs.meta
+ElementButton.cs
+ElementButton.cs.meta
+IState.cs
+IState.cs.meta
+ScaleSelectableAction.cs
+ScaleSelectableAction.cs.meta
+ScaleButtonActionData.cs
+ScaleButtonActionData.cs.meta
+SequencerBase.cs
+SequencerBase.cs.meta
+SimpleBehaviorContainerBase.cs
+SimpleBehaviorContainerBase.cs.meta
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="Action.cs">
+using System;
+using Sirenix.OdinInspector;
+
+namespace Scrips.StateBehavior
+{
+    [Serializable]
+    public abstract class Action : IStateContract
+    {
+        [InlineEditor]
+        public ActionData Data;
+        
+        [ValueDropdown(nameof(GetActionTypes))]
+        [OnValueChanged(nameof(UpdateActionBase))]
+        public BehaviorActionTypes BehaviorActionType;
+
+        [InlineProperty, HideLabel]
+        [ShowInInspector, ReadOnly]
+        public BehaviorActionBase ActionBase;
+
+        // Dropdown source
+        private static BehaviorActionTypes[] GetActionTypes()
+        {
+            return (BehaviorActionTypes[])System.Enum.GetValues(typeof(BehaviorActionTypes));
+        }
+
+        // Called automatically when Type changes
+        private void UpdateActionBase()
+        {
+            ActionBase = BehaviorActionFactory.Create(BehaviorActionType);
+        }
+    }
+
+}
+</file>
+
+<file path="Action.cs.meta">
+fileFormatVersion: 2
+guid: b3c5dc064450484fa160eb959d47c658
+timeCreated: 1761240005
+</file>
+
+<file path="ActionSelectable.cs">
+namespace Scrips.StateBehavior
+{
+    public abstract class ActionSelectable:Action, ISelectableStates
+    {
+        public abstract void OnIdle();
+        
+        public abstract void OnSelected();
+
+        public abstract void OnPressed();
+    }
+}
+</file>
+
+<file path="ActionSelectable.cs.meta">
+fileFormatVersion: 2
+guid: 6050e2cab0d242ac87401c1d66e4f268
+timeCreated: 1761240084
+</file>
+
+<file path="ActionData.cs">
+using System;
+using System.Collections.Generic;
+using Sirenix.OdinInspector;
+
+namespace Scrips.StateBehavior
+{
+    public class ActionData<TState, TActionDataContainer>: SerializedScriptableObject 
+        where TState : Enum
+        where TActionDataContainer : ActionDataContainer, new() 
+    {
+        public Dictionary<TState, ActionDataContainer> StateActionDataContainers = new();
+    }
+}
+</file>
+
+<file path="ActionData.cs.meta">
+fileFormatVersion: 2
+guid: bea6b61684ab454ab5dcdd7a75d3cccb
+timeCreated: 1761240180
+</file>
+
+<file path="ActionDataContainer.cs">
+namespace Scrips.StateBehavior
+{
+    public class ActionDataContainer
+    {
+        
+    }
+}
+</file>
+
+<file path="ActionDataContainer.cs.meta">
+fileFormatVersion: 2
+guid: 2fab9a2f2be444bbbaba7d2eac766896
+timeCreated: 1761259020
+</file>
+
+<file path="ActionDataSimpleContainer.cs">
+using System;
+using DG.Tweening;
+using Sirenix.OdinInspector;
+using UnityEngine;
+
+namespace Scrips.StateBehavior
+{
+    [Serializable]
+    public class ActionDataSimpleContainer:ActionDataContainer
+    {
+        /// <summary>
+        ///     If true, showAfter will be used
+        ///     If false, defaultShowAfter will be used
+        /// </summary>
+        [SerializeField]  public bool customShowAfter;
+
+        /// <summary>
+        ///     The time to wait before initiating the showing animation
+        /// </summary>
+        [SerializeField] [ShowIf("customShowAfter")]
+        public float showAfter;
+
+        /// <summary>
+        ///     If true, showingDuration will be used
+        ///     If false, defaultShowingDuration will be used
+        /// </summary>
+        [SerializeField] public bool customShowingDuration;
+
+        /// <summary>
+        ///     The duration of the showing animation
+        /// </summary>
+        [SerializeField] [ShowIf("customShowingDuration")]
+        public float showingDuration = 0.5f;
+
+        /// <summary>
+        ///     The animation curve of the showing animation
+        /// </summary>
+        [SerializeField] public Ease easeShow = Ease.OutBack;
+
+    }
+}
+</file>
+
+<file path="ActionDataSimpleContainer.cs.meta">
+fileFormatVersion: 2
+guid: 8bdf223c2f0e4b7e92f6a8d1a1170022
+timeCreated: 1761259039
+</file>
+
+<file path="BehaviorActionBase.cs">
+using DG.Tweening;
+using UnityEngine;
+
+namespace Scrips.StateBehavior
+{
+    public abstract class BehaviorActionBase
+    {
+        
+        protected GameObject gameObject;
+        
+        public virtual void Setup(GameObject gameObject)
+        {
+            if (gameObject == null)
+            {
+                this.gameObject = gameObject;
+            }
+        }
+
+        public virtual void Setup(GameObject gameObject, Tweener Tweener)
+        {
+            Setup(gameObject);
+        }
+        
+        
+        
+    }
+}
+</file>
+
+<file path="BehaviorActionBase.cs.meta">
+fileFormatVersion: 2
+guid: 22631a87aba742839f2414655e41f981
+timeCreated: 1761247425
+</file>
+
+<file path="BehaviorActionFactory.cs">
+using System;
+
+namespace Scrips.StateBehavior
+{
+    public enum BehaviorActionTypes
+    {
+        None,
+        Simple,
+        OneShot,
+        Looping,
+        Sequencer,
+    }
+    public static class BehaviorActionFactory
+    {
+        public static BehaviorActionBase Create(BehaviorActionTypes type)
+        {
+            switch (type)
+            {
+                case BehaviorActionTypes.None:
+                    return new SimpleBehaviorAction();
+                case BehaviorActionTypes.Simple:
+                    break;
+                case BehaviorActionTypes.Looping:
+                    break;
+                case BehaviorActionTypes.Sequencer:
+                    break;
+                case BehaviorActionTypes.OneShot:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+
+            return null;
+        } 
+    }
+}
+</file>
+
+<file path="BehaviorActionFactory.cs.meta">
+fileFormatVersion: 2
+guid: c07642d326f04b9b83cb11b6d4119e09
+timeCreated: 1761250875
+</file>
+
+<file path="ButtonState.cs">
+namespace Scrips.StateBehavior
+{
+// El enum define los estados posibles
+    public enum ButtonState : byte {
+    Idle,
+    Selected,
+    Pressed
+    }
+
+    public enum ButtonTransition : byte
+    {
+        IdleToSelected,
+        SelectedToPressed,
+        PressedToSelected,
+        SelectedToIdle
+    }
+
+// La interfaz define el contrato de comportamiento obligatorio
+    public interface ISelectableStates : IStateContract {
+        void OnIdle();
+        void OnSelected();
+        void OnPressed();
+    }
+
+}
+</file>
+
+<file path="ButtonState.cs.meta">
+fileFormatVersion: 2
+guid: 3ec28c2e05924c01944ebb9e14546ce4
+timeCreated: 1761239798
+</file>
+
+<file path="Element.cs">
+using System;
+using System.Collections.Generic;
+using Sirenix.OdinInspector;
+using Stateless;
+using UnityEngine;
+
+namespace Scrips.StateBehavior
+{
+    public abstract class Element<TAction>: SerializedMonoBehaviour where TAction : Action
+    {
+        [SerializeReference]
+        public List<TAction> Actions;
+        [NonSerialized]
+        public StateMachine<ButtonState, ButtonTransition> StateMachine;
+    }
+}
+</file>
+
+<file path="Element.cs.meta">
+fileFormatVersion: 2
+guid: bb6910dce54b44bbace99dffd14d9a57
+timeCreated: 1761240728
+</file>
+
+<file path="ElementButton.cs">
+using System;
+
+namespace Scrips.StateBehavior
+{
+    [Serializable]
+    public class ElementButton:Element<ActionSelectable>
+    {
+        
+    }
+}
+</file>
+
+<file path="ElementButton.cs.meta">
+fileFormatVersion: 2
+guid: 5f473bed1db24e52bc78d3bce4ba40b7
+timeCreated: 1761241580
+</file>
+
+<file path="IState.cs">
+namespace Scrips.StateBehavior
+{
+    public interface IStateDefinition
+    {
+    }
+
+    public interface IStateContract
+    {
+    }
+}
+</file>
+
+<file path="IState.cs.meta">
+fileFormatVersion: 2
+guid: f8973b1b24ae4fb8a84e93042c9eafc8
+timeCreated: 1761239517
+</file>
+
+<file path="ScaleSelectableAction.cs">
+namespace Scrips.StateBehavior
+{
+    public class ScaleSelectableAction:ActionSelectable
+    {
+        public override void OnIdle()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void OnSelected()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void OnPressed()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+}
+</file>
+
+<file path="ScaleSelectableAction.cs.meta">
+fileFormatVersion: 2
+guid: af06359a39de43eba7e772a7fe2f8c23
+timeCreated: 1761257175
+</file>
+
+<file path="ScaleButtonActionData.cs">
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Scrips.StateBehavior
+{
+    [CreateAssetMenu (fileName = "ScaleButtonActionData", menuName = "StateBehavior/Actions/ScaleButtonActionData", order = 1)]
+    public class ScaleButtonActionData :ActionData
+    {
+        
+    }
+}
+</file>
+
+<file path="ScaleButtonActionData.cs.meta">
+fileFormatVersion: 2
+guid: 69f97485f66140bf9f0681f3abdcca90
+timeCreated: 1761258655
+</file>
+
+<file path="SequencerBase.cs">
+namespace Scrips.StateBehavior
+{
+    public class SequencerBase
+    {
+        
+    }
+}
+</file>
+
+<file path="SequencerBase.cs.meta">
+fileFormatVersion: 2
+guid: be3727476e5c41b2acf8b7c0a056dd53
+timeCreated: 1761250313
+</file>
+
+<file path="SimpleBehaviorContainerBase.cs">
+using DG.Tweening;
+using UnityEngine;
+
+namespace Scrips.StateBehavior
+{
+    public class SimpleBehaviorAction : BehaviorActionBase
+    {
+        #region Serialized Fields
+
+        /// <summary>
+        ///     Ease of the transition
+        /// </summary>
+        [SerializeField] protected Ease ease;
+
+        #endregion
+
+
+        public override void Setup(GameObject gameObject, Tweener Tweener)
+        {
+            base.Setup(gameObject);
+            Tweener.SetEase(ease).SetAutoKill(false).SetLink(gameObject);
+        }
+        
+    }
+}
+</file>
+
+<file path="SimpleBehaviorContainerBase.cs.meta">
+fileFormatVersion: 2
+guid: af846c4c5d7a4721bf5d7451616935f1
+timeCreated: 1761247539
+</file>
+
+</files>
