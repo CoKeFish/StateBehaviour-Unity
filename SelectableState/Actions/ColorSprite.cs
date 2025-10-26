@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Scrips.StateBehavior
+namespace Marmary.StateBehavior.SelectableState.Actions
 {
     public class ColorSpriteSelectableAction : SelectableAction<Image, Color>
     {

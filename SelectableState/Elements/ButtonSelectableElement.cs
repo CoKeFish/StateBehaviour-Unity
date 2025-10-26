@@ -1,4 +1,4 @@
-﻿namespace Scrips.StateBehavior
+﻿namespace Marmary.StateBehavior.SelectableState.Elements
 {
     public class ButtonSelectableElement:SelectableElement
     {

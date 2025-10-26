@@ -2,9 +2,8 @@
 using DG.Tweening;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace Scrips.StateBehavior
+namespace Marmary.StateBehavior.Core
 {
     [Serializable]
     public class ActionDataSimpleState<TValue> : ActionDataState<TValue>

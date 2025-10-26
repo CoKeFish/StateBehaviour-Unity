@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Scrips.StateBehavior
+namespace Marmary.StateBehavior.SelectableState.Actions
 {
     [CreateAssetMenu(fileName = "ScaleSelectableActionData", menuName = "StateBehavior/Actions/ScaleSelectableActionData",
         order = 1)]

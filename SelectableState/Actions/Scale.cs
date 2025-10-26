@@ -1,7 +1,7 @@
 using DG.Tweening;
 using UnityEngine;
 
-namespace Scrips.StateBehavior
+namespace Marmary.StateBehavior.SelectableState.Actions
 {
     public class ScaleSelectableAction : SelectableAction<RectTransform, Vector3>
     {

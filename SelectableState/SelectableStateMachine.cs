@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using Marmary.StateBehavior.Core;
+using Sirenix.Utilities;
 using UnityEngine;
 
-namespace Scrips.StateBehavior
+namespace Marmary.StateBehavior.SelectableState
 {
     /// <summary>
     ///     State machine for managing the state transitions and actions of a selectable UI element.
@@ -33,6 +35,7 @@ namespace Scrips.StateBehavior
             _actions = actions;
             ConfigureStateMachine();
             _selectableElement = selectableElement;
+            if (actions.IsNullOrEmpty()) return;
             foreach (var action in actions)
             {
                 action.Setup(gameObject);
@@ -83,6 +86,7 @@ namespace Scrips.StateBehavior
 
         private void Action()
         {
+            if (_actions.IsNullOrEmpty()) return;
             foreach (var action in _actions)
             {
                 action.Set(StateMachine.State);

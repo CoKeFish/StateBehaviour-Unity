@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Sirenix.OdinInspector;
-using UnityEngine;
 
-namespace Scrips.StateBehavior
+namespace Marmary.StateBehavior.Core
 {
     [Serializable]
     public class ActionData<TState, TValue> : SerializedScriptableObject

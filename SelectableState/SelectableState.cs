@@ -1,4 +1,4 @@
-﻿namespace Scrips.StateBehavior
+﻿namespace Marmary.StateBehavior.SelectableState
 {
 // El enum define los estados posibles
     /// <summary>

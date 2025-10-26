@@ -2,7 +2,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace Scrips.StateBehavior
+namespace Marmary.StateBehavior.SelectableState.Actions
 {
     public class ColorFontSelectableAction : SelectableAction<TextMeshProUGUI, Color>
     {

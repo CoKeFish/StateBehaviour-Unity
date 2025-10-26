@@ -1,7 +1,7 @@
 ﻿using System;
 using DG.Tweening;
 
-namespace Scrips.StateBehavior
+namespace Marmary.StateBehavior.Core
 {
     [Serializable]
     public enum BehaviorActionTypes

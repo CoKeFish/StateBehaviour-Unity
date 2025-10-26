@@ -1,13 +1,13 @@
 ﻿using System;
 using DG.Tweening;
+using Marmary.StateBehavior.Core;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-
-namespace Scrips.StateBehavior
+namespace Marmary.StateBehavior.SelectableState
 {
     [Serializable]
-    public abstract class SelectableAction<TComponent, TValue> : Action<SelectableState, TValue>,
+    public abstract class SelectableAction<TComponent, TValue> : Core.Action<SelectableState, TValue>,
         IStateContract<SelectableState> where TComponent : Component
     {
         protected TValue originalValue;

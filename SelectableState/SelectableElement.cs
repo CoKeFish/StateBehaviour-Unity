@@ -1,10 +1,10 @@
 ﻿using Marmary.Libraries.UI.Events;
+using Marmary.StateBehavior.Core;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace Scrips.StateBehavior
+namespace Marmary.StateBehavior.SelectableState
 {
     
     public abstract class SelectableElement : Element<SelectableState>
@@ -27,6 +27,7 @@ namespace Scrips.StateBehavior
 
         protected void Awake()
         {
+            
             _selectableStateMachine = new SelectableStateMachine(SelectableState.Normal, gameObject, actions, this);
         }
 

@@ -5,7 +5,7 @@ using Sirenix.Serialization;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Scrips.StateBehavior
+namespace Marmary.StateBehavior.Core
 {
     public abstract class Element<TState> : SerializedMonoBehaviour where TState : Enum
     {

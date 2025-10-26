@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Scrips.StateBehavior
+namespace Marmary.StateBehavior.Core
 {
     public interface IStateContract<TState>
     {

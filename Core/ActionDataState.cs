@@ -1,6 +1,6 @@
 ﻿using DG.Tweening;
 
-namespace Scrips.StateBehavior
+namespace Marmary.StateBehavior.Core
 {
     public abstract class ActionDataState<TValue>
     {

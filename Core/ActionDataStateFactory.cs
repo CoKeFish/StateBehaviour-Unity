@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Scrips.StateBehavior
+namespace Marmary.StateBehavior.Core
 {
     public class ActionDataStateFactory
     {

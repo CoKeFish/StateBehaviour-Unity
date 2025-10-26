@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Scrips.StateBehavior
+namespace Marmary.StateBehavior.SelectableState.Actions
 {
     [CreateAssetMenu(fileName = "ColorSpriteSelectableActionData",
         menuName = "StateBehavior/Actions/ColorSpriteSelectableActionData",
