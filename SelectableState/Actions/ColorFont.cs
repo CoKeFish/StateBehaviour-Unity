@@ -6,6 +6,8 @@ namespace Marmary.StateBehavior.SelectableState.Actions
 {
     public class ColorFontSelectableAction : SelectableAction<TextMeshProUGUI, Color>
     {
+        #region Methods
+
         protected override Tweener CreateTweener(GameObject gameObject)
         {
             return DOTween.To(
@@ -27,5 +29,7 @@ namespace Marmary.StateBehavior.SelectableState.Actions
             return ScriptableObject.CreateInstance<ColorFontSelectableActionData>();
         }
 #endif
+
+        #endregion
     }
 }

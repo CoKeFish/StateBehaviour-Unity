@@ -10,15 +10,21 @@ namespace Marmary.StateBehavior.SelectableState
     /// </summary>
     internal class SelectableStateMachine : StateMachineBase<SelectableState, SelectableTrigger>
     {
-        /// <summary>
-        ///     List of actions to execute on state changes.
-        /// </summary>
-        private readonly List<IStateContract<SelectableState>> _actions;
+        #region Fields
 
         /// <summary>
         ///     The animation element that handles events for selection states.
         /// </summary>
         private readonly SelectableElement _selectableElement;
+
+        /// <summary>
+        ///     List of actions to execute on state changes.
+        /// </summary>
+        private readonly List<IStateContract<SelectableState>> _actions;
+
+        #endregion
+
+        #region Constructors and Injected
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="SelectableStateMachine" /> class.
@@ -36,11 +42,12 @@ namespace Marmary.StateBehavior.SelectableState
             ConfigureStateMachine();
             _selectableElement = selectableElement;
             if (actions.IsNullOrEmpty()) return;
-            foreach (var action in actions)
-            {
-                action.Setup(gameObject);
-            }
+            foreach (var action in actions) action.Setup(gameObject);
         }
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
         ///     Configures the state machine with state transitions and entry actions.
@@ -87,15 +94,12 @@ namespace Marmary.StateBehavior.SelectableState
         private void Action()
         {
             if (_actions.IsNullOrEmpty()) return;
-            foreach (var action in _actions)
-            {
-                action.Set(StateMachine.State);
-            }
+            foreach (var action in _actions) action.Set(StateMachine.State);
 
             if (_selectableElement.events.ContainsKey(StateMachine.State))
-            {
                 _selectableElement.events[StateMachine.State]?.Invoke();
-            }
         }
+
+        #endregion
     }
 }

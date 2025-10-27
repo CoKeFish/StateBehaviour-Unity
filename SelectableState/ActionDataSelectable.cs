@@ -2,8 +2,7 @@
 
 namespace Marmary.StateBehavior.SelectableState
 {
-    public abstract class ActionDataSelectable<TValue>:ActionData<SelectableState, TValue>
+    public abstract class ActionDataSelectable<TValue> : ActionData<SelectableState, TValue>
     {
-        
     }
 }

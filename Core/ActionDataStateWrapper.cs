@@ -7,18 +7,38 @@ namespace Marmary.StateBehavior.Core
     [Serializable]
     public class ActionDataStateWrapper<TValue>
     {
+        #region Serialized Fields
+
         [ValueDropdown(nameof(GetActionTypes))] [OnValueChanged(nameof(UpdateActionBase))] [SerializeField]
         public BehaviorActionTypes BehaviorActionType;
 
-        [InlineProperty, HideLabel] [ShowInInspector]
+        #endregion
+
+        #region Fields
+
+        private bool IsDefaultState;
+
+        [InlineProperty] [HideLabel] [ShowInInspector]
         public ActionDataState<TValue> BehaviorActionData;
 
-        private bool IsDefaultState = false;
-        
+        #endregion
+
+        #region Constructors and Injected
+
         public ActionDataStateWrapper(bool isDefaultState = false)
         {
             BehaviorActionType = BehaviorActionTypes.None;
             IsDefaultState = isDefaultState;
+        }
+
+        #endregion
+
+        #region Methods
+
+        // Called automatically when Type changes
+        private void UpdateActionBase()
+        {
+            BehaviorActionData = ActionDataStateFactory.Create<TValue>(BehaviorActionType, IsDefaultState);
         }
 
         // Dropdown source
@@ -27,10 +47,6 @@ namespace Marmary.StateBehavior.Core
             return (BehaviorActionTypes[])Enum.GetValues(typeof(BehaviorActionTypes));
         }
 
-        // Called automatically when Type changes
-        private void UpdateActionBase()
-        {
-            BehaviorActionData = ActionDataStateFactory.Create<TValue>(BehaviorActionType, IsDefaultState);
-        }
+        #endregion
     }
 }

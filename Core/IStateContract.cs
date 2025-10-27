@@ -6,6 +6,10 @@ namespace Marmary.StateBehavior.Core
     {
         void Setup(GameObject value);
 
+        #region Methods
+
         public void Set(TState state);
+
+        #endregion
     }
 }

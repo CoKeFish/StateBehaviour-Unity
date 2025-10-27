@@ -10,13 +10,28 @@ namespace Marmary.StateBehavior.SelectableState
     public abstract class SelectableAction<TComponent, TValue> : Core.Action<SelectableState, TValue>,
         IStateContract<SelectableState> where TComponent : Component
     {
+        #region Serialized Fields
+
+        [SerializeField] [PropertyOrder(-10)] protected TComponent target;
+
+        #endregion
+
+        #region Fields
+
         protected TValue originalValue;
 
-
-        [SerializeField][PropertyOrder(-10)]
-        protected TComponent target;
-
         protected Tweener Tweener;
+
+        #endregion
+
+        #region Methods
+
+        protected abstract Tweener CreateTweener(GameObject gameObject);
+        protected abstract void InitializeStartValue(GameObject gameObject);
+
+        #endregion
+
+        #region IStateContract<SelectableState> Members
 
         public void Setup(GameObject gameObject)
         {
@@ -30,7 +45,6 @@ namespace Marmary.StateBehavior.SelectableState
             Data.StateActionDataContainers[state].BehaviorActionData.ApplyData(Tweener, originalValue).Restart();
         }
 
-        protected abstract Tweener CreateTweener(GameObject gameObject);
-        protected abstract void InitializeStartValue(GameObject gameObject);
+        #endregion
     }
 }

@@ -9,10 +9,13 @@ namespace Marmary.StateBehavior.Core
 {
     public abstract class Element<TState> : SerializedMonoBehaviour where TState : Enum
     {
+        #region Serialized Fields
+
         [SerializeReference] protected List<IStateContract<TState>> actions;
 
         [SerializeReference] [OdinSerialize] [NonSerialized]
         public Dictionary<TState, UnityEvent> events = new();
-        
+
+        #endregion
     }
 }

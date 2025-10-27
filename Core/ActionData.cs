@@ -9,9 +9,15 @@ namespace Marmary.StateBehavior.Core
     public class ActionData<TState, TValue> : SerializedScriptableObject
         where TState : Enum
     {
+        #region Serialized Fields
+
         [DictionaryDrawerSettings(KeyLabel = "State", ValueLabel = "Data",
             DisplayMode = DictionaryDisplayOptions.ExpandedFoldout)]
         public Dictionary<TState, ActionDataStateWrapper<TValue>> StateActionDataContainers = new();
+
+        #endregion
+
+        #region Unity Event Functions
 
         private void OnValidate()
         {
@@ -33,11 +39,13 @@ namespace Marmary.StateBehavior.Core
 
             // 🔹 Eliminar claves que ya no existen o son 0
             var keysToRemove = StateActionDataContainers.Keys
-                .Where(k =>  !states.Contains(k))
+                .Where(k => !states.Contains(k))
                 .ToList();
 
             foreach (var key in keysToRemove)
                 StateActionDataContainers.Remove(key);
         }
+
+        #endregion
     }
 }

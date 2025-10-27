@@ -8,8 +8,12 @@ namespace Marmary.StateBehavior.Core
     [Serializable]
     public abstract class Action<TState, TValue> where TState : Enum
     {
+        #region Serialized Fields
+
         [InlineEditor] public ActionData<TState, TValue> Data;
-        
+
+        #endregion
+
 #if UNITY_EDITOR
         protected abstract ScriptableObject CreateInstanceScriptableObject();
 
@@ -17,13 +21,11 @@ namespace Marmary.StateBehavior.Core
         [Button("Crear ScriptableObject")]
         private void CreateScriptableObject()
         {
-
-            
             // Crear instancia
             var asset = CreateInstanceScriptableObject();
 
             // Pedir ubicación al usuario
-            string path = EditorUtility.SaveFilePanelInProject(
+            var path = EditorUtility.SaveFilePanelInProject(
                 "Guardar ActionData",
                 typeof(ActionData<TState, TValue>).Name + ".asset",
                 "asset",
@@ -37,8 +39,6 @@ namespace Marmary.StateBehavior.Core
                 AssetDatabase.Refresh();
                 Debug.Log($"ActionData creado en: {path}");
             }
-
-
         }
 #endif
     }

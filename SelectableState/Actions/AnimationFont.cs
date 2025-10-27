@@ -1,6 +1,4 @@
-﻿
-#if DEFINICION_TexAnimator
-
+﻿#if DEFINICION_TexAnimator
 using System;
 using DG.Tweening;
 using Sirenix.OdinInspector;
@@ -9,15 +7,13 @@ using UnityEngine;
 namespace Scrips.StateBehavior
 {
     [Serializable]
-    public class AnimationFontSelectableAction : SelectableAction<TextAnimator_TMP,float>
+    public class AnimationFontSelectableAction : SelectableAction<TextAnimator_TMP, float>
     {
-        
         /// <summary>
         ///     The tag to use for the animation, see Febucci documentation for more info
         /// </summary>
-        [SerializeField] [Required]
-        private string tag = "Wave";
-        
+        [SerializeField] [Required] private string tag = "Wave";
+
         private float _amount;
 
         private float Amount
@@ -29,7 +25,7 @@ namespace Scrips.StateBehavior
                 target.DefaultBehaviorsTags = new[] { $"{tag} a={_amount}".Replace(',', '.') };
             }
         }
-        
+
         protected override Tweener CreateTweener(GameObject gameObject)
         {
             if (useCustomTarget)
@@ -71,7 +67,6 @@ namespace Scrips.StateBehavior
         order = 1)]
     public class AnimationFontSelectableActionData : ActionDataSelectable<float>
     {
-        
     }
 }
 

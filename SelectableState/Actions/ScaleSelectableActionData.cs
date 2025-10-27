@@ -2,7 +2,8 @@ using UnityEngine;
 
 namespace Marmary.StateBehavior.SelectableState.Actions
 {
-    [CreateAssetMenu(fileName = "ScaleSelectableActionData", menuName = "StateBehavior/Actions/ScaleSelectableActionData",
+    [CreateAssetMenu(fileName = "ScaleSelectableActionData",
+        menuName = "StateBehavior/Actions/ScaleSelectableActionData",
         order = 1)]
     public class ScaleSelectableActionData : ActionDataSelectable<Vector3>
     {

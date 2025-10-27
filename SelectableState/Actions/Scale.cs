@@ -5,6 +5,8 @@ namespace Marmary.StateBehavior.SelectableState.Actions
 {
     public class ScaleSelectableAction : SelectableAction<RectTransform, Vector3>
     {
+        #region Methods
+
         protected override Tweener CreateTweener(GameObject gameObject)
         {
             return DOTween.To(
@@ -26,5 +28,7 @@ namespace Marmary.StateBehavior.SelectableState.Actions
             return ScriptableObject.CreateInstance<ScaleSelectableActionData>();
         }
 #endif
+
+        #endregion
     }
 }

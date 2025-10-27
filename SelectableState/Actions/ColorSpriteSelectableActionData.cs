@@ -7,6 +7,5 @@ namespace Marmary.StateBehavior.SelectableState.Actions
         order = 1)]
     public class ColorSpriteSelectableActionData : ActionDataSelectable<Color>
     {
-        
     }
 }

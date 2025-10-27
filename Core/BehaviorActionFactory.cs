@@ -10,10 +10,13 @@ namespace Marmary.StateBehavior.Core
         Simple,
         OneShot,
         Looping,
-        Sequencer,
+        Sequencer
     }
+
     public static class BehaviorActionFactory
     {
+        #region Methods
+
         public static void Set(BehaviorActionTypes type, Tweener Tweener)
         {
             switch (type)
@@ -33,6 +36,8 @@ namespace Marmary.StateBehavior.Core
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
-        } 
+        }
+
+        #endregion
     }
 }

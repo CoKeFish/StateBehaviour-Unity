@@ -4,6 +4,8 @@ namespace Marmary.StateBehavior.Core
 {
     public class ActionDataStateFactory
     {
+        #region Methods
+
         public static ActionDataState<TValue> Create<TValue>(BehaviorActionTypes type, bool isDefaultState)
         {
             switch (type)
@@ -23,7 +25,8 @@ namespace Marmary.StateBehavior.Core
             }
 
             return null;
-        } 
+        }
 
+        #endregion
     }
 }
