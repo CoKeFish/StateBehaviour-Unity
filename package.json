@@ -1,0 +1,26 @@
+{
+  "name": "com.marmary.statebehavior",
+  "version": "1.0.0",
+  "displayName": "Marmary State Behavior",
+  "description": "State behavior system for Unity with state machines and interactive elements support.",
+  "unity": "2020.3",
+  "unityRelease": "0f1",
+  "type": "library",
+  "author": {
+    "name": "Rodión Romanovich Tabares Correa",
+    "email": "rrtc26@gmail.com"
+  },
+  "keywords": [
+    "unity",
+    "state-machine",
+    "behavior",
+    "state-behavior",
+    "interactive",
+    "ui"
+  ],
+  "dependencies": {
+    "com.marmary.utils": "1.0.0"
+  },
+  "samples": []
+}
+
