@@ -1,0 +1,155 @@
+name: Auto Version Bump
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - '.github/**'
+  workflow_dispatch: # Permite ejecución manual
+
+# Prevenir que el workflow se ejecute en commits de versión
+env:
+  SKIP_VERSION_BUMP: false
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Necesario para obtener todo el historial de commits
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Check if last commit is version bump
+        id: check-version-bump
+        run: |
+          LAST_COMMIT=$(git log -1 --pretty=format:"%s")
+          if echo "$LAST_COMMIT" | grep -qE "chore\(release\): bump version"; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "Last commit is already a version bump, skipping workflow"
+            exit 0
+          fi
+          echo "skip=false" >> $GITHUB_OUTPUT
+      
+      - name: Configure Git
+        if: steps.check-version-bump.outputs.skip != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Detect version bump type
+        if: steps.check-version-bump.outputs.skip != 'true'
+        id: detect-bump
+        run: |
+          # Obtener el último tag o usar versión inicial
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          
+          if [ -z "$LAST_TAG" ]; then
+            # No hay tags, analizar todos los commits
+            COMMITS=$(git log --pretty=format:"%s" --no-merges)
+          else
+            # Analizar commits desde el último tag
+            COMMITS=$(git log ${LAST_TAG}..HEAD --pretty=format:"%s" --no-merges)
+          fi
+          
+          # Detectar tipo de bump
+          BUMP_TYPE="patch" # Por defecto
+          
+          if echo "$COMMITS" | grep -qiE "BREAKING CHANGE|!:"; then
+            BUMP_TYPE="major"
+          elif echo "$COMMITS" | grep -qiE "^feat|^feature|^add|^new:"; then
+            BUMP_TYPE="minor"
+          elif echo "$COMMITS" | grep -qiE "^fix|^bugfix|^patch|^hotfix:"; then
+            BUMP_TYPE="patch"
+          fi
+          
+          echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+          echo "Detected bump type: $BUMP_TYPE"
+      
+      - name: Update version in package.json
+        if: steps.check-version-bump.outputs.skip != 'true'
+        id: update-version
+        run: |
+          # Leer versión actual
+          CURRENT_VERSION=$(grep -oP '"version":\s*"\K[^"]+' package.json)
+          echo "Current version: $CURRENT_VERSION"
+          
+          # Parsear versión
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+          
+          # Incrementar según bump type
+          BUMP_TYPE="${{ steps.detect-bump.outputs.bump_type }}"
+          case "$BUMP_TYPE" in
+            major)
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              ;;
+            minor)
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              ;;
+            patch)
+              PATCH=$((PATCH + 1))
+              ;;
+          esac
+          
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "New version: $NEW_VERSION"
+          
+          # Actualizar package.json usando sed
+          sed -i "s/\"version\": \"[^\"]*\"/\"version\": \"$NEW_VERSION\"/" package.json
+          
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "updated_version=true" >> $GITHUB_OUTPUT
+      
+      - name: Create version bump commit
+        if: steps.check-version-bump.outputs.skip != 'true' && steps.update-version.outputs.updated_version == 'true'
+        run: |
+          # Verificar si hay cambios
+          if git diff --quiet package.json; then
+            echo "No version change needed"
+            exit 0
+          fi
+          
+          # Agregar package.json
+          git add package.json package.json.meta
+          
+          # Crear commit con formato especial para evitar re-ejecución
+          git commit -m "chore(release): bump version to ${{ steps.update-version.outputs.new_version }}"
+          
+          # Crear tag si no existe
+          if ! git rev-parse "v${{ steps.update-version.outputs.new_version }}" >/dev/null 2>&1; then
+            git tag -a "v${{ steps.update-version.outputs.new_version }}" -m "Version ${{ steps.update-version.outputs.new_version }}"
+          fi
+          
+          # Push cambios y tags
+          git push origin ${{ github.ref_name }}
+          git push origin "v${{ steps.update-version.outputs.new_version }}" || true
+      
+      - name: Create GitHub Release
+        if: steps.check-version-bump.outputs.skip != 'true' && steps.update-version.outputs.updated_version == 'true'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.update-version.outputs.new_version }}
+          name: Release v${{ steps.update-version.outputs.new_version }}
+          body: |
+            ## Changes in this release
+            
+            Version bump to ${{ steps.update-version.outputs.new_version }}
+            
+            ### Bump Type: ${{ steps.detect-bump.outputs.bump_type }}
+            
+            See commit history for details.
+          draft: false
+          prerelease: false
+
