@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if STATE_BEHAVIOR_ENABLED
+using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -50,3 +51,4 @@ namespace Marmary.StateBehavior.Core
         #endregion
     }
 }
+#endif

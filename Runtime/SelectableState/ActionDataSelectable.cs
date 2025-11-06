@@ -1,4 +1,5 @@
-﻿using Marmary.StateBehavior.Core;
+﻿#if STATE_BEHAVIOR_ENABLED
+using Marmary.StateBehavior.Core;
 
 namespace Marmary.StateBehavior.SelectableState
 {
@@ -6,3 +7,4 @@ namespace Marmary.StateBehavior.SelectableState
     {
     }
 }
+#endif

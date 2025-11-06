@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if STATE_BEHAVIOR_ENABLED
+using System.Collections.Generic;
 using Marmary.StateBehavior.Core;
 using Sirenix.Utilities;
 using UnityEngine;
@@ -103,3 +104,4 @@ namespace Marmary.StateBehavior.SelectableState
         #endregion
     }
 }
+#endif

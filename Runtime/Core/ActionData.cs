@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if STATE_BEHAVIOR_ENABLED
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sirenix.OdinInspector;
@@ -49,3 +50,4 @@ namespace Marmary.StateBehavior.Core
         #endregion
     }
 }
+#endif

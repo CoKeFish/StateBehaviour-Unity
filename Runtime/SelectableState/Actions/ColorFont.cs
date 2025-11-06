@@ -1,4 +1,5 @@
-﻿using DG.Tweening;
+﻿#if STATE_BEHAVIOR_ENABLED
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
@@ -33,3 +34,4 @@ namespace Marmary.StateBehavior.SelectableState.Actions
         #endregion
     }
 }
+#endif

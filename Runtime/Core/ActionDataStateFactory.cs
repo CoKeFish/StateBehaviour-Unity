@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if STATE_BEHAVIOR_ENABLED
+using System;
 
 namespace Marmary.StateBehavior.Core
 {
@@ -30,3 +31,4 @@ namespace Marmary.StateBehavior.Core
         #endregion
     }
 }
+#endif

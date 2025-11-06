@@ -1,4 +1,4 @@
-﻿#if DEFINICION_TexAnimator
+﻿#if STATE_BEHAVIOR_ENABLED && DEFINICION_TexAnimator
 using System;
 using DG.Tweening;
 using Sirenix.OdinInspector;
@@ -69,5 +69,4 @@ namespace Scrips.StateBehavior
     {
     }
 }
-
 #endif

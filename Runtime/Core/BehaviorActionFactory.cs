@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if STATE_BEHAVIOR_ENABLED
+using System;
 using DG.Tweening;
 
 namespace Marmary.StateBehavior.Core
@@ -41,3 +42,4 @@ namespace Marmary.StateBehavior.Core
         #endregion
     }
 }
+#endif

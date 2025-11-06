@@ -1,4 +1,5 @@
-﻿namespace Marmary.StateBehavior.SelectableState
+﻿#if STATE_BEHAVIOR_ENABLED
+namespace Marmary.StateBehavior.SelectableState
 {
 // El enum define los estados posibles
 /// <summary>
@@ -83,3 +84,4 @@ public enum SelectableState
         UnPressed
     }
 }
+#endif

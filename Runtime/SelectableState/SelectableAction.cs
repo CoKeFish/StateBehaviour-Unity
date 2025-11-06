@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if STATE_BEHAVIOR_ENABLED
+using System;
 using DG.Tweening;
 using Marmary.StateBehavior.Core;
 using Sirenix.OdinInspector;
@@ -48,3 +49,4 @@ namespace Marmary.StateBehavior.SelectableState
         #endregion
     }
 }
+#endif

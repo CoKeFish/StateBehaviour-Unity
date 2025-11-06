@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if STATE_BEHAVIOR_ENABLED
+using System;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
@@ -43,3 +44,4 @@ namespace Marmary.StateBehavior.Core
 #endif
     }
 }
+#endif

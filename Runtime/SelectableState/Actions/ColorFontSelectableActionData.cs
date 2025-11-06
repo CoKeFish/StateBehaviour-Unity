@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if STATE_BEHAVIOR_ENABLED
+using UnityEngine;
 
 namespace Marmary.StateBehavior.SelectableState.Actions
 {
@@ -9,3 +10,4 @@ namespace Marmary.StateBehavior.SelectableState.Actions
     {
     }
 }
+#endif

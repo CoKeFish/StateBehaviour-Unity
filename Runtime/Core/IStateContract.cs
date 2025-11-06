@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if STATE_BEHAVIOR_ENABLED
+using UnityEngine;
 
 namespace Marmary.StateBehavior.Core
 {
@@ -13,3 +14,4 @@ namespace Marmary.StateBehavior.Core
         #endregion
     }
 }
+#endif

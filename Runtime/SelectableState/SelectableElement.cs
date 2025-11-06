@@ -1,4 +1,5 @@
-﻿using Marmary.Libraries.UI.Events;
+﻿#if STATE_BEHAVIOR_ENABLED
+using Marmary.Libraries.UI.Events;
 using Marmary.StateBehavior.Core;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -190,3 +191,4 @@ namespace Marmary.StateBehavior.SelectableState
         #endregion
     }
 }
+#endif
