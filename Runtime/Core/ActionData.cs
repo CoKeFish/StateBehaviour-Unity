@@ -7,7 +7,7 @@ using Sirenix.OdinInspector;
 namespace Marmary.StateBehavior.Core
 {
     [Serializable]
-    public class ActionData<TState, TValue> : SerializedScriptableObject
+    public class ActionData<TState, TValue> : ActionDataBase
         where TState : Enum
     {
         #region Serialized Fields
