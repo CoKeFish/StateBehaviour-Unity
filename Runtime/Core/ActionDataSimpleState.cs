@@ -47,7 +47,7 @@ namespace Marmary.StateBehavior.Core
 
         #region Properties
 
-        private bool ShowEndValue => !useOrigin;
+        private bool ShowEndValue => !IsDefaultState && !useOrigin;
 
         #endregion
 

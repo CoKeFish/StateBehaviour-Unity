@@ -20,25 +20,27 @@ namespace Marmary.StateBehavior.Core
 
         #region Unity Event Functions
 
-        private void OnValidate()
+        private void OnEnable() => EnsureStateActionDataContainers();
+
+        private void OnValidate() => EnsureStateActionDataContainers();
+
+        private void EnsureStateActionDataContainers()
         {
             var states = Enum.GetValues(typeof(TState)).Cast<TState>().ToArray();
 
-            // 🔹 Agregar solo estados distintos de 0
             foreach (var state in states)
             {
                 if (Convert.ToInt32(state) == 0)
                 {
                     if (!StateActionDataContainers.ContainsKey(state))
                         StateActionDataContainers[state] = new ActionDataStateWrapper<TValue>(true);
-                    continue; // ignorar el "estado por defecto"
+                    continue;
                 }
 
                 if (!StateActionDataContainers.ContainsKey(state))
                     StateActionDataContainers[state] = new ActionDataStateWrapper<TValue>();
             }
 
-            // 🔹 Eliminar claves que ya no existen o son 0
             var keysToRemove = StateActionDataContainers.Keys
                 .Where(k => !states.Contains(k))
                 .ToList();
