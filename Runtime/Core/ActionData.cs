@@ -7,7 +7,7 @@ using Sirenix.OdinInspector;
 namespace Marmary.StateBehavior.Core
 {
     /// <summary>
-    ///     Base container for mapping state values to <see cref="ActionDataState{TValue}"/> instances.
+    ///     Base container for mapping state values to <see cref="ActionDataState{TValue}" /> instances.
     /// </summary>
     [Serializable]
     public class ActionData<TState, TValue> : ActionDataBase
@@ -29,15 +29,25 @@ namespace Marmary.StateBehavior.Core
         /// <summary>
         ///     Ensures the state containers exist when the asset is loaded.
         /// </summary>
-        private void OnEnable() => EnsureStateActionDataContainers();
+        private void OnEnable()
+        {
+            EnsureStateActionDataContainers();
+        }
 
         /// <summary>
         ///     Ensures the state containers remain in sync when the asset is validated in the editor.
         /// </summary>
-        private void OnValidate() => EnsureStateActionDataContainers();
+        private void OnValidate()
+        {
+            EnsureStateActionDataContainers();
+        }
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
-        ///     Synchronises the backing dictionary with the values defined in the <typeparamref name="TState"/> enum.
+        ///     Synchronises the backing dictionary with the values defined in the <typeparamref name="TState" /> enum.
         /// </summary>
         private void EnsureStateActionDataContainers()
         {

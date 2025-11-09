@@ -14,18 +14,22 @@ namespace Marmary.StateBehavior.Core
         ///     No behavior will be applied.
         /// </summary>
         None,
+
         /// <summary>
         ///     A basic tween configuration with a single playthrough.
         /// </summary>
         Simple,
+
         /// <summary>
         ///     Executes the tween and optionally loops.
         /// </summary>
         OneShot,
+
         /// <summary>
         ///     Plays the tween in a continuous looping manner.
         /// </summary>
         Looping,
+
         /// <summary>
         ///     Executes a sequenced set of tweens.
         /// </summary>

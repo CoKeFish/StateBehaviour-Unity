@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Marmary.StateBehavior.SelectableState.Actions
 {
     /// <summary>
-    ///     Animates the text color of a <see cref="TextMeshProUGUI"/> when selectable states change.
+    ///     Animates the text color of a <see cref="TextMeshProUGUI" /> when selectable states change.
     /// </summary>
     public class ColorFontSelectableAction : SelectableAction<TextMeshProUGUI, Color>
     {

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Marmary.StateBehavior.SelectableState.Actions
 {
     /// <summary>
-    ///     Tweens the local scale of a <see cref="RectTransform"/> in response to selectable state changes.
+    ///     Tweens the local scale of a <see cref="RectTransform" /> in response to selectable state changes.
     /// </summary>
     public class ScaleSelectableAction : SelectableAction<RectTransform, Vector3>
     {

@@ -9,7 +9,7 @@ using UnityEngine;
 namespace Marmary.StateBehavior.Core
 {
     /// <summary>
-    ///     Collection of <see cref="ActionDataBase"/> assets used to build runtime actions.
+    ///     Collection of <see cref="ActionDataBase" /> assets used to build runtime actions.
     /// </summary>
     [CreateAssetMenu(fileName = "ActionDataCollection", menuName = "StateBehavior/ActionDataCollection", order = 50)]
     public class ActionDataCollection : SerializedScriptableObject
@@ -35,12 +35,14 @@ namespace Marmary.StateBehavior.Core
         #endregion
 
 #if UNITY_EDITOR
+
         #region Fields
 
         /// <summary>
         ///     Cache mapping action data types to their producing action types.
         /// </summary>
         private static readonly Dictionary<Type, Type> ActionDataToActionCache = new();
+
         /// <summary>
         ///     Cached list of resolved action types to prevent repeated reflection.
         /// </summary>
@@ -170,21 +172,21 @@ namespace Marmary.StateBehavior.Core
         }
 
         /// <summary>
-        ///     Determines whether a type implements <see cref="IStateContract{TState}"/>.
+        ///     Determines whether a type implements <see cref="IStateContract{TState}" />.
         /// </summary>
         /// <param name="type">Type to evaluate.</param>
         /// <returns><c>true</c> when the interface is implemented; otherwise, <c>false</c>.</returns>
         private static bool ImplementsIStateContract(Type type)
         {
             return type.GetInterfaces().Any(i => i.IsGenericType &&
-                                                i.GetGenericTypeDefinition() == typeof(IStateContract<>));
+                                                 i.GetGenericTypeDefinition() == typeof(IStateContract<>));
         }
 
         /// <summary>
-        ///     Checks whether a type inherits from <see cref="Action{TState,TValue}"/>.
+        ///     Checks whether a type inherits from <see cref="Action{TState,TValue}" />.
         /// </summary>
         /// <param name="type">Type to inspect.</param>
-        /// <returns><c>true</c> when the inheritance chain contains <see cref="Action{TState,TValue}"/>.</returns>
+        /// <returns><c>true</c> when the inheritance chain contains <see cref="Action{TState,TValue}" />.</returns>
         private static bool InheritsFromAction(Type type)
         {
             var current = type;
@@ -220,7 +222,7 @@ namespace Marmary.StateBehavior.Core
                     return false;
 
                 var matches = previewAsset.GetType() == dataType;
-                UnityEngine.Object.DestroyImmediate(previewAsset);
+                DestroyImmediate(previewAsset);
 
                 return matches;
             }
@@ -250,7 +252,8 @@ namespace Marmary.StateBehavior.Core
 
             while (current != null)
             {
-                dataField = current.GetField("Data", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                dataField = current.GetField("Data",
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
                 if (dataField != null) break;
 
@@ -277,7 +280,7 @@ namespace Marmary.StateBehavior.Core
         }
 
         /// <summary>
-        ///     Verifies the supplied asset derives from <see cref="ActionDataBase"/>.
+        ///     Verifies the supplied asset derives from <see cref="ActionDataBase" />.
         /// </summary>
         /// <param name="asset">Asset to inspect.</param>
         /// <returns><c>true</c> when the asset is valid.</returns>
@@ -287,8 +290,8 @@ namespace Marmary.StateBehavior.Core
         }
 
         #endregion
+
 #endif
     }
 }
 #endif
-

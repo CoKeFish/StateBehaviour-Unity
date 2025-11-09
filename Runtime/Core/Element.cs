@@ -26,8 +26,7 @@ namespace Marmary.StateBehavior.Core
         /// <summary>
         ///     Asset collection used to build the actions list.
         /// </summary>
-        [SerializeField]
-        [InlineEditor(ObjectFieldMode = InlineEditorObjectFieldModes.Foldout)]
+        [SerializeField] [InlineEditor(ObjectFieldMode = InlineEditorObjectFieldModes.Foldout)]
         protected ActionDataCollection actionDataCollection;
 
         /// <summary>
@@ -39,13 +38,17 @@ namespace Marmary.StateBehavior.Core
         #endregion
 
 #if UNITY_EDITOR
+
         #region Editor Utilities
 
         /// <summary>
-        ///     Synchronises the actions list using the linked <see cref="ActionDataCollection"/>.
+        ///     Synchronises the actions list using the linked <see cref="ActionDataCollection" />.
         /// </summary>
         [Button("Sync Actions From Collection")]
-        private void SyncActionsFromCollection() => SyncActionsFromCollectionInternal(true);
+        private void SyncActionsFromCollection()
+        {
+            SyncActionsFromCollectionInternal(true);
+        }
 
         /// <summary>
         ///     Synchronises the actions list and optionally marks the object dirty.
@@ -68,12 +71,12 @@ namespace Marmary.StateBehavior.Core
         }
 
         /// <summary>
-        ///     Determines whether the element needs an <see cref="ActionDataCollection"/> asset.
+        ///     Determines whether the element needs an <see cref="ActionDataCollection" /> asset.
         /// </summary>
         private bool NeedsCollection => actionDataCollection == null;
 
         /// <summary>
-        ///     Creates an <see cref="ActionDataCollection"/> asset and assigns it to the element.
+        ///     Creates an <see cref="ActionDataCollection" /> asset and assigns it to the element.
         /// </summary>
         [Button("Create ActionData Collection")]
         [ShowIf(nameof(NeedsCollection))]
@@ -89,7 +92,7 @@ namespace Marmary.StateBehavior.Core
 
             if (string.IsNullOrEmpty(path))
             {
-                UnityEngine.Object.DestroyImmediate(asset);
+                DestroyImmediate(asset);
                 return;
             }
 
@@ -103,6 +106,7 @@ namespace Marmary.StateBehavior.Core
         }
 
         #endregion
+
 #endif
     }
 }

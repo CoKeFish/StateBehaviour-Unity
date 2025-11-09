@@ -8,7 +8,7 @@ using UnityEngine.Serialization;
 namespace Marmary.StateBehavior.Core
 {
     /// <summary>
-    ///     Base action that binds a <see cref="ActionData{TState, TValue}"/> asset and exposes creation utilities in-editor.
+    ///     Base action that binds a <see cref="ActionData{TState, TValue}" /> asset and exposes creation utilities in-editor.
     /// </summary>
     [Serializable]
     public abstract class Action<TState, TValue> where TState : Enum
@@ -18,13 +18,14 @@ namespace Marmary.StateBehavior.Core
         /// <summary>
         ///     Scriptable object containing the configuration for each selectable state.
         /// </summary>
-        [FormerlySerializedAs("Data")] [InlineEditor] public ActionData<TState, TValue> data;
+        [FormerlySerializedAs("Data")] [InlineEditor]
+        public ActionData<TState, TValue> data;
 
         #endregion
 
 #if UNITY_EDITOR
         /// <summary>
-        ///     Creates the backing <see cref="ScriptableObject"/> used by this action.
+        ///     Creates the backing <see cref="ScriptableObject" /> used by this action.
         /// </summary>
         /// <returns>Newly created scriptable object.</returns>
         protected abstract ScriptableObject CreateInstanceScriptableObject();

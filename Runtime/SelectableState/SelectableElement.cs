@@ -8,11 +8,12 @@ using UnityEngine.UI;
 namespace Marmary.StateBehavior.SelectableState
 {
     /// <summary>
-    /// Represents an abstract base class for a selectable UI element.
-    /// Inherits from <c>Element</c> with a <c>SelectableState</c> and implements various Unity event interfaces.
+    ///     Represents an abstract base class for a selectable UI element.
+    ///     Inherits from <c>Element</c> with a <c>SelectableState</c> and implements various Unity event interfaces.
     /// </summary>
     /// <remarks>
-    /// This class defines behavior for handling UI element interactions such as pointer events, selection, clicks, cancellation, and state transitions.
+    ///     This class defines behavior for handling UI element interactions such as pointer events, selection, clicks,
+    ///     cancellation, and state transitions.
     /// </remarks>
     public abstract class SelectableElement : Element<SelectableState>
         , IPointerEnterHandler, IPointerExitHandler,
@@ -22,15 +23,15 @@ namespace Marmary.StateBehavior.SelectableState
         #region Serialized Fields
 
         /// <summary>
-        /// Determines whether mouse input should be ignored for specific interactions.
+        ///     Determines whether mouse input should be ignored for specific interactions.
         /// </summary>
         [SerializeField] private bool ignoreMouse;
 
         /// <summary>
-        /// The state machine responsible for handling transitions and logic
-        /// between different states of a selectable UI element (e.g., Normal,
-        /// Highlighted, PressedInside, PressedOutside) based on user inputs such as
-        /// pointer interactions, selection, and submission events.
+        ///     The state machine responsible for handling transitions and logic
+        ///     between different states of a selectable UI element (e.g., Normal,
+        ///     Highlighted, PressedInside, PressedOutside) based on user inputs such as
+        ///     pointer interactions, selection, and submission events.
         /// </summary>
         private SelectableStateMachine _selectableStateMachine;
 
@@ -39,7 +40,7 @@ namespace Marmary.StateBehavior.SelectableState
         #region Unity Event Functions
 
         /// <summary>
-        /// Initializes the SelectableElement by creating and configuring the internal SelectableStateMachine instance.
+        ///     Initializes the SelectableElement by creating and configuring the internal SelectableStateMachine instance.
         /// </summary>
         protected void Awake()
         {
@@ -52,7 +53,7 @@ namespace Marmary.StateBehavior.SelectableState
 
         /// <inheritdoc />
         /// <summary>
-        /// Executes the cancel operation in response to the cancel event.
+        ///     Executes the cancel operation in response to the cancel event.
         /// </summary>
         /// <param name="eventData">The data associated with the cancel event.</param>
         public void OnCancel(BaseEventData eventData)
@@ -80,7 +81,7 @@ namespace Marmary.StateBehavior.SelectableState
 
         /// <inheritdoc />
         /// <summary>
-        /// Handles the click interaction when the pointer is clicked on the selectable element.
+        ///     Handles the click interaction when the pointer is clicked on the selectable element.
         /// </summary>
         /// <param name="eventData">The data associated with the pointer click event.</param>
         public virtual void OnPointerClick(PointerEventData eventData)
@@ -124,7 +125,7 @@ namespace Marmary.StateBehavior.SelectableState
 
         /// <inheritdoc />
         /// <summary>
-        /// Executes the action when the pointer exits the selectable element.
+        ///     Executes the action when the pointer exits the selectable element.
         /// </summary>
         /// <param name="eventData">The data associated with the pointer event.</param>
         public void OnPointerExit(PointerEventData eventData)
@@ -153,7 +154,7 @@ namespace Marmary.StateBehavior.SelectableState
         #region ISelectHandler Members
 
         /// <summary>
-        /// Executes the select function.
+        ///     Executes the select function.
         /// </summary>
         /// <param name="eventData">The event data associated with the select event.</param>
         public virtual void OnSelect(BaseEventData eventData)
@@ -180,7 +181,7 @@ namespace Marmary.StateBehavior.SelectableState
 
         /// <inheritdoc />
         /// <summary>
-        /// Execute the unpressed functionality.
+        ///     Execute the unpressed functionality.
         /// </summary>
         /// <param name="eventData">The event data associated with the pointer action.</param>
         public void OnUnPressed(PointerEventData eventData)

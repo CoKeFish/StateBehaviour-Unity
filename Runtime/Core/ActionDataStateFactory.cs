@@ -4,7 +4,7 @@ using System;
 namespace Marmary.StateBehavior.Core
 {
     /// <summary>
-    ///     Factory responsible for creating <see cref="ActionDataState{TValue}"/> instances based on behavior types.
+    ///     Factory responsible for creating <see cref="ActionDataState{TValue}" /> instances based on behavior types.
     /// </summary>
     public class ActionDataStateFactory
     {

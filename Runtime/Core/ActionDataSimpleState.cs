@@ -23,7 +23,7 @@ namespace Marmary.StateBehavior.Core
         public bool useCustomDelay;
 
         /// <summary>
-        ///     Specifies the custom delay to use when <see cref="useCustomDelay"/> is enabled.
+        ///     Specifies the custom delay to use when <see cref="useCustomDelay" /> is enabled.
         /// </summary>
         [ShowIf(nameof(useCustomDelay))] [LabelWidth(140)]
         public float customDelay;
@@ -93,7 +93,7 @@ namespace Marmary.StateBehavior.Core
         #region Methods
 
         /// <summary>
-        ///     Applies the configuration to the supplied <see cref="Tweener"/> while considering the original value.
+        ///     Applies the configuration to the supplied <see cref="Tweener" /> while considering the original value.
         /// </summary>
         /// <param name="tweener">Tween instance to configure.</param>
         /// <param name="originalValue">Value captured from the source component.</param>
@@ -118,7 +118,7 @@ namespace Marmary.StateBehavior.Core
         }
 
         /// <summary>
-        ///     Applies the configuration to the supplied <see cref="Tweener"/> without considering an original value.
+        ///     Applies the configuration to the supplied <see cref="Tweener" /> without considering an original value.
         /// </summary>
         /// <param name="tweener">Tween instance to configure.</param>
         /// <returns>The configured tween instance.</returns>

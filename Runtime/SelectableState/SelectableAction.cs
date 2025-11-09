@@ -45,6 +45,7 @@ namespace Marmary.StateBehavior.SelectableState
         /// <param name="gameObject">Game object hosting the component.</param>
         /// <returns>Newly created tweener.</returns>
         protected abstract Tweener CreateTweener(GameObject gameObject);
+
         /// <summary>
         ///     Captures the starting value from the component prior to running animations.
         /// </summary>

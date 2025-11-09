@@ -17,7 +17,10 @@ namespace Marmary.StateBehavior.Core
         /// <summary>
         ///     Behavior type assigned to the state.
         /// </summary>
-        [FormerlySerializedAs("BehaviorActionType")] [ValueDropdown(nameof(GetActionTypes))] [OnValueChanged(nameof(UpdateActionBase))] [SerializeField]
+        [FormerlySerializedAs("BehaviorActionType")]
+        [ValueDropdown(nameof(GetActionTypes))]
+        [OnValueChanged(nameof(UpdateActionBase))]
+        [SerializeField]
         public BehaviorActionTypes behaviorActionType;
 
         #endregion
@@ -64,7 +67,7 @@ namespace Marmary.StateBehavior.Core
         /// <summary>
         ///     Retrieves the available behavior types.
         /// </summary>
-        /// <returns>Array containing all values of <see cref="BehaviorActionTypes"/>.</returns>
+        /// <returns>Array containing all values of <see cref="BehaviorActionTypes" />.</returns>
         private static BehaviorActionTypes[] GetActionTypes()
         {
             return (BehaviorActionTypes[])Enum.GetValues(typeof(BehaviorActionTypes));

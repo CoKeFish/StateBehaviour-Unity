@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace Marmary.StateBehavior.SelectableState.Actions
 {
     /// <summary>
-    ///     Animates the color of a <see cref="UnityEngine.UI.Image"/> component when selectable states change.
+    ///     Animates the color of a <see cref="UnityEngine.UI.Image" /> component when selectable states change.
     /// </summary>
     public class ColorSpriteSelectableAction : SelectableAction<Image, Color>
     {
