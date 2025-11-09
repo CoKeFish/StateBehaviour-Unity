@@ -3,12 +3,23 @@ using UnityEngine;
 
 namespace Marmary.StateBehavior.Core
 {
-    public interface IStateContract<TState>
+    /// <summary>
+    ///     Defines the lifecycle for actions that respond to state transitions.
+    /// </summary>
+    public interface IStateContract<in TState>
     {
+        /// <summary>
+        ///     Performs any setup required before the action can respond to state changes.
+        /// </summary>
+        /// <param name="value">Game object hosting the action.</param>
         void Setup(GameObject value);
 
         #region Methods
 
+        /// <summary>
+        ///     Applies the behaviour for the supplied state.
+        /// </summary>
+        /// <param name="state">State to activate.</param>
         public void Set(TState state);
 
         #endregion

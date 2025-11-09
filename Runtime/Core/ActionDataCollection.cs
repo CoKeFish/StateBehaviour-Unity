@@ -8,11 +8,17 @@ using UnityEngine;
 
 namespace Marmary.StateBehavior.Core
 {
+    /// <summary>
+    ///     Collection of <see cref="ActionDataBase"/> assets used to build runtime actions.
+    /// </summary>
     [CreateAssetMenu(fileName = "ActionDataCollection", menuName = "StateBehavior/ActionDataCollection", order = 50)]
     public class ActionDataCollection : SerializedScriptableObject
     {
         #region Serialized Fields
 
+        /// <summary>
+        ///     Scriptable objects that define action data for concrete behaviours.
+        /// </summary>
         [ListDrawerSettings(ShowFoldout = true, DefaultExpandedState = true, DraggableItems = false)]
         [InlineEditor(ObjectFieldMode = InlineEditorObjectFieldModes.Foldout)]
         public List<ActionDataBase> actionDataAssets = new();
@@ -21,6 +27,9 @@ namespace Marmary.StateBehavior.Core
 
         #region Properties
 
+        /// <summary>
+        ///     Gets the collection of action data assets registered in the collection.
+        /// </summary>
         public IReadOnlyList<ActionDataBase> ActionDataAssets => actionDataAssets;
 
         #endregion
@@ -28,13 +37,24 @@ namespace Marmary.StateBehavior.Core
 #if UNITY_EDITOR
         #region Fields
 
+        /// <summary>
+        ///     Cache mapping action data types to their producing action types.
+        /// </summary>
         private static readonly Dictionary<Type, Type> ActionDataToActionCache = new();
-        private static List<Type> cachedActionTypes;
+        /// <summary>
+        ///     Cached list of resolved action types to prevent repeated reflection.
+        /// </summary>
+        private static List<Type> _cachedActionTypes;
 
         #endregion
 
         #region Methods
 
+        /// <summary>
+        ///     Instantiates action instances compatible with the stored assets.
+        /// </summary>
+        /// <typeparam name="TState">State enum type used by the actions.</typeparam>
+        /// <returns>List of actions ready to be injected into an element.</returns>
         public List<IStateContract<TState>> BuildActions<TState>() where TState : Enum
         {
             if (actionDataAssets == null || actionDataAssets.Count == 0)
@@ -85,6 +105,11 @@ namespace Marmary.StateBehavior.Core
             return actions;
         }
 
+        /// <summary>
+        ///     Resolves the action type that can create the provided action data type.
+        /// </summary>
+        /// <param name="actionDataType">Type representing the action data.</param>
+        /// <returns>Action type able to produce the data or <c>null</c>.</returns>
         private static Type ResolveActionType(Type actionDataType)
         {
             if (actionDataType == null) return null;
@@ -104,11 +129,15 @@ namespace Marmary.StateBehavior.Core
             return null;
         }
 
+        /// <summary>
+        ///     Retrieves all available action types in currently loaded assemblies.
+        /// </summary>
+        /// <returns>Enumeration of action types.</returns>
         private static IEnumerable<Type> GetActionTypes()
         {
-            if (cachedActionTypes != null) return cachedActionTypes;
+            if (_cachedActionTypes != null) return _cachedActionTypes;
 
-            cachedActionTypes = new List<Type>();
+            _cachedActionTypes = new List<Type>();
 
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
@@ -133,19 +162,29 @@ namespace Marmary.StateBehavior.Core
 
                     if (!InheritsFromAction(type)) continue;
 
-                    cachedActionTypes.Add(type);
+                    _cachedActionTypes.Add(type);
                 }
             }
 
-            return cachedActionTypes;
+            return _cachedActionTypes;
         }
 
+        /// <summary>
+        ///     Determines whether a type implements <see cref="IStateContract{TState}"/>.
+        /// </summary>
+        /// <param name="type">Type to evaluate.</param>
+        /// <returns><c>true</c> when the interface is implemented; otherwise, <c>false</c>.</returns>
         private static bool ImplementsIStateContract(Type type)
         {
             return type.GetInterfaces().Any(i => i.IsGenericType &&
                                                 i.GetGenericTypeDefinition() == typeof(IStateContract<>));
         }
 
+        /// <summary>
+        ///     Checks whether a type inherits from <see cref="Action{TState,TValue}"/>.
+        /// </summary>
+        /// <param name="type">Type to inspect.</param>
+        /// <returns><c>true</c> when the inheritance chain contains <see cref="Action{TState,TValue}"/>.</returns>
         private static bool InheritsFromAction(Type type)
         {
             var current = type;
@@ -161,6 +200,12 @@ namespace Marmary.StateBehavior.Core
             return false;
         }
 
+        /// <summary>
+        ///     Verifies if an action type produces the specified action data through its factory method.
+        /// </summary>
+        /// <param name="actionType">Action type to test.</param>
+        /// <param name="dataType">Desired action data type.</param>
+        /// <returns><c>true</c> if the action creates the data type; otherwise, <c>false</c>.</returns>
         private static bool DoesActionProduceData(Type actionType, Type dataType)
         {
             try
@@ -187,6 +232,14 @@ namespace Marmary.StateBehavior.Core
             }
         }
 
+        /// <summary>
+        ///     Attaches the provided action data to the created action instance.
+        /// </summary>
+        /// <typeparam name="TState">Type of the state enum.</typeparam>
+        /// <param name="actionInstance">Action instance that will receive the data.</param>
+        /// <param name="actionType">Type of the action.</param>
+        /// <param name="actionData">Action data instance to inject.</param>
+        /// <returns><c>true</c> if the assignment succeeded; otherwise, <c>false</c>.</returns>
         private static bool TryAssignActionData<TState>(IStateContract<TState> actionInstance,
             Type actionType,
             ActionDataBase actionData) where TState : Enum
@@ -223,6 +276,11 @@ namespace Marmary.StateBehavior.Core
             return true;
         }
 
+        /// <summary>
+        ///     Verifies the supplied asset derives from <see cref="ActionDataBase"/>.
+        /// </summary>
+        /// <param name="asset">Asset to inspect.</param>
+        /// <returns><c>true</c> when the asset is valid.</returns>
         private static bool IsActionDataAsset(ActionDataBase asset)
         {
             return asset != null;
