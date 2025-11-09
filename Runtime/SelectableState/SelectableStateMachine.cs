@@ -53,6 +53,7 @@ namespace Marmary.StateBehavior.SelectableState
         /// <summary>
         ///     Configures the state machine with state transitions and entry actions.
         /// </summary>
+        /// <inheritdoc />
         protected sealed override void ConfigureStateMachine()
         {
             StateMachine.Configure(SelectableState.Normal)
@@ -92,13 +93,16 @@ namespace Marmary.StateBehavior.SelectableState
                 .OnEntry(Action);
         }
 
+        /// <summary>
+        ///     Executes the configured actions and events for the current state.
+        /// </summary>
         private void Action()
         {
             if (_actions.IsNullOrEmpty()) return;
             foreach (var action in _actions) action.Set(StateMachine.State);
 
-            if (_selectableElement.events.ContainsKey(StateMachine.State))
-                _selectableElement.events[StateMachine.State]?.Invoke();
+            if (_selectableElement.Events.ContainsKey(StateMachine.State))
+                _selectableElement.Events[StateMachine.State]?.Invoke();
         }
 
         #endregion

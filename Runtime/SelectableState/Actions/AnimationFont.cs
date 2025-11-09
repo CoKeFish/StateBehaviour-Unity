@@ -1,4 +1,5 @@
 ﻿#if STATE_BEHAVIOR_ENABLED && DEFINICION_TexAnimator
+// TODO: Revisar este archivo cuando se implemente la característica
 using System;
 using DG.Tweening;
 using Sirenix.OdinInspector;
@@ -6,6 +7,9 @@ using UnityEngine;
 
 namespace Scrips.StateBehavior
 {
+    /// <summary>
+    ///     Animates TextAnimator components by tweaking tagged behaviour parameters for each state.
+    /// </summary>
     [Serializable]
     public class AnimationFontSelectableAction : SelectableAction<TextAnimator_TMP, float>
     {
@@ -14,8 +18,14 @@ namespace Scrips.StateBehavior
         /// </summary>
         [SerializeField] [Required] private string tag = "Wave";
 
+        /// <summary>
+        ///     Stores the cached amount applied to the animation tag.
+        /// </summary>
         private float _amount;
 
+        /// <summary>
+        ///     Gets or sets the animated amount and updates the underlying tag.
+        /// </summary>
         private float Amount
         {
             get => _amount;
@@ -26,6 +36,7 @@ namespace Scrips.StateBehavior
             }
         }
 
+        /// <inheritdoc />
         protected override Tweener CreateTweener(GameObject gameObject)
         {
             if (useCustomTarget)
@@ -48,12 +59,14 @@ namespace Scrips.StateBehavior
             }
         }
 
+        /// <inheritdoc />
         protected override void InitializeStartValue(GameObject gameObject)
         {
             originalValue = Amount;
         }
 
 #if UNITY_EDITOR
+        /// <inheritdoc />
         protected override ScriptableObject CreateInstanceScriptableObject()
         {
             return ScriptableObject.CreateInstance<AnimationFontSelectableActionData>();
@@ -62,6 +75,9 @@ namespace Scrips.StateBehavior
     }
 
 
+    /// <summary>
+    ///     Scriptable object holding animation amplitudes for text animator actions.
+    /// </summary>
     [CreateAssetMenu(fileName = "AnimationFontSelectableActionData",
         menuName = "StateBehavior/Actions/AnimationFontSelectableActionData",
         order = 1)]

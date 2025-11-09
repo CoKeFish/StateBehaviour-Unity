@@ -65,11 +65,6 @@ namespace Marmary.StateBehavior.Core
         /// </summary>
         private bool _isDefaultState;
 
-        /// <summary>
-        ///     Stores whether the origin toggle should be shown in the inspector.
-        /// </summary>
-        private readonly bool showOrigin;
-
         #endregion
 
         #region Properties
@@ -91,7 +86,6 @@ namespace Marmary.StateBehavior.Core
         {
             useOrigin = isDefaultState;
             _isDefaultState = isDefaultState;
-            showOrigin = !isDefaultState;
         }
 
         #endregion

@@ -1,11 +1,10 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
 namespace Marmary.StateBehavior.SelectableState
 {
-// El enum define los estados posibles
-/// <summary>
-///     Represents the possible states for a selectable UI element.
-/// </summary>
-public enum SelectableState
+    /// <summary>
+    ///     Represents the possible states for a selectable UI element.
+    /// </summary>
+    public enum SelectableState
     {
         /// <summary>
         ///     The default state when the UI element is not interacted with.
