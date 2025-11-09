@@ -40,10 +40,14 @@ namespace Marmary.StateBehavior.SelectableState
             SelectableElement selectableElement) : base(initialState)
         {
             _actions = actions;
-            ConfigureStateMachine();
             _selectableElement = selectableElement;
+
+            ConfigureStateMachine();
+            
             if (actions.IsNullOrEmpty()) return;
-            foreach (var action in actions) action.Setup(gameObject);
+            
+            foreach (var action in actions) 
+                action.Setup(gameObject);
         }
 
         #endregion
@@ -61,7 +65,7 @@ namespace Marmary.StateBehavior.SelectableState
                 .Ignore(SelectableTrigger.UnPressed)
                 .Permit(SelectableTrigger.PointerEnter, SelectableState.Highlighted)
                 .Permit(SelectableTrigger.Select, SelectableState.Highlighted)
-                .OnEntry(Action);
+                .OnEntry(ExecuteActions);
 
             StateMachine.Configure(SelectableState.Highlighted)
                 .PermitReentry(SelectableTrigger.PointerClick)
@@ -70,9 +74,9 @@ namespace Marmary.StateBehavior.SelectableState
                 .Permit(SelectableTrigger.PointerDown, SelectableState.PressedInside)
                 .Permit(SelectableTrigger.Submit, SelectableState.PressedInside)
                 .Permit(SelectableTrigger.Cancel, SelectableState.Normal)
-                .OnEntryFrom(SelectableTrigger.PointerClick, Action)
-                .OnEntryFrom(SelectableTrigger.UnPressed, Action)
-                .OnEntry(Action);
+                .OnEntryFrom(SelectableTrigger.PointerClick, ExecuteActions)
+                .OnEntryFrom(SelectableTrigger.UnPressed, ExecuteActions)
+                .OnEntry(ExecuteActions);
 
             StateMachine.Configure(SelectableState.PressedInside)
                 .Ignore(SelectableTrigger.Cancel)
@@ -80,7 +84,7 @@ namespace Marmary.StateBehavior.SelectableState
                 .Permit(SelectableTrigger.Deselect, SelectableState.PressedOutside)
                 .Permit(SelectableTrigger.PointerUp, SelectableState.Highlighted)
                 .Permit(SelectableTrigger.UnPressed, SelectableState.Highlighted)
-                .OnEntry(Action);
+                .OnEntry(ExecuteActions);
 
             // You can trigger your click event in OnExit or in a specific handler here
 
@@ -90,16 +94,17 @@ namespace Marmary.StateBehavior.SelectableState
                 .Permit(SelectableTrigger.PointerEnter, SelectableState.PressedInside)
                 .Permit(SelectableTrigger.Select, SelectableState.PressedInside)
                 .Permit(SelectableTrigger.PointerUp, SelectableState.Normal) // Released outside, no click
-                .OnEntry(Action);
+                .OnEntry(ExecuteActions);
         }
 
         /// <summary>
         ///     Executes the configured actions and events for the current state.
         /// </summary>
-        private void Action()
+        protected override void ExecuteActions()
         {
             if (_actions.IsNullOrEmpty()) return;
-            foreach (var action in _actions) action.Set(StateMachine.State);
+            foreach (var action in _actions)
+                action.Set(StateMachine.State);
 
             if (_selectableElement.Events.ContainsKey(StateMachine.State))
                 _selectableElement.Events[StateMachine.State]?.Invoke();
