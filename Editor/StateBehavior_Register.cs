@@ -1,6 +1,6 @@
 #if UNITY_EDITOR
 
-using MyCompany.ModuleSymbols;
+using Marmary.Utils.Editor.ModuleSymbols;
 using UnityEditor;
 
 //TODO: Check namespace name rule
@@ -29,9 +29,9 @@ namespace Marmary.StateBehavior
             var desc = new ModuleSymbolDescriptor
 
             {
-                moduleName = "State Behavior",
+                ModuleName = "State Behavior",
 
-                options = new[]
+                Options = new[]
 
                 {
                     new SymbolOption

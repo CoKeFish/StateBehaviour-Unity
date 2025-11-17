@@ -48,7 +48,7 @@ namespace Marmary.StateBehavior.Core
         private void SyncActionsFromCollection()
         {
             SyncActionsFromCollectionInternal(true);
-        }
+       }
 
         /// <summary>
         ///     Synchronises the actions list and optionally marks the object dirty.

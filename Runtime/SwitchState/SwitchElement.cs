@@ -14,7 +14,8 @@ namespace Marmary.StateBehavior.SwitchState
         #region Fields
 
         private SwitchStateMachine _stateMachine;
-
+        
+        
         #endregion
 
         #region Unity Event Functions
@@ -59,7 +60,31 @@ namespace Marmary.StateBehavior.SwitchState
         /// </summary>
         public void Hide() => OnHide();
 
+        /// <summary>
+        ///     Instantly sets the element to the hide state without animation.
+        /// </summary>
+        public void InstantHide()
+        {
+            if (actions == null) return;
+            foreach (var action in actions)
+                action.InstantSet(SwitchState.Hide);
+            
+            if (Events.ContainsKey(SwitchState.Hide))
+                Events[SwitchState.Hide]?.Invoke();
+        }
 
+        /// <summary>
+        ///     Instantly sets the element to the show state without animation.
+        /// </summary>
+        public void InstantShow()
+        {
+            if (actions == null) return;
+            foreach (var action in actions)
+                action.InstantSet(SwitchState.Show);
+            
+            if (Events.ContainsKey(SwitchState.Show))
+                Events[SwitchState.Show]?.Invoke();
+        }
 
         #endregion
     }

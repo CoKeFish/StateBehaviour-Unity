@@ -5,7 +5,8 @@ using DG.Tweening;
 namespace Marmary.StateBehavior.Core
 {
     /// <summary>
-    ///     Defines the available behaviors that can be applied to a tween for a given state.
+    /// Represents a behavior type that executes a tween instantly,
+    /// bypassing any animation or delay.
     /// </summary>
     [Serializable]
     public enum BehaviorActionTypes
@@ -21,9 +22,10 @@ namespace Marmary.StateBehavior.Core
         Simple,
 
         /// <summary>
-        ///     Executes the tween and optionally loops.
+        /// Represents a behavior type that performs an action instantaneously
+        /// without any animation, transition, or delay.
         /// </summary>
-        OneShot,
+        Instant,
 
         /// <summary>
         ///     Plays the tween in a continuous looping manner.
@@ -50,20 +52,35 @@ namespace Marmary.StateBehavior.Core
         /// <param name="tweener">Tween instance to configure.</param>
         public static void Set(BehaviorActionTypes type, Tweener tweener)
         {
+            if (tweener == null) return;
+
             switch (type)
             {
                 case BehaviorActionTypes.None:
+                    // No configuration needed
                     break;
+                    
                 case BehaviorActionTypes.Simple:
                     tweener.SetAutoKill(false)
                         .SetLoops(1, LoopType.Yoyo);
-                    return;
+                    break;
+                    
+                case BehaviorActionTypes.Instant:
+                    // Configure tween to execute instantly (duration 0)
+                    tweener.SetAutoKill(false)
+                        .Complete(true);
+                    break;
+                    
                 case BehaviorActionTypes.Looping:
+                    // Configure tween for infinite looping
+                    tweener.SetAutoKill(false)
+                        .SetLoops(-1, LoopType.Yoyo);
                     break;
+                    
                 case BehaviorActionTypes.Sequencer:
+                    // Sequencer behavior will be implemented separately
                     break;
-                case BehaviorActionTypes.OneShot:
-                    break;
+                    
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }

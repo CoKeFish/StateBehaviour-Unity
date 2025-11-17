@@ -1,5 +1,7 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
 using System;
+using Ardalis.GuardClauses;
+using DG.Tweening;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
@@ -13,6 +15,17 @@ namespace Marmary.StateBehavior.Core
     [Serializable]
     public abstract class Action<TState, TValue> where TState : Enum
     {
+        
+        /// <summary>
+        ///     Captured value before applying action data.
+        /// </summary>
+        protected TValue OriginalValue;
+
+        /// <summary>
+        ///     Tween instance reused across state changes.
+        /// </summary>
+        protected Tweener Tweener;
+        
         #region Serialized Fields
 
         /// <summary>
@@ -23,6 +36,55 @@ namespace Marmary.StateBehavior.Core
 
         #endregion
 
+
+        /// <summary>
+        /// Sets the behavior action for the specified state and applies the corresponding data to the existing tweener.
+        /// </summary>
+        /// <param name="state">The state for which the behavior action is to be configured.</param>
+        public virtual void Set(TState state)
+        {
+            Guard.Against.Null(Tweener);
+            BehaviorActionFactory.Set(data.StateActionDataContainers[state].behaviorActionType, Tweener);
+            data.StateActionDataContainers[state].BehaviorActionData.ApplyData(Tweener, OriginalValue).Restart();
+        }
+
+
+        /// <summary>
+        /// Sets up the action by initializing the starting value and creating a reusable tweener for state transitions.
+        /// </summary>
+        /// <param name="gameObject">Game object hosting the component.</param>
+        public void Setup(GameObject gameObject)
+        {
+            InitializeStartValue(gameObject);
+            Tweener = CreateTweener(gameObject);
+        }
+        
+        /// <summary>
+        ///     Creates the tweener that will be reused for state transitions.
+        /// </summary>
+        /// <param name="gameObject">Game object hosting the component.</param>
+        /// <returns>Newly created tweener.</returns>
+        protected abstract Tweener CreateTweener(GameObject gameObject);
+
+        /// <summary>
+        ///     Captures the starting value from the component prior to running animations.
+        /// </summary>
+        /// <param name="gameObject">Game object hosting the component.</param>
+        protected abstract void InitializeStartValue(GameObject gameObject);
+
+
+        /// <summary>
+        ///     Applies the behaviour for the supplied state instantly without animation.
+        /// </summary>
+        /// <param name="state">State to activate.</param>
+        public void InstantSet(TState state)
+        {
+            Guard.Against.Null(Tweener);
+            BehaviorActionFactory.Set(BehaviorActionTypes.Instant, Tweener);
+            data.StateActionDataContainers[state].BehaviorActionData.ApplyData(Tweener, OriginalValue).Restart();
+        }
+        
+        
 #if UNITY_EDITOR
         /// <summary>
         ///     Creates the backing <see cref="ScriptableObject" /> used by this action.

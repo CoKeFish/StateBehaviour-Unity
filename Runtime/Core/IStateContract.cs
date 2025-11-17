@@ -22,6 +22,12 @@ namespace Marmary.StateBehavior.Core
         /// <param name="state">State to activate.</param>
         public void Set(TState state);
 
+        /// <summary>
+        ///     Applies the behaviour for the supplied state instantly without animation.
+        /// </summary>
+        /// <param name="state">State to activate.</param>
+        public void InstantSet(TState state);
+
         #endregion
     }
 }
