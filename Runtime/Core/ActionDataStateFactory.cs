@@ -29,7 +29,7 @@ namespace Marmary.StateBehavior.Core
                     break;
                 case BehaviorActionTypes.Sequencer:
                     break;
-                case BehaviorActionTypes.OneShot:
+                case BehaviorActionTypes.Instant:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);

@@ -3,7 +3,9 @@ using System;
 using Ardalis.GuardClauses;
 using DG.Tweening;
 using Sirenix.OdinInspector;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -13,7 +15,7 @@ namespace Marmary.StateBehavior.Core
     ///     Base action that binds a <see cref="ActionData{TState, TValue}" /> asset and exposes creation utilities in-editor.
     /// </summary>
     [Serializable]
-    public abstract class Action<TState, TValue> where TState : Enum
+    public abstract class Action<TState, TValue>:IStateContract<TState> where TState : Enum
     {
         
         /// <summary>
