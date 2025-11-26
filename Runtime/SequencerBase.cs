@@ -27,7 +27,7 @@ namespace Marmary.StateBehavior
         /// This criterion defines how the elements are sorted and can be customized to implement various ordering strategies.
         /// </summary>
         [FormerlySerializedAs("_criterion")] [SerializeField] [OdinSerialize] [SerializeReference]
-        public ISequencingCriterion<TState, TTrigger, TValue> criterion;
+        public ISequencingCriterion<TValue> criterion;
 
         #endregion
 
