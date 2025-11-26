@@ -24,39 +24,38 @@ namespace Marmary.StateBehavior.Runtime
         /// <summary>
         ///     The animation element that handles events for selection states.
         /// </summary>
-        private readonly Element<TState> _selectableElement;
+        private readonly Element<TState, TTrigger> _selectableElement;
 
         /// <summary>
         ///     Collection of asynchronous tasks generated while executing the current state.
         /// </summary>
         private readonly List<UniTask> _executionTasks = new();
 
-        
+
         /// <summary>
         ///     Executes all actions or events configured for the current state of the state machine.
         /// </summary>
-        private bool ShouldExecuteInstantly { get; set; }
+        public bool ShouldExecuteInstantly { get; set; }
 
 
-        public StateBehaviourStateMachine(TState initialState,
+        protected StateBehaviourStateMachine(TState initialState,
             GameObject gameObject,
             List<IStateContract<TState>> actions,
-            Element<TState> selectableElement)
+            Element<TState, TTrigger> selectableElement)
             : base(initialState)
         {
             _actions = actions;
             _selectableElement = selectableElement;
-            
+
             ConfigureStateMachine();
 
             if (actions.IsNullOrEmpty()) return;
 
             foreach (var action in actions)
                 action.Setup(gameObject);
-            
         }
-        
-        
+
+
         /// <summary>
         ///     Clears the list of tasks registered for the current execution batch.
         /// </summary>
@@ -73,35 +72,32 @@ namespace Marmary.StateBehavior.Runtime
         {
             _executionTasks.Add(task);
         }
-        
+
         /// <summary>
         ///     Fires a trigger forcing the next state execution to run instantly.
         /// </summary>
         /// <param name="trigger">The trigger to fire.</param>
         public void FireTriggerInstant(TTrigger trigger)
         {
-            FireTriggerInternal(trigger, true);
+            var previousInstantSetting = ShouldExecuteInstantly;
+            ShouldExecuteInstantly = true;
+            StateMachine.Fire(trigger);
+            ShouldExecuteInstantly = previousInstantSetting;
         }
 
         /// <summary>
-        /// Fires a trigger to transition the state machine to the next state.
-        /// Optionally allows executing the transition instantly by bypassing animations or delays.
+        /// Fires a trigger asynchronously, ensuring that the next state execution is not forced to run instantly.
         /// </summary>
         /// <param name="trigger">The trigger to fire.</param>
-        /// <param name="executeInstantly">Indicates whether the transition should be executed instantly.</param>
-        private void FireTriggerInternal(TTrigger trigger, bool executeInstantly)
+        public void FireTriggerAsync(TTrigger trigger)
         {
-            ShouldExecuteInstantly = executeInstantly;
-            try
-            {
-                StateMachine.Fire(trigger);
-            }
-            finally
-            {
-                ShouldExecuteInstantly = false;
-            }
+            var previousInstantSetting = ShouldExecuteInstantly;
+            ShouldExecuteInstantly = false;
+            StateMachine.Fire(trigger);
+            ShouldExecuteInstantly = previousInstantSetting;
         }
         
+
         /// <summary>
         ///     Retrieves a task that completes when all registered execution tasks finish.
         /// </summary>
@@ -110,7 +106,6 @@ namespace Marmary.StateBehavior.Runtime
         {
             return _executionTasks.Count == 0 ? UniTask.CompletedTask : UniTask.WhenAll(_executionTasks);
         }
-
 
 
         /// <summary>
@@ -164,7 +159,7 @@ namespace Marmary.StateBehavior.Runtime
             TriggerStateEvents(currentState);
             AddExecutionTask(UniTask.CompletedTask);
         }
-        
+
         /// <summary>
         /// Triggers the associated events for the specified state in the selectable element.
         /// </summary>

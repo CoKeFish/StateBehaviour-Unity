@@ -15,7 +15,7 @@ namespace Marmary.StateBehavior.SelectableState
     ///     This class defines behavior for handling UI element interactions such as pointer events, selection, clicks,
     ///     cancellation, and state transitions.
     /// </remarks>
-    public abstract class SelectableElement : Element<SelectableState>
+    public abstract class SelectableElement : Element<SelectableState, SelectableTrigger>
         , IPointerEnterHandler, IPointerExitHandler,
         IPointerDownHandler, IPointerClickHandler, ISelectHandler, IDeselectHandler,
         IPointerUpHandler, ISubmitHandler, ICancelHandler, IUnPressedHandler
@@ -27,13 +27,6 @@ namespace Marmary.StateBehavior.SelectableState
         /// </summary>
         [SerializeField] private bool ignoreMouse;
 
-        /// <summary>
-        ///     The state machine responsible for handling transitions and logic
-        ///     between different states of a selectable UI element (e.g., Normal,
-        ///     Highlighted, PressedInside, PressedOutside) based on user inputs such as
-        ///     pointer interactions, selection, and submission events.
-        /// </summary>
-        private SelectableStateMachine _selectableStateMachine;
 
         #endregion
 
@@ -42,9 +35,10 @@ namespace Marmary.StateBehavior.SelectableState
         /// <summary>
         ///     Initializes the SelectableElement by creating and configuring the internal SelectableStateMachine instance.
         /// </summary>
-        protected void Awake()
+        protected override void Awake()
         {
-            _selectableStateMachine = new SelectableStateMachine(SelectableState.Normal, gameObject, actions, this);
+            stateMachine = new SelectableStateMachine(SelectableState.Normal, gameObject, actions, this);
+            base.Awake();
         }
 
         #endregion
@@ -58,7 +52,7 @@ namespace Marmary.StateBehavior.SelectableState
         /// <param name="eventData">The data associated with the cancel event.</param>
         public void OnCancel(BaseEventData eventData)
         {
-            _selectableStateMachine.FireTrigger(SelectableTrigger.Cancel);
+            TriggerState(SelectableTrigger.Cancel);
         }
 
         #endregion
@@ -72,7 +66,7 @@ namespace Marmary.StateBehavior.SelectableState
         /// <param name="eventData"></param>
         public void OnDeselect(BaseEventData eventData)
         {
-            _selectableStateMachine.FireTrigger(SelectableTrigger.Deselect);
+            TriggerState(SelectableTrigger.Deselect);
         }
 
         #endregion
@@ -86,7 +80,7 @@ namespace Marmary.StateBehavior.SelectableState
         /// <param name="eventData">The data associated with the pointer click event.</param>
         public virtual void OnPointerClick(PointerEventData eventData)
         {
-            _selectableStateMachine.FireTrigger(SelectableTrigger.PointerClick);
+            TriggerState(SelectableTrigger.PointerClick);
         }
 
         #endregion
@@ -100,7 +94,7 @@ namespace Marmary.StateBehavior.SelectableState
         /// <param name="eventData"></param>
         public void OnPointerDown(PointerEventData eventData)
         {
-            _selectableStateMachine.FireTrigger(SelectableTrigger.PointerDown);
+            TriggerState(SelectableTrigger.PointerDown);
         }
 
         #endregion
@@ -146,7 +140,7 @@ namespace Marmary.StateBehavior.SelectableState
         /// <param name="eventData"></param>
         public void OnPointerUp(PointerEventData eventData)
         {
-            _selectableStateMachine.FireTrigger(SelectableTrigger.PointerUp);
+            TriggerState(SelectableTrigger.PointerUp);
         }
 
         #endregion
@@ -159,7 +153,7 @@ namespace Marmary.StateBehavior.SelectableState
         /// <param name="eventData">The event data associated with the select event.</param>
         public virtual void OnSelect(BaseEventData eventData)
         {
-            _selectableStateMachine.FireTrigger(SelectableTrigger.Select);
+            TriggerState(SelectableTrigger.Select);
         }
 
         #endregion
@@ -172,7 +166,7 @@ namespace Marmary.StateBehavior.SelectableState
         /// <param name="eventData"></param>
         public virtual void OnSubmit(BaseEventData eventData)
         {
-            _selectableStateMachine.FireTrigger(SelectableTrigger.Submit);
+            TriggerState(SelectableTrigger.Submit);
         }
 
         #endregion
@@ -186,7 +180,7 @@ namespace Marmary.StateBehavior.SelectableState
         /// <param name="eventData">The event data associated with the pointer action.</param>
         public void OnUnPressed(PointerEventData eventData)
         {
-            _selectableStateMachine.FireTrigger(SelectableTrigger.UnPressed);
+            TriggerState(SelectableTrigger.UnPressed);
         }
 
         #endregion

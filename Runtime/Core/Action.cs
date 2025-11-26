@@ -1,6 +1,7 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
 using System;
 using Ardalis.GuardClauses;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Sirenix.OdinInspector;
 #if UNITY_EDITOR
@@ -22,12 +23,17 @@ namespace Marmary.StateBehavior.Core
         /// <summary>
         ///     Captured value before applying action data.
         /// </summary>
-        protected TValue OriginalValue;
+        protected TValue originalValue;
 
         /// <summary>
         ///     Tween instance reused across state changes.
         /// </summary>
-        protected Tweener Tweener;
+        protected Tweener tweener;
+        
+        /// <summary>
+        ///     Determines whether the action needs an ActionData asset.
+        /// </summary>
+        private bool NeedsActionData => data == null;
         
         #region Serialized Fields
 
@@ -41,27 +47,39 @@ namespace Marmary.StateBehavior.Core
 
 
         /// <summary>
-        /// Sets the behavior action for the specified state and applies the corresponding data to the existing tweener.
-        /// </summary>
-        /// <param name="state">The state for which the behavior action is to be configured.</param>
-        public virtual void Set(TState state)
-        {
-            Guard.Against.Null(Tweener);
-            BehaviorActionFactory.Set(data.StateActionDataContainers[state].behaviorActionType, Tweener);
-            data.StateActionDataContainers[state].BehaviorActionData.ApplyData(Tweener, OriginalValue).Restart();
-        }
-
-
-        /// <summary>
         /// Sets up the action by initializing the starting value and creating a reusable tweener for state transitions.
         /// </summary>
         /// <param name="gameObject">Game object hosting the component.</param>
         public void Setup(GameObject gameObject)
         {
             InitializeStartValue(gameObject);
-            Tweener = CreateTweener(gameObject);
+            tweener = CreateTweener(gameObject);
         }
-        
+
+        /// <summary>
+        /// Sets the behavior action for the specified state and applies the corresponding data to the existing tweener.
+        /// </summary>
+        /// <param name="state">The state for which the behavior action is to be configured.</param>
+        public virtual UniTask Set(TState state)
+        {
+            Guard.Against.Null(tweener);
+            BehaviorActionFactory.Set(data.StateActionDataContainers[state].behaviorActionType, tweener);
+            data.StateActionDataContainers[state].BehaviorActionData.ApplyData(tweener, originalValue).Restart();
+            return AwaitTweenerCompletion();
+        }
+
+
+        /// <summary>
+        ///     Applies the behaviour for the supplied state instantly without animation.
+        /// </summary>
+        /// <param name="state">State to activate.</param>
+        public virtual void InstantSet(TState state)
+        {
+            Guard.Against.Null(tweener);
+            BehaviorActionFactory.Set(BehaviorActionTypes.Instant, tweener);
+            data.StateActionDataContainers[state].BehaviorActionData.ApplyData(tweener, originalValue).Restart();
+        }
+
         /// <summary>
         ///     Creates the tweener that will be reused for state transitions.
         /// </summary>
@@ -75,19 +93,20 @@ namespace Marmary.StateBehavior.Core
         /// <param name="gameObject">Game object hosting the component.</param>
         protected abstract void InitializeStartValue(GameObject gameObject);
 
-
         /// <summary>
-        ///     Applies the behaviour for the supplied state instantly without animation.
+        ///     Waits for the currently configured tweener to complete.
         /// </summary>
-        /// <param name="state">State to activate.</param>
-        public virtual void InstantSet(TState state)
+        /// <returns>A UniTask that completes when the tween finishes.</returns>
+        protected UniTask AwaitTweenerCompletion()
         {
-            Guard.Against.Null(Tweener);
-            BehaviorActionFactory.Set(BehaviorActionTypes.Instant, Tweener);
-            data.StateActionDataContainers[state].BehaviorActionData.ApplyData(Tweener, OriginalValue).Restart();
+            if (tweener == null || !tweener.IsActive())
+                return UniTask.CompletedTask;
+
+            var completionTask = tweener.AsyncWaitForCompletion();
+            return completionTask != null ? completionTask.AsUniTask() : UniTask.CompletedTask;
         }
-        
-        
+
+
 #if UNITY_EDITOR
         /// <summary>
         ///     Creates the backing <see cref="ScriptableObject" /> used by this action.
@@ -96,10 +115,7 @@ namespace Marmary.StateBehavior.Core
         protected abstract ScriptableObject CreateInstanceScriptableObject();
 
 
-        /// <summary>
-        ///     Determines whether the action needs an ActionData asset.
-        /// </summary>
-        private bool NeedsActionData => data == null;
+        
 
         /// <summary>
         ///     Opens a save dialog and creates a scriptable object asset for the action data.

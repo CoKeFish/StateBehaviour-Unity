@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Marmary.StateBehavior.Core;
 using Marmary.StateBehavior.Menu;
 using Sirenix.Serialization;
@@ -11,12 +10,12 @@ using UnityEngine.Serialization;
 namespace Marmary.StateBehavior
 {
     /// <summary>
-    ///     Base class for sequencers that control the order of elements using a criterion.
+    /// Base class for sequencers that determine the order of elements based on a specified sequencing criterion.
     /// </summary>
-    /// <typeparam name="TValue">Type of value used by the criterion.</typeparam>
-    /// <typeparam name="TState">Type of state enum.</typeparam>
+    /// <typeparam name="TState">The type representing the state enumeration.</typeparam>
+    /// <typeparam name="TTrigger">The type representing the trigger enumeration.</typeparam>
     [Serializable]
-    public class SequencerBase<TValue, TState> where TState : Enum
+    public class SequencerBase<TState, TTrigger> where TState : Enum where TTrigger : Enum
     {
         #region Fields
 
@@ -25,7 +24,7 @@ namespace Marmary.StateBehavior
         /// This criterion defines how the elements are sorted and can be customized to implement various ordering strategies.
         /// </summary>
         [FormerlySerializedAs("_criterion")] [SerializeField] [OdinSerialize] [SerializeReference]
-        public ISequencingCriterion<TValue, TState> criterion;
+        public ISequencingCriterion<TState, TTrigger> criterion;
 
         #endregion
 
@@ -37,10 +36,10 @@ namespace Marmary.StateBehavior
         /// </summary>
         /// <param name="elements">The elements to sort.</param>
         /// <returns>Sorted, read-only list of elements.</returns>
-        protected IReadOnlyList<Element<TState>> GetSortedElements(List<Element<TState>> elements)
+        protected IReadOnlyList<Element<TState, TTrigger>> GetSortedElements(List<Element<TState, TTrigger>> elements)
         {
             if (elements == null)
-                return Array.Empty<Element<TState>>();
+                return Array.Empty<Element<TState, TTrigger>>();
 
 
             if (criterion == null || elements.Count == 0)
