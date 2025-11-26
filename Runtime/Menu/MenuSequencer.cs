@@ -1,10 +1,12 @@
 #if STATE_BEHAVIOR_ENABLED
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Marmary.StateBehavior.Core;
+using Cysharp.Threading.Tasks;
 using Marmary.StateBehavior.SwitchState;
+using Sirenix.OdinInspector;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Marmary.StateBehavior.Menu
 {
@@ -13,49 +15,171 @@ namespace Marmary.StateBehavior.Menu
     ///     The sequencer determines the order in which elements should be shown or hidden based on a criterion.
     /// </summary>
     [Serializable]
-    public class MenuSequencer : SequencerBase<RectTransform, SwitchState.SwitchState>
+    public class MenuSequencer : SequencerBase<SwitchState.SwitchState, SwitchTrigger, SwitchElement>
     {
+        /// <summary>
+        /// Specifies the operation of hiding elements in a sequence within the MenuSequencer.
+        /// Used to make menu elements invisible or removed from view during sequencing.
+        /// </summary>
+        public enum SequencerOperation
+        {
+            /// <summary>
+            /// Represents the operation to display menu elements in a sequence.
+            /// When applied, the sequencer transitions the elements to a visible state.
+            /// </summary>
+            Show,
+
+
+            /// <summary>
+            /// Represents the operation of hiding elements in a sequence within the MenuSequencer.
+            /// This operation is used to make menu elements invisible or removed from view during the sequencing process.
+            /// </summary>
+            Hide
+        }
+
         #region Fields
 
-        public float _separation;
+        /// <summary>
+        ///     The menu elements represent the elements of the menu that will be animated
+        ///     It not necessarily has to be the children of the menu, it can be any game object
+        /// </summary>
+        [SerializeField] [BoxGroup("Menu")] private SwitchElement[] menuElements;
+
+        /// <summary>
+        /// Represents a list of asynchronous tasks that are executed as part of the menu sequencing operations,
+        /// such as showing or hiding menu elements.
+        /// This collection is used to aggregate tasks and ensure their completion before progressing further.
+        /// </summary>
+        private List<UniTask> _tasks = new();
+
+
+        /// <summary>
+        /// The time delay, in seconds, between the sequential animation of menu elements.
+        /// This value determines the interval at which each menu element is shown or hidden,
+        /// ensuring a smooth and timed transition sequence.
+        /// </summary>
+        [FormerlySerializedAs("_separation")] public float separation;
+
+        /// <summary>
+        /// Stores a reference to a Unity `Component` that is utilized by the menu sequencer for performing various operations
+        /// such as retrieving child objects or manipulating game objects related to menu functionality.
+        /// </summary>
+        private Component _component;
 
         #endregion
 
+        public MenuSequencer(Component component)
+        {
+            this._component = component;
+        }
 
-
-        #region Methods
 
         /// <summary>
-        ///     Sorts the menu elements according to the sequencing criterion.
+        /// Initiates the hiding process for all menu elements and waits for their animations or tasks to complete.
         /// </summary>
-        /// <param name="elements">The elements to sort.</param>
-        /// <returns>Sorted array of elements.</returns>
-        public SwitchElement[] SortElements(SwitchElement[] elements)
+        /// <returns>
+        /// A UniTask that completes when all menu element tasks are finished.
+        /// </returns>
+        public UniTask Hide()
         {
-            if (elements == null || elements.Length == 0)
-                return Array.Empty<SwitchElement>();
+            foreach (var menuElement in menuElements)
+            {
+                menuElement.OnHide();
+                _tasks.Add(menuElement.WhenTaskCompleted());
+            }
 
-            // Convert array to list of Element<SwitchState>
-            var elementList = elements.Cast<Element<SwitchState.SwitchState>>().ToList();
-
-            // Sort using base class method
-            var sortedList = SortElements(elementList);
-
-            // Convert back to SwitchElement array
-            return sortedList.Cast<SwitchElement>().ToArray();
+            return UniTask.WhenAll(_tasks);
         }
 
         /// <summary>
-        ///     Gets the delay time for a specific element based on its position in the sorted sequence.
+        /// Triggers the "show" behavior for all menu elements asynchronously and waits for all animations to complete.
         /// </summary>
-        /// <param name="elementIndex">The index of the element in the sorted sequence.</param>
-        /// <returns>The delay time in seconds.</returns>
-        public float GetDelayForElement(int elementIndex)
+        /// <return>
+        /// A UniTask that completes when all menu element tasks have finished executing.
+        /// </return>
+        public UniTask Show()
         {
-            return elementIndex * _separation;
+            foreach (var menuElement in menuElements)
+            {
+                menuElement.OnShow();
+                _tasks.Add(menuElement.WhenTaskCompleted());
+            }
+
+            return UniTask.WhenAll(_tasks);
         }
 
-        #endregion
+
+        /// <summary>
+        ///     Set the initial state of the menu elements (animations)
+        /// </summary>
+        public void InstantShow()
+        {
+            foreach (var menuElement in menuElements)
+            {
+                menuElement.OnShowInstant();
+            }
+        }
+
+        /// <summary>
+        ///     Set the final state of the menu elements for all animations/actions
+        /// </summary>
+        public void InstantHide()
+        {
+            foreach (var menuElement in menuElements)
+            {
+                menuElement.OnHideInstant();
+            }
+        }
+
+        /// <summary>
+        /// Sets up the menu sequencer by initializing all menu elements and calculating their animation times.
+        /// </summary>
+        public override void Setup()
+        {
+            GetAllMenuElements();
+            CalculateTimes();
+        }
+
+
+        /// <summary>
+        ///     Get all menu elements
+        /// </summary>
+        [Button(ButtonSizes.Large)]
+        [BoxGroup("Menu")]
+        public void GetAllMenuElements()
+        {
+            menuElements = _component.GetComponentsInChildren<SwitchElement>();
+#if UNITY_EDITOR
+            EditorUtility.SetDirty(_component);
+#endif
+        }
+
+        /// <summary>
+        ///     Reset the times of the menu elements and calculate them again.
+        ///     Note: This method is kept for compatibility but may need to be updated
+        ///     based on how durations are stored in SwitchElement actions.
+        /// </summary>
+        [Button(ButtonSizes.Large)]
+        [BoxGroup("Options")]
+        [PropertySpace(SpaceAfter = 0, SpaceBefore = 20)]
+        public void CalculateTimes()
+        {
+            var delayBeforeDeactivating = 0f;
+            var delayBeforeActivating = 0f;
+
+            if (menuElements == null) return;
+
+            foreach (var menuElement in menuElements)
+            {
+                menuElement.defaultHideAfter = delayBeforeDeactivating;
+                menuElement.defaultShowAfter = delayBeforeActivating;
+                delayBeforeDeactivating += separation;
+                delayBeforeActivating += separation;
+#if UNITY_EDITOR
+                EditorUtility.SetDirty(_component);
+#endif
+            }
+        }
     }
 }
 #endif

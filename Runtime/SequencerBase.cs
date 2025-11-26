@@ -14,8 +14,11 @@ namespace Marmary.StateBehavior
     /// </summary>
     /// <typeparam name="TState">The type representing the state enumeration.</typeparam>
     /// <typeparam name="TTrigger">The type representing the trigger enumeration.</typeparam>
+    /// <typeparam name="TValue">The type of elements being sequenced.</typeparam>
     [Serializable]
-    public class SequencerBase<TState, TTrigger> where TState : Enum where TTrigger : Enum
+    public abstract class SequencerBase<TState, TTrigger, TValue> where TState : Enum
+        where TTrigger : Enum
+        where TValue : Element<TState, TTrigger>
     {
         #region Fields
 
@@ -24,7 +27,7 @@ namespace Marmary.StateBehavior
         /// This criterion defines how the elements are sorted and can be customized to implement various ordering strategies.
         /// </summary>
         [FormerlySerializedAs("_criterion")] [SerializeField] [OdinSerialize] [SerializeReference]
-        public ISequencingCriterion<TState, TTrigger> criterion;
+        public ISequencingCriterion<TState, TTrigger, TValue> criterion;
 
         #endregion
 
@@ -36,10 +39,10 @@ namespace Marmary.StateBehavior
         /// </summary>
         /// <param name="elements">The elements to sort.</param>
         /// <returns>Sorted, read-only list of elements.</returns>
-        protected IReadOnlyList<Element<TState, TTrigger>> GetSortedElements(List<Element<TState, TTrigger>> elements)
+        protected List<TValue> GetSortedElements(List<TValue> elements)
         {
             if (elements == null)
-                return Array.Empty<Element<TState, TTrigger>>();
+                return new List<TValue>();
 
 
             if (criterion == null || elements.Count == 0)
@@ -47,6 +50,12 @@ namespace Marmary.StateBehavior
 
             return criterion.GetSortValues(elements);
         }
+
+
+        /// <summary>
+        /// Sets up the sequencer by initializing necessary components and configuring elements based on the specific implementation.
+        /// </summary>
+        public abstract void Setup();
 
         #endregion
     }

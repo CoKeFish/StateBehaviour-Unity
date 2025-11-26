@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using Marmary.StateBehavior.Menu;
-using Marmary.StateBehavior.SwitchState;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
-using Sirenix.Utilities;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -23,6 +19,8 @@ namespace Marmary.Libraries.UI.Menu.Core
     public class Menu : MonoBehaviour
     {
         #region Serialized Fields
+
+        #region Selectable Fields
 
         /// <summary>
         ///     First selectable of the menu when it is activated
@@ -58,6 +56,10 @@ namespace Marmary.Libraries.UI.Menu.Core
         [SerializeField] [ChildGameObjectsOnly] [BoxGroup("Options")] [PropertySpace(SpaceAfter = 10, SpaceBefore = 0)]
         public Selectable defaultRightButton;
 
+        #endregion
+
+        #region Menu Events
+
         /// <summary>
         ///     Event called when the menu is shown
         /// </summary>
@@ -81,6 +83,10 @@ namespace Marmary.Libraries.UI.Menu.Core
         /// </summary>
         [SerializeField] [FoldoutGroup("Events")]
         public UnityEvent onShowComplete;
+
+        #endregion
+
+        #region Options
 
         /// <summary>
         ///     Indicates if the menu has a deactivation delay
@@ -142,26 +148,19 @@ namespace Marmary.Libraries.UI.Menu.Core
         [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useSelectionTime")]
         private float timeToSelect;
 
-
-        /// <summary>
-        ///     The menu elements represent the elements of the menu that will be animated
-        ///     It not necessarily has to be the children of the menu, it can be any game object
-        /// </summary>
-        [SerializeField] [BoxGroup("Menu")] private SwitchElement[] menuElements;
-
-
         /// <summary>
         ///     Indicates the separation between elements
         /// </summary>
         [SerializeField] [BoxGroup("Options")] [TitleGroup("Options/Utilities")]
         private float separation;
 
+        #endregion
+
+
         /// <summary>
         ///     The sequencer that controls the order of menu elements.
         /// </summary>
-        [OdinSerialize][NonSerialized]
-        public MenuSequencer _sequencer = new();
-
+        [OdinSerialize] [NonSerialized] public MenuSequencer Sequencer;
 
         #endregion
 
@@ -188,22 +187,20 @@ namespace Marmary.Libraries.UI.Menu.Core
             if (useExtraActivationDelay)
             {
                 await UniTask.Delay(TimeSpan.FromSeconds(extraDelayBeforeActivating));
-                await ActivateMenuAnimation();
+                await Sequencer.Show();
             }
             else
             {
                 if (useShowAnimation)
-                    await ActivateMenuAnimation();
+                    await Sequencer.Show();
                 else
                     InstantShow();
             }
-
 
             await SelectFirstDelay();
 
             ActiveInteractables();
             onShowComplete.Invoke();
-
         }
 
         /// <summary>
@@ -219,30 +216,19 @@ namespace Marmary.Libraries.UI.Menu.Core
 
             if (useHideAnimation)
             {
-                //Hide the menu elements (animations) using the sequencer order
-
-                if (_sequencer != null && menuElements != null && menuElements.Length > 0)
-                {
-                    var sortedElements = _sequencer.SortElements(menuElements);
-                    var tasks = sortedElements
-                        .Select(menuElement => menuElement.Hide())
-                        .ToArray();
-
-                    await UniTask.WhenAll(tasks);
-                }
-
                 if (useExtraDelayBeforeDeactivating)
                     await UniTask.Delay(TimeSpan.FromSeconds(extraDelayBeforeDeactivating));
+                await Sequencer.Hide();
 
 
                 //Deactivate the menu after the animations
                 gameObject.SetActive(false);
-                
             }
             else
             {
                 InstantHide();
             }
+
             onHideComplete.Invoke();
         }
 
@@ -274,8 +260,7 @@ namespace Marmary.Libraries.UI.Menu.Core
         internal void InstantShow()
         {
             gameObject.SetActive(true);
-            foreach (var menuElement in menuElements) menuElement.InstantShow();
-
+            Sequencer.InstantShow();
             onShow.Invoke();
         }
 
@@ -284,8 +269,7 @@ namespace Marmary.Libraries.UI.Menu.Core
         /// </summary>
         internal void InstantHide()
         {
-            menuElements.ForEach(menu => menu.InstantHide());
-
+            Sequencer.InstantHide();
             onHide.Invoke();
             gameObject.SetActive(false);
         }
@@ -302,64 +286,6 @@ namespace Marmary.Libraries.UI.Menu.Core
                 firstSelected.Select();
         }
 
-        /// <summary>
-        ///     Show the menu elements (animations) using the sequencer order.
-        /// </summary>
-        private async UniTask ActivateMenuAnimation()
-        {
-            if (_sequencer == null || menuElements == null || menuElements.Length == 0)
-                return;
-
-            var sortedElements = _sequencer.SortElements(menuElements);
-            var tasks = sortedElements
-                .Select(menuElement => menuElement.Show())
-                .ToArray();
-
-            await UniTask.WhenAll(tasks);
-        }
-
         #endregion
-
-#if UNITY_EDITOR
-        
-        /// <summary>
-        ///     Get all menu elements
-        /// </summary>
-        [Button(ButtonSizes.Large)]
-        [BoxGroup("Menu")]
-        public void GetAllMenuElements()
-        {
-            menuElements = GetComponentsInChildren<SwitchElement>();
-
-            EditorUtility.SetDirty(this);
-        }
-
-        /// <summary>
-        ///     Reset the times of the menu elements and calculate them again.
-        ///     Note: This method is kept for compatibility but may need to be updated
-        ///     based on how durations are stored in SwitchElement actions.
-        /// </summary>
-        [Button(ButtonSizes.Large)]
-        [BoxGroup("Options")]
-        [PropertySpace(SpaceAfter = 0, SpaceBefore = 20)]
-        public void CalculateTimes()
-        {
-            delayBeforeDeactivating = 0f;
-            delayBeforeActivating = 0f;
-
-            if (menuElements == null) return;
-
-            foreach (var menuElement in menuElements)
-            {
-                menuElement.defaultHideAfter = delayBeforeDeactivating;
-                menuElement.defaultShowAfter = delayBeforeActivating;
-                delayBeforeDeactivating += separation;
-                delayBeforeActivating += separation;
-                EditorUtility.SetDirty(menuElement);
-            }
-            
-        }
-
-#endif
     }
 }
