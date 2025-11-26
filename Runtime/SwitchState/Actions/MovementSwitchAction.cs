@@ -56,14 +56,7 @@ namespace Marmary.StateBehavior.SwitchState.Actions
             if (target == null)
                 target = gameObject.GetComponent<RectTransform>();
 
-            if (target != null)
-            {
-                OriginalValue = target.localPosition;
-            }
-            else
-            {
-                OriginalValue = Vector3.zero;
-            }
+            OriginalValue = target != null ? target.localPosition : Vector3.zero;
         }
 
         /// <inheritdoc />
@@ -78,13 +71,12 @@ namespace Marmary.StateBehavior.SwitchState.Actions
                 return null;
             }
 
-            // Use DOTween.To pattern like other actions
             return DOTween.To(
                 () => target.localPosition,
                 x => target.localPosition = x,
                 OriginalValue,
-                0f // Temporary duration, will be set by ApplyData
-            ).SetAutoKill(false).Pause();
+                0f // duración temporal
+            ).Pause();
         }
 
         /// <summary>
@@ -161,7 +153,6 @@ namespace Marmary.StateBehavior.SwitchState.Actions
             else
             {
                 // For Show state, use base implementation
-                // ActionDataSimpleState for Show should have useOrigin = true to return to OriginalValue
                 base.Set(state);
             }
         }
@@ -181,24 +172,15 @@ namespace Marmary.StateBehavior.SwitchState.Actions
             if (state == SwitchState.Hide)
             {
                 var endPosition = GetEndPosition();
-                ApplyValueInstantly(endPosition);
+                if (target != null)
+                {
+                    target.localPosition = endPosition;
+                }
             }
             else
             {
                 // For Show state, use base implementation
                 base.InstantSet(state);
-            }
-        }
-
-        /// <summary>
-        ///     Applies the value instantly to the target component without animation.
-        /// </summary>
-        /// <param name="value">Value to apply.</param>
-        private void ApplyValueInstantly(Vector3 value)
-        {
-            if (target != null)
-            {
-                target.localPosition = value;
             }
         }
 
@@ -208,7 +190,7 @@ namespace Marmary.StateBehavior.SwitchState.Actions
         /// <inheritdoc />
         protected override ScriptableObject CreateInstanceScriptableObject()
         {
-            return ScriptableObject.CreateInstance<ActionDataSwitch<Vector3>>();
+            return ScriptableObject.CreateInstance<ActionDataMovementSwitch>();
         }
 #endif
     }

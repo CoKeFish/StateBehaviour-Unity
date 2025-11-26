@@ -12,28 +12,16 @@ namespace Marmary.StateBehavior.Menu
     ///     Controls the order and timing of menu element animations using a sequencing criterion.
     ///     The sequencer determines the order in which elements should be shown or hidden based on a criterion.
     /// </summary>
+    [Serializable]
     public class MenuSequencer : SequencerBase<RectTransform, SwitchState.SwitchState>
     {
         #region Fields
 
-        private readonly float _separation;
+        public float _separation;
 
         #endregion
 
-        #region Constructors
 
-        /// <summary>
-        ///     Creates a new menu sequencer with the specified criterion and separation time.
-        /// </summary>
-        /// <param name="criterion">The criterion used to determine element order.</param>
-        /// <param name="separation">Time delay between each element's animation (in seconds).</param>
-        public MenuSequencer(ISequencingCriterion<RectTransform, SwitchState.SwitchState> criterion, float separation = 0.1f)
-            : base(criterion)
-        {
-            _separation = separation;
-        }
-
-        #endregion
 
         #region Methods
 

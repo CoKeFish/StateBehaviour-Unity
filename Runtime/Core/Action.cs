@@ -8,6 +8,7 @@ using UnityEditor;
 #endif
 using UnityEngine;
 using UnityEngine.Serialization;
+using Object = UnityEngine.Object;
 
 namespace Marmary.StateBehavior.Core
 {
@@ -79,7 +80,7 @@ namespace Marmary.StateBehavior.Core
         ///     Applies the behaviour for the supplied state instantly without animation.
         /// </summary>
         /// <param name="state">State to activate.</param>
-        public void InstantSet(TState state)
+        public virtual void InstantSet(TState state)
         {
             Guard.Against.Null(Tweener);
             BehaviorActionFactory.Set(BehaviorActionTypes.Instant, Tweener);
@@ -96,9 +97,15 @@ namespace Marmary.StateBehavior.Core
 
 
         /// <summary>
+        ///     Determines whether the action needs an ActionData asset.
+        /// </summary>
+        private bool NeedsActionData => data == null;
+
+        /// <summary>
         ///     Opens a save dialog and creates a scriptable object asset for the action data.
         /// </summary>
         [Button("Crear ScriptableObject")]
+        [ShowIf(nameof(NeedsActionData))]
         private void CreateScriptableObject()
         {
             // Crear instancia
@@ -117,7 +124,40 @@ namespace Marmary.StateBehavior.Core
                 AssetDatabase.CreateAsset(asset, path);
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
+                
+                // Asignar automáticamente el ScriptableObject creado al campo data
+                if (asset is ActionData<TState, TValue> actionData)
+                {
+                    // Registrar el cambio en el sistema de Undo y marcar el objeto como modificado
+                    var selectedObject = Selection.activeGameObject;
+                    if (selectedObject != null)
+                    {
+                        var element = selectedObject.GetComponent<MonoBehaviour>();
+                        if (element != null)
+                        {
+                            Undo.RecordObject(element, "Assign ActionData");
+                            data = actionData;
+                            EditorUtility.SetDirty(element);
+                        }
+                        else
+                        {
+                            // Si no encontramos el componente, simplemente asignar el valor
+                            data = actionData;
+                        }
+                    }
+                    else
+                    {
+                        // Si no hay objeto seleccionado, simplemente asignar el valor
+                        data = actionData;
+                    }
+                }
+                
                 Debug.Log($"ActionData creado en: {path}");
+            }
+            else
+            {
+                // Si el usuario cancela, destruir la instancia temporal
+                Object.DestroyImmediate(asset);
             }
         }
 #endif

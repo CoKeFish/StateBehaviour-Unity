@@ -18,22 +18,22 @@ namespace Marmary.StateBehavior.SwitchState
         /// <summary>
         ///     Default delay before hiding animation starts.
         /// </summary>
-        [SerializeField] protected float defaultHideAfter;
+        [SerializeField] public float defaultHideAfter;
 
         /// <summary>
         ///     Default duration for hiding animation.
         /// </summary>
-        [SerializeField] protected float defaultHidingDuration = 0.5f;
+        [SerializeField] public float defaultHidingDuration = 0.5f;
 
         /// <summary>
         ///     Default delay before showing animation starts.
         /// </summary>
-        [SerializeField] protected float defaultShowAfter;
+        [SerializeField] public float defaultShowAfter;
 
         /// <summary>
         ///     Default duration for showing animation.
         /// </summary>
-        [SerializeField] protected float defaultShowingDuration = 0.5f;
+        [SerializeField] public float defaultShowingDuration = 0.5f;
 
         #endregion
 

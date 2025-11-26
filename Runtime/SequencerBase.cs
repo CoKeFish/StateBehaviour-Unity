@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Marmary.StateBehavior.Core;
 using Marmary.StateBehavior.Menu;
+using Sirenix.Serialization;
+using UnityEngine;
 
 #if STATE_BEHAVIOR_ENABLED
 namespace Marmary.StateBehavior
@@ -11,26 +13,17 @@ namespace Marmary.StateBehavior
     /// </summary>
     /// <typeparam name="TValue">Type of value used by the criterion.</typeparam>
     /// <typeparam name="TState">Type of state enum.</typeparam>
+    [Serializable]
     public class SequencerBase<TValue, TState> where TState : Enum
     {
         #region Fields
 
-        private readonly ISequencingCriterion<TValue, TState> _criterion;
+        [SerializeField][OdinSerialize][SerializeReference]
+        public ISequencingCriterion<TValue, TState> _criterion;
 
         #endregion
 
-        #region Constructors
 
-        /// <summary>
-        ///     Creates a new sequencer base with the specified criterion.
-        /// </summary>
-        /// <param name="criterion">The criterion used to determine element order.</param>
-        protected SequencerBase(ISequencingCriterion<TValue, TState> criterion)
-        {
-            _criterion = criterion ?? throw new ArgumentNullException(nameof(criterion));
-        }
-
-        #endregion
 
         #region Methods
 

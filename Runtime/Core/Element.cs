@@ -21,7 +21,7 @@ namespace Marmary.StateBehavior.Core
         /// <summary>
         ///     List of actions bound to the element for each state.
         /// </summary>
-        [SerializeReference] protected List<IStateContract<TState>> actions = new();
+        [SerializeReference][HideReferenceObjectPicker] protected List<IStateContract<TState>> actions = new();
 
         /// <summary>
         ///     Asset collection used to build the actions list.

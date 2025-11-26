@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using DTT.ExtendedDebugLogs;
-using Marmary.HellmenRaaun.Infrastructure;
 using Marmary.StateBehavior.Menu;
 using Marmary.StateBehavior.SwitchState;
 using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using Sirenix.Utilities;
 using UnityEditor;
 using UnityEngine;
@@ -70,6 +69,18 @@ namespace Marmary.Libraries.UI.Menu.Core
         /// </summary>
         [SerializeField] [FoldoutGroup("Events")]
         public UnityEvent onHide;
+
+        /// <summary>
+        /// Event that is triggered when the hiding animation or process of the menu has completed.
+        /// </summary>
+        [SerializeField] [FoldoutGroup("Events")]
+        public UnityEvent onHideComplete;
+
+        /// <summary>
+        /// Event triggered upon the completion of the menu's show animation or process.
+        /// </summary>
+        [SerializeField] [FoldoutGroup("Events")]
+        public UnityEvent onShowComplete;
 
         /// <summary>
         ///     Indicates if the menu has a deactivation delay
@@ -148,44 +159,17 @@ namespace Marmary.Libraries.UI.Menu.Core
         /// <summary>
         ///     The sequencer that controls the order of menu elements.
         /// </summary>
-        private MenuSequencer _sequencer;
+        [OdinSerialize][NonSerialized]
+        public MenuSequencer _sequencer = new();
 
-        /// <summary>
-        ///     The criterion used to determine the order of menu elements.
-        ///     If null, a default height-based criterion will be used.
-        /// </summary>
-        [SerializeField] 
-        [BoxGroup("Options")] 
-        [TitleGroup("Options/Utilities")]
-        [InfoBox("The sequencer will use a height-based criterion by default. Custom criteria can be set programmatically.")]
-        private bool useCustomCriterion;
 
         #endregion
 
-
-        /// <summary>
-        ///     Sets up all the menu elements and initializes the sequencer.
-        /// </summary>
-        internal void Setup()
+        [Button]
+        public void Hide()
         {
-
-            // Initialize sequencer with criterion
-            ISequencingCriterion<RectTransform, SwitchState> criterion;
-            if (useCustomCriterion && menuElements != null && menuElements.Length > 0)
-            {
-                // TODO: Allow custom criterion assignment via inspector
-                // For now, default to height-based criterion
-                criterion = new RectTransformHeightCriterion();
-            }
-            else
-            {
-                // Default to height-based criterion
-                criterion = new RectTransformHeightCriterion();
-            }
-
-            _sequencer = new MenuSequencer(criterion, separation);
+            InactivateMenu().Forget();
         }
-
 
         #region Methods
 
@@ -199,6 +183,7 @@ namespace Marmary.Libraries.UI.Menu.Core
         internal async UniTask ActivateMenu()
         {
             gameObject.SetActive(true);
+            onShow.Invoke();
             //Show the menu elements (animations) and wait for them to finish for selecting the first selectable
             if (useExtraActivationDelay)
             {
@@ -217,42 +202,8 @@ namespace Marmary.Libraries.UI.Menu.Core
             await SelectFirstDelay();
 
             ActiveInteractables();
+            onShowComplete.Invoke();
 
-            onShow.Invoke();
-        }
-
-        /// <summary>
-        ///     Make all selectables in the menu interactable
-        /// </summary>
-        internal void ActiveInteractables()
-        {
-            //Get all selectables in the menu
-            var selectables = GetComponentsInChildren<Selectable>();
-            //Interactable = true
-            foreach (var selectable in selectables) selectable.interactable = true;
-        }
-
-
-        /// <summary>
-        ///     Set the final state of the menu elements for all animations/actions
-        /// </summary>
-        internal void InstantHide()
-        {
-            menuElements.ForEach(menu => menu.InstantHide());
-
-            onHide.Invoke();
-            gameObject.SetActive(false);
-        }
-
-        /// <summary>
-        ///     Set the initial state of the menu elements (animations)
-        /// </summary>
-        internal void InstantShow()
-        {
-            gameObject.SetActive(true);
-            foreach (var menuElement in menuElements) menuElement.InstantShow();
-
-            onShow.Invoke();
         }
 
         /// <summary>
@@ -264,7 +215,7 @@ namespace Marmary.Libraries.UI.Menu.Core
         internal async UniTask InactivateMenu()
         {
             DisabledInteractables();
-
+            onHide.Invoke();
 
             if (useHideAnimation)
             {
@@ -286,13 +237,26 @@ namespace Marmary.Libraries.UI.Menu.Core
 
                 //Deactivate the menu after the animations
                 gameObject.SetActive(false);
-                onHide.Invoke();
+                
             }
             else
             {
                 InstantHide();
             }
+            onHideComplete.Invoke();
         }
+
+        /// <summary>
+        ///     Make all selectables in the menu interactable
+        /// </summary>
+        internal void ActiveInteractables()
+        {
+            //Get all selectables in the menu
+            var selectables = GetComponentsInChildren<Selectable>();
+            //Interactable = true
+            foreach (var selectable in selectables) selectable.interactable = true;
+        }
+
 
         /// <summary>
         ///     Make all selectables in the menu uninteractable
@@ -302,6 +266,28 @@ namespace Marmary.Libraries.UI.Menu.Core
             //Get all seleccatables in the menu and make them uninteractable
             var selectables = GetComponentsInChildren<Selectable>();
             foreach (var selectable in selectables) selectable.interactable = false;
+        }
+
+        /// <summary>
+        ///     Set the initial state of the menu elements (animations)
+        /// </summary>
+        internal void InstantShow()
+        {
+            gameObject.SetActive(true);
+            foreach (var menuElement in menuElements) menuElement.InstantShow();
+
+            onShow.Invoke();
+        }
+
+        /// <summary>
+        ///     Set the final state of the menu elements for all animations/actions
+        /// </summary>
+        internal void InstantHide()
+        {
+            menuElements.ForEach(menu => menu.InstantHide());
+
+            onHide.Invoke();
+            gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -335,24 +321,7 @@ namespace Marmary.Libraries.UI.Menu.Core
         #endregion
 
 #if UNITY_EDITOR
-
-        #region ISelfValidator Members
-
-        /// <summary>
-        ///     Called when the script is loaded or a value is
-        ///     changed in the inspector (Called in the editor only).
-        /// </summary>
-        public void Validate(SelfValidationResult result)
-        {
-            //Verificamos si el objecto esta en una escena
-            if (string.IsNullOrEmpty(gameObject.scene.name) ||
-                string.Equals(gameObject.scene.name, gameObject.name)) return;
-            GetAllMenuElements();
-            CalculateTimes();
-        }
-
-        #endregion
-
+        
         /// <summary>
         ///     Get all menu elements
         /// </summary>
@@ -380,30 +349,15 @@ namespace Marmary.Libraries.UI.Menu.Core
 
             if (menuElements == null) return;
 
-            // TODO: Implement duration calculation based on SwitchElement actions
-            // This will require accessing the ActionDataSimpleState duration values
-            // For now, this is a placeholder that maintains the structure
-
-            EditorUtility.SetDirty(this);
-        }
-
-        /// <summary>
-        ///     Sets the sequencing criterion to use height-based ordering (top to bottom).
-        ///     This uses the RectTransformHeightCriterion.
-        /// </summary>
-        [Button(ButtonSizes.Medium)]
-        [BoxGroup("Options", order: 1)]
-        [TitleGroup("Options/Utilities", order: 1)]
-        [PropertySpace(SpaceAfter = 0, SpaceBefore = 0)]
-        public void SetHeightBasedCriterion()
-        {
-            // Note: In a real implementation, you might want to create a ScriptableObject
-            // instance for the criterion. For now, this is a placeholder that shows
-            // how the sequencer would be configured.
-            var criterion = new RectTransformHeightCriterion();
-            _sequencer = new MenuSequencer(criterion, separation);
+            foreach (var menuElement in menuElements)
+            {
+                menuElement.defaultHideAfter = delayBeforeDeactivating;
+                menuElement.defaultShowAfter = delayBeforeActivating;
+                delayBeforeDeactivating += separation;
+                delayBeforeActivating += separation;
+                EditorUtility.SetDirty(menuElement);
+            }
             
-            EditorUtility.SetDirty(this);
         }
 
 #endif

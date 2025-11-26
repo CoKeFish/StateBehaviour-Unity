@@ -213,7 +213,6 @@ namespace Marmary.Libraries.UI.Menu.Core
         {
             foreach (var menu in allMenus)
             {
-                menu.Setup();
                 menu.InstantHide();
                 menu.gameObject.SetActive(false);
             }
