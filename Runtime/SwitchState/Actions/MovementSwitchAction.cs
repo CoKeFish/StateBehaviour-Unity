@@ -1,24 +1,35 @@
 #if STATE_BEHAVIOR_ENABLED
 using System;
 using DG.Tweening;
-using Marmary.StateBehavior.Core;
-using Marmary.StateBehavior.SwitchState;
 using Sirenix.OdinInspector;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+
 using UnityEngine;
 
 namespace Marmary.StateBehavior.SwitchState.Actions
 {
     /// <summary>
-    ///     Enum representing the positions where an element can be hidden.
+    /// Represents the position to the right where an element can be hidden.
     /// </summary>
     public enum Position
     {
+        /// <summary>
+        /// Specifies the top position within the enum, indicating that the element should be hidden at the top of the screen.
+        /// </summary>
         Top,
+
+        /// <summary>
+        /// Represents the bottom position where an element can be hidden.
+        /// </summary>
         Bottom,
+
+        /// <summary>
+        /// Specifies the 'Left' position, representing the element being hidden to the left side of the screen.
+        /// </summary>
         Left,
+
+        /// <summary>
+        /// Specifies the right position within the enum, indicating that the element should be hidden at the right of the screen.
+        /// </summary>
         Right
     }
 
@@ -42,8 +53,7 @@ namespace Marmary.StateBehavior.SwitchState.Actions
         /// <summary>
         ///     Scale correction factor for width calculations when hiding to left/right.
         /// </summary>
-        [LabelWidth(140)]
-        [Tooltip("Scale correction factor applied to width calculations for left/right hiding.")]
+        [LabelWidth(140)] [Tooltip("Scale correction factor applied to width calculations for left/right hiding.")]
         public float scaleCorrection = 1f;
 
         #endregion
@@ -56,7 +66,7 @@ namespace Marmary.StateBehavior.SwitchState.Actions
             if (target == null)
                 target = gameObject.GetComponent<RectTransform>();
 
-            OriginalValue = target != null ? target.localPosition : Vector3.zero;
+            originalValue = target != null ? target.localPosition : Vector3.zero;
         }
 
         /// <inheritdoc />
@@ -65,18 +75,16 @@ namespace Marmary.StateBehavior.SwitchState.Actions
             if (target == null)
                 target = gameObject.GetComponent<RectTransform>();
 
-            if (target == null)
-            {
-                Debug.LogWarning($"MovementSwitchAction: RectTransform not found on {gameObject.name}");
-                return null;
-            }
+            if (target != null)
+                return DOTween.To(
+                    () => target.localPosition,
+                    x => target.localPosition = x,
+                    originalValue,
+                    0f // duración temporal
+                ).Pause();
+            Debug.LogWarning($"MovementSwitchAction: RectTransform not found on {gameObject.name}");
+            return null;
 
-            return DOTween.To(
-                () => target.localPosition,
-                x => target.localPosition = x,
-                OriginalValue,
-                0f // duración temporal
-            ).Pause();
         }
 
         /// <summary>
@@ -94,13 +102,13 @@ namespace Marmary.StateBehavior.SwitchState.Actions
             return hidingPosition switch
             {
                 Position.Top => new Vector3(
-                    OriginalValue.x,
+                    originalValue.x,
                     Screen.height * 0.5f + rect.height * pivot.y,
-                    OriginalValue.z),
+                    originalValue.z),
                 Position.Bottom => new Vector3(
-                    OriginalValue.x,
+                    originalValue.x,
                     -Screen.height * 0.5f - rect.height * (1 - pivot.y),
-                    OriginalValue.z),
+                    originalValue.z),
                 Position.Left => new Vector3(
                     -Screen.width * 0.5f - rect.width * (1 - pivot.x) * scaleCorrection,
                     localPosition.y,
@@ -111,77 +119,6 @@ namespace Marmary.StateBehavior.SwitchState.Actions
                     localPosition.z),
                 _ => Vector3.zero
             };
-        }
-
-        /// <summary>
-        ///     Sets the behavior action for the specified state and applies the corresponding data.
-        ///     Overridden to handle dynamic end position calculation for Hide state.
-        /// </summary>
-        /// <param name="state">The state for which the behavior action is to be configured.</param>
-        public override void Set(SwitchState state)
-        {
-            if (Tweener == null) return;
-
-            var stateWrapper = data.StateActionDataContainers[state];
-            var stateData = stateWrapper.BehaviorActionData;
-            
-            BehaviorActionFactory.Set(stateWrapper.behaviorActionType, Tweener);
-
-            // For Hide state, we need to calculate the end position dynamically
-            // For Show state, use base implementation which handles useOrigin correctly
-            if (state == SwitchState.Hide)
-            {
-                // Calculate dynamic end position based on hidingPosition
-                var endPosition = GetEndPosition();
-                
-                // Apply configuration manually for Hide state
-                if (stateData is ActionDataSimpleState<Vector3> simpleState)
-                {
-                    var delay = simpleState.useCustomDelay ? simpleState.customDelay : 0f;
-                    Tweener
-                        .SetEase(simpleState.easeShow)
-                        .SetDelay(delay)
-                        .ChangeEndValue(endPosition, simpleState.duration, true)
-                        .Restart();
-                }
-                else
-                {
-                    // Fallback if not ActionDataSimpleState
-                    Tweener.ChangeEndValue(endPosition, 0.5f, true).Restart();
-                }
-            }
-            else
-            {
-                // For Show state, use base implementation
-                base.Set(state);
-            }
-        }
-
-        /// <summary>
-        ///     Applies the behaviour for the supplied state instantly without animation.
-        ///     Overridden to handle dynamic end position calculation for Hide state.
-        /// </summary>
-        /// <param name="state">State to activate.</param>
-        public override void InstantSet(SwitchState state)
-        {
-            if (Tweener == null) return;
-
-            BehaviorActionFactory.Set(BehaviorActionTypes.Instant, Tweener);
-
-            // For Hide state, calculate end position dynamically and apply instantly
-            if (state == SwitchState.Hide)
-            {
-                var endPosition = GetEndPosition();
-                if (target != null)
-                {
-                    target.localPosition = endPosition;
-                }
-            }
-            else
-            {
-                // For Show state, use base implementation
-                base.InstantSet(state);
-            }
         }
 
         #endregion

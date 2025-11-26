@@ -18,7 +18,7 @@ namespace Marmary.StateBehavior.SelectableState.Actions
             return DOTween.To(
                 () => target.color,
                 x => target.color = x,
-                OriginalValue,
+                originalValue,
                 0f // duración temporal
             ).Pause();
         }
@@ -26,7 +26,7 @@ namespace Marmary.StateBehavior.SelectableState.Actions
         /// <inheritdoc />
         protected override void InitializeStartValue(GameObject gameObject)
         {
-            OriginalValue = target.color;
+            originalValue = target.color;
         }
 
 #if UNITY_EDITOR

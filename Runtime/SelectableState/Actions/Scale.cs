@@ -17,7 +17,7 @@ namespace Marmary.StateBehavior.SelectableState.Actions
             return DOTween.To(
                 () => target.transform.localScale,
                 x => target.transform.localScale = x,
-                OriginalValue,
+                originalValue,
                 0f // duración temporal
             ).Pause();
         }
@@ -25,7 +25,7 @@ namespace Marmary.StateBehavior.SelectableState.Actions
         /// <inheritdoc />
         protected override void InitializeStartValue(GameObject gameObject)
         {
-            OriginalValue = gameObject.transform.localScale;
+            originalValue = gameObject.transform.localScale;
         }
 
 #if UNITY_EDITOR

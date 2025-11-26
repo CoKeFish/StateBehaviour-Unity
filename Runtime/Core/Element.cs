@@ -1,6 +1,7 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Marmary.StateBehavior.Runtime;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
@@ -17,6 +18,22 @@ namespace Marmary.StateBehavior.Core
     /// </summary>
     public abstract class Element<TState, TTrigger> : SerializedMonoBehaviour where TState : Enum where TTrigger : Enum
     {
+        /// <summary>
+        /// The default delay, in seconds, before the element is shown.
+        /// This value is typically used to define the initial time interval
+        /// before triggering the visibility state of an element within a sequenced or state-driven context.
+        /// </summary>
+        public float defaultShowAfter = 0.5f;
+
+        /// <summary>
+        /// The default time, in seconds, after which an element is hidden
+        /// automatically when no further interaction or action is performed.
+        /// This delay period can be used to configure behavior such as auto-hiding
+        /// menus, tooltips, or UI components after a predefined duration.
+        /// </summary>
+        public float defaultHideAfter = 0.5f;
+        
+        
         #region Serialized Fields
 
         /// <summary>
@@ -77,6 +94,19 @@ namespace Marmary.StateBehavior.Core
         protected virtual void Awake()
         {
             ExecuteInstantly = executeInstantly;
+        }
+
+        /// <summary>
+        /// Executes a completion task that monitors the execution state of the
+        /// associated state machine. This method resolves when all pending
+        /// actions and transitions in the state machine have been completed.
+        /// </summary>
+        /// <returns>
+        /// A UniTask that completes when the state machine execution process has finished.
+        /// </returns>
+        public UniTask WhenTaskCompleted()
+        {
+            return stateMachine.WhenExecutionCompletes();
         }
         
 
