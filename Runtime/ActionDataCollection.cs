@@ -6,7 +6,7 @@ using System.Reflection;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Marmary.StateBehavior.Core
+namespace Marmary.StateBehavior.Runtime
 {
     /// <summary>
     ///     Collection of <see cref="ActionDataBase" /> assets used to build runtime actions.

@@ -1,7 +1,5 @@
 #if STATE_BEHAVIOR_ENABLED
-using Marmary.StateBehavior.Core;
-
-namespace Marmary.StateBehavior.SwitchState
+namespace Marmary.StateBehavior.Runtime.SwitchState
 {
     /// <summary>
     ///     Base action data mapping for <see cref="SwitchState" /> driven behaviours.

@@ -2,7 +2,7 @@
 using System;
 using UnityEngine;
 
-namespace Marmary.StateBehavior.SwitchState
+namespace Marmary.StateBehavior.Runtime.SwitchState
 {
     /// <summary>
     ///     Base action used by switchable UI elements to tween component values.
@@ -10,7 +10,7 @@ namespace Marmary.StateBehavior.SwitchState
     /// <typeparam name="TComponent">Component that receives tweened values.</typeparam>
     /// <typeparam name="TValue">Type of value driven by the tween.</typeparam>
     [Serializable]
-    public abstract class SwitchAction<TComponent, TValue> : Core.Action<SwitchState, TValue>
+    public abstract class SwitchAction<TComponent, TValue> : Action<SwitchState, TValue>
         where TComponent : Component
     {
         #region Serialized Fields

@@ -3,13 +3,13 @@ using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Marmary.StateBehavior.SelectableState
+namespace Marmary.StateBehavior.Runtime.SelectableState
 {
     /// <summary>
     ///     Base selectable action that manages tween lifecycle for a specific component type.
     /// </summary>
     [Serializable]
-    public abstract class SelectableAction<TComponent, TValue> : Core.Action<SelectableState, TValue>
+    public abstract class SelectableAction<TComponent, TValue> : Action<SelectableState, TValue>
         where TComponent : Component
     {
         #region Serialized Fields

@@ -4,7 +4,7 @@ using DG.Tweening;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Marmary.StateBehavior.Core
+namespace Marmary.StateBehavior.Runtime
 {
     /// <summary>
     ///     Simple state configuration that controls timing, easing and value blending for tweened actions.

@@ -1,5 +1,5 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
-namespace Marmary.StateBehavior.SelectableState.Elements
+namespace Marmary.StateBehavior.Runtime.SelectableState.Elements
 {
     /// <summary>
     ///     Concrete selectable element configured for buttons.

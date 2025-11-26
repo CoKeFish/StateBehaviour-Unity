@@ -1,5 +1,5 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
-namespace Marmary.StateBehavior.SelectableState
+namespace Marmary.StateBehavior.Runtime.SelectableState
 {
     /// <summary>
     ///     Represents the possible states for a selectable UI element.

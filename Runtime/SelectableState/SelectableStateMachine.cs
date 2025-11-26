@@ -1,10 +1,8 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
 using System.Collections.Generic;
-using Marmary.StateBehavior.Core;
-using Marmary.StateBehavior.Runtime;
 using UnityEngine;
 
-namespace Marmary.StateBehavior.SelectableState
+namespace Marmary.StateBehavior.Runtime.SelectableState
 {
     /// <summary>
     ///     State machine for managing the state transitions and actions of a selectable UI element.

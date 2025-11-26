@@ -6,7 +6,7 @@ using DTT.ExtendedDebugLogs;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Marmary.Libraries.UI.Menu.Core
+namespace Marmary.StateBehavior.Runtime.Menu
 {
     /// <inheritdoc />
     /// <summary>

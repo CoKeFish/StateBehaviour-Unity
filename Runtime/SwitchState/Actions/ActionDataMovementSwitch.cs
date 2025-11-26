@@ -1,8 +1,7 @@
 #if STATE_BEHAVIOR_ENABLED
-using Marmary.StateBehavior.SwitchState;
 using UnityEngine;
 
-namespace Marmary.StateBehavior.SwitchState.Actions
+namespace Marmary.StateBehavior.Runtime.SwitchState.Actions
 {
     /// <summary>
     ///     Action data for MovementSwitchAction that animates RectTransform movement for show and hide transitions.

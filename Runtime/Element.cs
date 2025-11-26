@@ -2,16 +2,13 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Marmary.StateBehavior.Runtime;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
-namespace Marmary.StateBehavior.Core
+namespace Marmary.StateBehavior.Runtime
 {
     /// <summary>
     ///     Base MonoBehaviour responsible for orchestrating state-driven actions.

@@ -1,7 +1,7 @@
 #if STATE_BEHAVIOR_ENABLED
 using System.Collections.Generic;
 
-namespace Marmary.StateBehavior.Menu
+namespace Marmary.StateBehavior.Runtime
 {
     /// <summary>
     ///     Interface for defining criteria to determine the order of menu elements in a sequencer.

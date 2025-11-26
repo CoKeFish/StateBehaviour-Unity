@@ -2,7 +2,7 @@
 using DG.Tweening;
 using UnityEngine;
 
-namespace Marmary.StateBehavior.SelectableState.Actions
+namespace Marmary.StateBehavior.Runtime.SelectableState.Actions
 {
     /// <summary>
     ///     Tweens the local scale of a <see cref="RectTransform" /> in response to selectable state changes.

@@ -1,4 +1,4 @@
-﻿namespace Marmary.StateBehavior.SwitchState
+﻿namespace Marmary.StateBehavior.Runtime.SwitchState
 {
     public class MenuElement:SwitchElement
     {

@@ -2,13 +2,13 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Marmary.StateBehavior.SwitchState;
+using Marmary.StateBehavior.Runtime.SwitchState;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace Marmary.StateBehavior.Menu
+namespace Marmary.StateBehavior.Runtime.Menu
 {
     /// <summary>
     ///     Controls the order and timing of menu element animations using a sequencing criterion.

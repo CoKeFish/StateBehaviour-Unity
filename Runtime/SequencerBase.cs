@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using Marmary.StateBehavior.Core;
-using Marmary.StateBehavior.Menu;
 using Sirenix.Serialization;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 #if STATE_BEHAVIOR_ENABLED
-namespace Marmary.StateBehavior
+namespace Marmary.StateBehavior.Runtime
 {
     /// <summary>
     /// Base class for sequencers that determine the order of elements based on a specified sequencing criterion.

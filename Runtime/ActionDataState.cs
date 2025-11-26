@@ -1,7 +1,7 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
 using DG.Tweening;
 
-namespace Marmary.StateBehavior.Core
+namespace Marmary.StateBehavior.Runtime
 {
     /// <summary>
     ///     Represents a runtime configuration that can be applied to a tween for a specific state.

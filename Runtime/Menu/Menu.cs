@@ -1,6 +1,5 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
-using Marmary.StateBehavior.Menu;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine;
@@ -8,7 +7,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace Marmary.Libraries.UI.Menu.Core
+namespace Marmary.StateBehavior.Runtime.Menu
 {
     /// <inheritdoc cref="UnityEngine.MonoBehaviour" />
     /// <summary>

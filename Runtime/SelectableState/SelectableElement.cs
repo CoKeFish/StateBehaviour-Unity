@@ -1,11 +1,10 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
 using Marmary.Libraries.UI.Events;
-using Marmary.StateBehavior.Core;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace Marmary.StateBehavior.SelectableState
+namespace Marmary.StateBehavior.Runtime.SelectableState
 {
     /// <summary>
     ///     Represents an abstract base class for a selectable UI element.

@@ -1,10 +1,8 @@
 #if STATE_BEHAVIOR_ENABLED
 using System.Collections.Generic;
-using Marmary.StateBehavior.Core;
-using Marmary.StateBehavior.Runtime;
 using UnityEngine;
 
-namespace Marmary.StateBehavior.SwitchState
+namespace Marmary.StateBehavior.Runtime.SwitchState
 {
     /// <summary>
     /// Defines a state machine responsible for managing state transitions,

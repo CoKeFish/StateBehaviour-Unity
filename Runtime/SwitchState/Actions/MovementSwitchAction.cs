@@ -1,11 +1,11 @@
 #if STATE_BEHAVIOR_ENABLED
+
 using System;
 using DG.Tweening;
 using Sirenix.OdinInspector;
-
 using UnityEngine;
 
-namespace Marmary.StateBehavior.SwitchState.Actions
+namespace Marmary.StateBehavior.Runtime.SwitchState.Actions
 {
     /// <summary>
     /// Represents the position to the right where an element can be hidden.

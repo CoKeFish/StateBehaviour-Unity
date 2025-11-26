@@ -3,7 +3,7 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Marmary.StateBehavior.SelectableState.Actions
+namespace Marmary.StateBehavior.Runtime.SelectableState.Actions
 {
     /// <summary>
     ///     Animates the color of a <see cref="UnityEngine.UI.Image" /> component when selectable states change.

@@ -1,7 +1,7 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
 using UnityEngine;
 
-namespace Marmary.StateBehavior.SelectableState.Actions
+namespace Marmary.StateBehavior.Runtime.SelectableState.Actions
 {
     /// <summary>
     ///     Scriptable object that stores color targets for text-based selectable actions.

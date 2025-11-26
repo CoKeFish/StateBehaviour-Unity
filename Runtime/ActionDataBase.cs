@@ -1,7 +1,7 @@
 #if STATE_BEHAVIOR_ENABLED
 using Sirenix.OdinInspector;
 
-namespace Marmary.StateBehavior.Core
+namespace Marmary.StateBehavior.Runtime
 {
     /// <summary>
     ///     Base <see cref="SerializedScriptableObject" /> used to store configuration for behaviour actions.

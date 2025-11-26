@@ -1,7 +1,5 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
-using Marmary.StateBehavior.Core;
-
-namespace Marmary.StateBehavior.SelectableState
+namespace Marmary.StateBehavior.Runtime.SelectableState
 {
     /// <summary>
     ///     Base action data scoped to <see cref="SelectableState" /> values.

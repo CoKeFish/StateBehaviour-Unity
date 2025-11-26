@@ -1,17 +1,17 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using System;
 using Ardalis.GuardClauses;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Sirenix.OdinInspector;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 using UnityEngine;
 using UnityEngine.Serialization;
 using Object = UnityEngine.Object;
 
-namespace Marmary.StateBehavior.Core
+namespace Marmary.StateBehavior.Runtime
 {
     /// <summary>
     ///     Base action that binds a <see cref="ActionData{TState, TValue}" /> asset and exposes creation utilities in-editor.
@@ -103,7 +103,7 @@ namespace Marmary.StateBehavior.Core
                 return UniTask.CompletedTask;
 
             var completionTask = tweener.AsyncWaitForCompletion();
-            return completionTask != null ? completionTask.AsUniTask() : UniTask.CompletedTask;
+            return completionTask.AsUniTask();
         }
 
 

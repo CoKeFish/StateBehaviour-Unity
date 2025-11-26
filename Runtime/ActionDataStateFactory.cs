@@ -1,7 +1,7 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
 using System;
 
-namespace Marmary.StateBehavior.Core
+namespace Marmary.StateBehavior.Runtime
 {
     /// <summary>
     ///     Factory responsible for creating <see cref="ActionDataState{TValue}" /> instances based on behavior types.

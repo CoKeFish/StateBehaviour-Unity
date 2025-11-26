@@ -2,7 +2,7 @@
 using System;
 using DG.Tweening;
 
-namespace Marmary.StateBehavior.Core
+namespace Marmary.StateBehavior.Runtime
 {
     /// <summary>
     /// Represents a behavior type that executes a tween instantly,

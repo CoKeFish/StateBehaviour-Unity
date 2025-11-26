@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Marmary.StateBehavior.Menu
+namespace Marmary.StateBehavior.Runtime.Criterions
 {
     /// <summary>
     ///     Criterion that orders menu elements by the Y position (height) of their RectTransform.

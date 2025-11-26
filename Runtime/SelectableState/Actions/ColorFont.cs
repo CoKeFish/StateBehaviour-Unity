@@ -3,7 +3,7 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
-namespace Marmary.StateBehavior.SelectableState.Actions
+namespace Marmary.StateBehavior.Runtime.SelectableState.Actions
 {
     /// <summary>
     ///     Animates the text color of a <see cref="TextMeshProUGUI" /> when selectable states change.

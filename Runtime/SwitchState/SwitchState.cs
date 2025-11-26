@@ -1,5 +1,5 @@
 #if STATE_BEHAVIOR_ENABLED
-namespace Marmary.StateBehavior.SwitchState
+namespace Marmary.StateBehavior.Runtime.SwitchState
 {
     /// <summary>
     ///     Represents the visibility states for a switchable UI element.

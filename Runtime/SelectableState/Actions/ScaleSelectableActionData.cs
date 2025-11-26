@@ -1,7 +1,7 @@
 #if STATE_BEHAVIOR_ENABLED
 using UnityEngine;
 
-namespace Marmary.StateBehavior.SelectableState.Actions
+namespace Marmary.StateBehavior.Runtime.SelectableState.Actions
 {
     /// <summary>
     ///     Scriptable object containing per-state scale targets for selectable elements.
