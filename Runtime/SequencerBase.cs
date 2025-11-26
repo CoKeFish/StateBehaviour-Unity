@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Marmary.StateBehavior.Core;
 using Marmary.StateBehavior.Menu;
 using Sirenix.Serialization;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 #if STATE_BEHAVIOR_ENABLED
 namespace Marmary.StateBehavior
@@ -18,11 +20,14 @@ namespace Marmary.StateBehavior
     {
         #region Fields
 
-        [SerializeField][OdinSerialize][SerializeReference]
-        public ISequencingCriterion<TValue, TState> _criterion;
+        /// <summary>
+        /// Represents the sequencing criterion used by the sequencer to determine the order of elements.
+        /// This criterion defines how the elements are sorted and can be customized to implement various ordering strategies.
+        /// </summary>
+        [FormerlySerializedAs("_criterion")] [SerializeField] [OdinSerialize] [SerializeReference]
+        public ISequencingCriterion<TValue, TState> criterion;
 
         #endregion
-
 
 
         #region Methods
@@ -31,13 +36,17 @@ namespace Marmary.StateBehavior
         ///     Sorts the elements according to the sequencing criterion.
         /// </summary>
         /// <param name="elements">The elements to sort.</param>
-        /// <returns>Sorted list of elements.</returns>
-        protected List<Element<TState>> SortElements(List<Element<TState>> elements)
+        /// <returns>Sorted, read-only list of elements.</returns>
+        protected IReadOnlyList<Element<TState>> GetSortedElements(List<Element<TState>> elements)
         {
-            if (_criterion == null || elements == null || elements.Count == 0)
-                return elements ?? new List<Element<TState>>();
+            if (elements == null)
+                return Array.Empty<Element<TState>>();
 
-            return _criterion.GetSortValues(elements);
+
+            if (criterion == null || elements.Count == 0)
+                return elements;
+
+            return criterion.GetSortValues(elements);
         }
 
         #endregion

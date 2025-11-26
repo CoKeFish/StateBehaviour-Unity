@@ -1,7 +1,7 @@
 #if STATE_BEHAVIOR_ENABLED
 using System.Collections.Generic;
 using Marmary.StateBehavior.Core;
-using Sirenix.Utilities;
+using Marmary.StateBehavior.Runtime;
 using UnityEngine;
 
 namespace Marmary.StateBehavior.SwitchState
@@ -11,24 +11,8 @@ namespace Marmary.StateBehavior.SwitchState
     /// supporting operations to switch states dynamically while executing
     /// corresponding behaviors or animations.
     /// </summary>
-    internal class SwitchStateMachine : StateMachineBase<SwitchState, SwitchTrigger>
+    internal class SwitchStateMachine : StateBehaviourStateMachine<SwitchState, SwitchTrigger>
     {
-        #region Fields
-
-        /// <summary>
-        /// Stores a collection of state-specific actions that implement the IStateContract interface,
-        /// allowing the state machine to execute setup and transition logic for each state.
-        /// </summary>
-        private readonly List<IStateContract<SwitchState>> _actions;
-
-        /// <summary>
-        /// Represents the SwitchElement instance associated with the state machine,
-        /// which controls UI element show and hide transitions and manages related animations.
-        /// </summary>
-        private readonly SwitchElement _switchElement;
-
-        #endregion
-
         #region Constructors and Injected
 
         /// <summary>
@@ -41,21 +25,12 @@ namespace Marmary.StateBehavior.SwitchState
         public SwitchStateMachine(SwitchState initialState,
             GameObject gameObject,
             List<IStateContract<SwitchState>> actions,
-            SwitchElement switchElement) : base(initialState)
+            SwitchElement switchElement) : base(initialState, gameObject, actions, switchElement)
         {
-            _switchElement = switchElement;
-            _actions = actions;
-
-            ConfigureStateMachine();
-
-            if (_actions.IsNullOrEmpty()) return;
-
-            foreach (var action in _actions) 
-                action.Setup(gameObject);
         }
 
         #endregion
-        
+
 
         #region Methods
 
@@ -72,26 +47,8 @@ namespace Marmary.StateBehavior.SwitchState
                 .PermitReentry(SwitchTrigger.OnHide)
                 .OnEntry(ExecuteActions);
         }
-        
-        #endregion
-
-        #region Helpers
-
-        /// <summary>
-        /// Executes all actions configured for the current state of the state machine.
-        /// </summary>
-        protected override void ExecuteActions()
-        {
-            if (!_actions.IsNullOrEmpty())
-                foreach (var action in _actions)
-                    action.Set(StateMachine.State);
-
-            if (_switchElement.Events.ContainsKey(StateMachine.State))
-                _switchElement.Events[StateMachine.State]?.Invoke();
-        }
 
         #endregion
     }
 }
 #endif
-

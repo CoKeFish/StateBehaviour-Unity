@@ -1,7 +1,7 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
 using System.Collections.Generic;
 using Marmary.StateBehavior.Core;
-using Sirenix.Utilities;
+using Marmary.StateBehavior.Runtime;
 using UnityEngine;
 
 namespace Marmary.StateBehavior.SelectableState
@@ -9,22 +9,8 @@ namespace Marmary.StateBehavior.SelectableState
     /// <summary>
     ///     State machine for managing the state transitions and actions of a selectable UI element.
     /// </summary>
-    internal class SelectableStateMachine : StateMachineBase<SelectableState, SelectableTrigger>
+    internal class SelectableStateMachine : StateBehaviourStateMachine<SelectableState, SelectableTrigger>
     {
-        #region Fields
-
-        /// <summary>
-        ///     The animation element that handles events for selection states.
-        /// </summary>
-        private readonly SelectableElement _selectableElement;
-
-        /// <summary>
-        ///     List of actions to execute on state changes.
-        /// </summary>
-        private readonly List<IStateContract<SelectableState>> _actions;
-
-        #endregion
-
         #region Constructors and Injected
 
         /// <summary>
@@ -37,17 +23,8 @@ namespace Marmary.StateBehavior.SelectableState
         public SelectableStateMachine(SelectableState initialState,
             GameObject gameObject,
             List<IStateContract<SelectableState>> actions,
-            SelectableElement selectableElement) : base(initialState)
+            SelectableElement selectableElement) : base(initialState, gameObject, actions, selectableElement)
         {
-            _actions = actions;
-            _selectableElement = selectableElement;
-
-            ConfigureStateMachine();
-            
-            if (actions.IsNullOrEmpty()) return;
-            
-            foreach (var action in actions) 
-                action.Setup(gameObject);
         }
 
         #endregion
@@ -96,19 +73,7 @@ namespace Marmary.StateBehavior.SelectableState
                 .Permit(SelectableTrigger.PointerUp, SelectableState.Normal) // Released outside, no click
                 .OnEntry(ExecuteActions);
         }
-
-        /// <summary>
-        ///     Executes the configured actions and events for the current state.
-        /// </summary>
-        protected override void ExecuteActions()
-        {
-            if (_actions.IsNullOrEmpty()) return;
-            foreach (var action in _actions)
-                action.Set(StateMachine.State);
-
-            if (_selectableElement.Events.ContainsKey(StateMachine.State))
-                _selectableElement.Events[StateMachine.State]?.Invoke();
-        }
+        
 
         #endregion
     }
