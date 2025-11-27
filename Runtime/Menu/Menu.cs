@@ -5,6 +5,7 @@ using Sirenix.Serialization;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Marmary.StateBehavior.Runtime.Menu
@@ -57,9 +58,17 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// <summary>
         ///     The sequencer that controls the order of menu elements.
         /// </summary>
-        [OdinSerialize] [NonSerialized] public MenuSequencer Sequencer;
+        [SerializeField] [HideLabel]
+        public MenuSequencer sequencer = new ();
 
         #endregion
+
+
+        public void Awake()
+        {
+            sequencer.Setup( this);
+        }
+
 
         #region Methods
 
@@ -78,12 +87,12 @@ namespace Marmary.StateBehavior.Runtime.Menu
             if (useExtraActivationDelay)
             {
                 await UniTask.Delay(TimeSpan.FromSeconds(extraDelayBeforeActivating));
-                await Sequencer.Show();
+                await sequencer.Show();
             }
             else
             {
                 if (useShowAnimation)
-                    await Sequencer.Show();
+                    await sequencer.Show();
                 else
                     InstantShow();
             }
@@ -109,7 +118,7 @@ namespace Marmary.StateBehavior.Runtime.Menu
             {
                 if (useExtraDelayBeforeDeactivating)
                     await UniTask.Delay(TimeSpan.FromSeconds(extraDelayBeforeDeactivating));
-                await Sequencer.Hide();
+                await sequencer.Hide();
 
 
                 //Deactivate the menu after the animations
@@ -151,7 +160,7 @@ namespace Marmary.StateBehavior.Runtime.Menu
         internal void InstantShow()
         {
             gameObject.SetActive(true);
-            Sequencer.InstantShow();
+            sequencer.InstantShow();
             onShow.Invoke();
         }
 
@@ -160,7 +169,7 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// </summary>
         internal void InstantHide()
         {
-            Sequencer.InstantHide();
+            sequencer.InstantHide();
             onHide.Invoke();
             gameObject.SetActive(false);
         }
@@ -185,6 +194,19 @@ namespace Marmary.StateBehavior.Runtime.Menu
         public void Hide()
         {
             InactivateMenu().Forget();
+        }
+        
+        [Button]
+        public void Show()
+        {
+            ActivateMenu().Forget();
+        }
+
+        [Button]
+        public void Setup()
+        {
+            sequencer.Setup(this);
+            sequencer.Setup();
         }
 
         #endregion
@@ -278,12 +300,6 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// </summary>
         [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useSelectionTime")]
         private float timeToSelect;
-
-        /// <summary>
-        ///     Indicates the separation between elements
-        /// </summary>
-        [SerializeField] [BoxGroup("Options")] [TitleGroup("Options/Utilities")]
-        private float separation;
 
         #endregion
     }

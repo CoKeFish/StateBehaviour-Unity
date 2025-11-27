@@ -9,7 +9,7 @@ namespace Marmary.StateBehavior.Runtime
     /// <summary>
     ///     Wraps the configuration for a state, including the selected behavior type and its data instance.
     /// </summary>
-    [Serializable]
+    [Serializable][HideLabel][HideReferenceObjectPicker]
     public class ActionDataStateWrapper<TValue>
     {
         #region Serialized Fields

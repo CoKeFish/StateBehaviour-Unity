@@ -78,7 +78,13 @@ namespace Marmary.StateBehavior.Runtime.Menu
 
         #region Constructors and Injected
 
-        public MenuSequencer(Component component)
+        /// <summary>
+        /// Sets up the menu sequencer by initializing a component required for its operation.
+        /// </summary>
+        /// <param name="component">
+        /// The component to be initialized and assigned to the sequencer for functional purposes.
+        /// </param>
+        public void Setup(Component component)
         {
             _component = component;
         }
@@ -154,8 +160,6 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// <summary>
         ///     Get all menu elements
         /// </summary>
-        [Button(ButtonSizes.Large)]
-        [BoxGroup("Menu")]
         public void GetAllMenuElements()
         {
             menuElements = _component.GetComponentsInChildren<SwitchElement>();
@@ -169,9 +173,6 @@ namespace Marmary.StateBehavior.Runtime.Menu
         ///     Note: This method is kept for compatibility but may need to be updated
         ///     based on how durations are stored in SwitchElement actions.
         /// </summary>
-        [Button(ButtonSizes.Large)]
-        [BoxGroup("Options")]
-        [PropertySpace(SpaceAfter = 0, SpaceBefore = 20)]
         public void CalculateTimes()
         {
             var delayBeforeDeactivating = 0f;
