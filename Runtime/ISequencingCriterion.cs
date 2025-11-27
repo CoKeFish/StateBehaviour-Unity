@@ -9,6 +9,8 @@ namespace Marmary.StateBehavior.Runtime
     /// </summary>
     public interface ISequencingCriterion<TElement>
     {
+        #region Methods
+
         /// <summary>
         ///     Gets the sorting value for a given menu element.
         ///     Elements will be sorted based on this value.
@@ -16,6 +18,8 @@ namespace Marmary.StateBehavior.Runtime
         /// <param name="element">The menu element to evaluate.</param>
         /// <returns>A value used for sorting. Lower values come first.</returns>
         List<TElement> GetSortValues(List<TElement> element);
+
+        #endregion
     }
 }
 

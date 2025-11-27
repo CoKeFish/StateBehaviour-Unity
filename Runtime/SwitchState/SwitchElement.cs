@@ -19,7 +19,7 @@ namespace Marmary.StateBehavior.Runtime.SwitchState
 
         #endregion
 
-        #region Methods
+        #region Event Functions
 
         /// <summary>
         ///     Fires the show trigger.

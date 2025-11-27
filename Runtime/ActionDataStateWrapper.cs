@@ -35,7 +35,7 @@ namespace Marmary.StateBehavior.Runtime
         /// <summary>
         ///     Instance containing the configuration for the selected behavior type.
         /// </summary>
-        [InlineProperty] [HideLabel] [ShowInInspector][HideReferenceObjectPicker]
+        [InlineProperty] [HideLabel] [ShowInInspector] [HideReferenceObjectPicker]
         public ActionDataState<TValue> BehaviorActionData;
 
         #endregion

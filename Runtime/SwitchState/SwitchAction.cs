@@ -21,8 +21,6 @@ namespace Marmary.StateBehavior.Runtime.SwitchState
         [SerializeField] protected TComponent target;
 
         #endregion
-  
     }
 }
 #endif
-

@@ -134,13 +134,11 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// <param name="stack"> Indicates if the current active menu should be stacked in the queue</param>
         public async UniTask SetMenuActive(Menu menu, bool animate, bool stack)
         {
-            Guard.Against.Null(menu, nameof(menu), "Menu cannot be null");
+            Guard.Against.Null(menu, "Menu cannot be null");
 
             if (menu == CurrentActiveMenu)
-            {
                 //DebugEx.LogWarning("The menu is already active", UITag.Menu);
                 return;
-            }
 
             if (stack)
             {

@@ -8,7 +8,7 @@ using UnityEngine.Serialization;
 namespace Marmary.StateBehavior.Runtime
 {
     /// <summary>
-    /// Base class for sequencers that determine the order of elements based on a specified sequencing criterion.
+    ///     Base class for sequencers that determine the order of elements based on a specified sequencing criterion.
     /// </summary>
     /// <typeparam name="TState">The type representing the state enumeration.</typeparam>
     /// <typeparam name="TTrigger">The type representing the trigger enumeration.</typeparam>
@@ -18,17 +18,23 @@ namespace Marmary.StateBehavior.Runtime
         where TTrigger : Enum
         where TValue : Element<TState, TTrigger>
     {
-        #region Fields
+        #region Serialized Fields
 
         /// <summary>
-        /// Represents the sequencing criterion used by the sequencer to determine the order of elements.
-        /// This criterion defines how the elements are sorted and can be customized to implement various ordering strategies.
+        ///     Represents the sequencing criterion used by the sequencer to determine the order of elements.
+        ///     This criterion defines how the elements are sorted and can be customized to implement various ordering strategies.
         /// </summary>
         [FormerlySerializedAs("_criterion")] [SerializeField] [OdinSerialize] [SerializeReference]
         public ISequencingCriterion<TValue> criterion;
 
         #endregion
 
+
+        /// <summary>
+        ///     Sets up the sequencer by initializing necessary components and configuring elements based on the specific
+        ///     implementation.
+        /// </summary>
+        public abstract void Setup();
 
         #region Methods
 
@@ -48,12 +54,6 @@ namespace Marmary.StateBehavior.Runtime
 
             return criterion.GetSortValues(elements);
         }
-
-
-        /// <summary>
-        /// Sets up the sequencer by initializing necessary components and configuring elements based on the specific implementation.
-        /// </summary>
-        public abstract void Setup();
 
         #endregion
     }

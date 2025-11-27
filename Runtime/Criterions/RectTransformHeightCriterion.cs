@@ -11,9 +11,11 @@ namespace Marmary.StateBehavior.Runtime.Criterions
     /// </summary>
     public class RectTransformHeightCriterion<TElement> : ISequencingCriterion<TElement> where TElement : Component
     {
+        #region ISequencingCriterion<TElement> Members
+
         /// <summary>
-        /// Sorts a list of menu elements by the Y position (height) of their RectTransform in descending order.
-        /// Elements with higher Y values are ordered first.
+        ///     Sorts a list of menu elements by the Y position (height) of their RectTransform in descending order.
+        ///     Elements with higher Y values are ordered first.
         /// </summary>
         /// <param name="elements">List of menu elements to be sorted based on their RectTransform Y position.</param>
         /// <returns>A list of menu elements sorted from top to bottom by their RectTransform Y position.</returns>
@@ -26,6 +28,8 @@ namespace Marmary.StateBehavior.Runtime.Criterions
                 .OrderByDescending(e => e.GetComponent<RectTransform>().anchoredPosition.y)
                 .ToList();
         }
+
+        #endregion
     }
 }
 #endif

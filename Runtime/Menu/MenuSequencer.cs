@@ -17,27 +17,31 @@ namespace Marmary.StateBehavior.Runtime.Menu
     [Serializable]
     public class MenuSequencer : SequencerBase<SwitchState.SwitchState, SwitchTrigger, SwitchElement>
     {
+        #region SequencerOperation enum
+
         /// <summary>
-        /// Specifies the operation of hiding elements in a sequence within the MenuSequencer.
-        /// Used to make menu elements invisible or removed from view during sequencing.
+        ///     Specifies the operation of hiding elements in a sequence within the MenuSequencer.
+        ///     Used to make menu elements invisible or removed from view during sequencing.
         /// </summary>
         public enum SequencerOperation
         {
             /// <summary>
-            /// Represents the operation to display menu elements in a sequence.
-            /// When applied, the sequencer transitions the elements to a visible state.
+            ///     Represents the operation to display menu elements in a sequence.
+            ///     When applied, the sequencer transitions the elements to a visible state.
             /// </summary>
             Show,
 
 
             /// <summary>
-            /// Represents the operation of hiding elements in a sequence within the MenuSequencer.
-            /// This operation is used to make menu elements invisible or removed from view during the sequencing process.
+            ///     Represents the operation of hiding elements in a sequence within the MenuSequencer.
+            ///     This operation is used to make menu elements invisible or removed from view during the sequencing process.
             /// </summary>
             Hide
         }
 
-        #region Fields
+        #endregion
+
+        #region Serialized Fields
 
         /// <summary>
         ///     The menu elements represent the elements of the menu that will be animated
@@ -45,40 +49,58 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// </summary>
         [SerializeField] [BoxGroup("Menu")] private SwitchElement[] menuElements;
 
-        /// <summary>
-        /// Represents a list of asynchronous tasks that are executed as part of the menu sequencing operations,
-        /// such as showing or hiding menu elements.
-        /// This collection is used to aggregate tasks and ensure their completion before progressing further.
-        /// </summary>
-        private List<UniTask> _tasks = new();
-
 
         /// <summary>
-        /// The time delay, in seconds, between the sequential animation of menu elements.
-        /// This value determines the interval at which each menu element is shown or hidden,
-        /// ensuring a smooth and timed transition sequence.
+        ///     The time delay, in seconds, between the sequential animation of menu elements.
+        ///     This value determines the interval at which each menu element is shown or hidden,
+        ///     ensuring a smooth and timed transition sequence.
         /// </summary>
         [FormerlySerializedAs("_separation")] public float separation;
 
+        #endregion
+
+        #region Fields
+
         /// <summary>
-        /// Stores a reference to a Unity `Component` that is utilized by the menu sequencer for performing various operations
-        /// such as retrieving child objects or manipulating game objects related to menu functionality.
+        ///     Stores a reference to a Unity `Component` that is utilized by the menu sequencer for performing various operations
+        ///     such as retrieving child objects or manipulating game objects related to menu functionality.
         /// </summary>
         private Component _component;
 
+        /// <summary>
+        ///     Represents a list of asynchronous tasks that are executed as part of the menu sequencing operations,
+        ///     such as showing or hiding menu elements.
+        ///     This collection is used to aggregate tasks and ensure their completion before progressing further.
+        /// </summary>
+        private List<UniTask> _tasks = new();
+
         #endregion
+
+        #region Constructors and Injected
 
         public MenuSequencer(Component component)
         {
-            this._component = component;
+            _component = component;
         }
 
+        #endregion
 
         /// <summary>
-        /// Initiates the hiding process for all menu elements and waits for their animations or tasks to complete.
+        ///     Sets up the menu sequencer by initializing all menu elements and calculating their animation times.
+        /// </summary>
+        public override void Setup()
+        {
+            GetAllMenuElements();
+            CalculateTimes();
+        }
+
+        #region Methods
+
+        /// <summary>
+        ///     Initiates the hiding process for all menu elements and waits for their animations or tasks to complete.
         /// </summary>
         /// <returns>
-        /// A UniTask that completes when all menu element tasks are finished.
+        ///     A UniTask that completes when all menu element tasks are finished.
         /// </returns>
         public UniTask Hide()
         {
@@ -92,10 +114,10 @@ namespace Marmary.StateBehavior.Runtime.Menu
         }
 
         /// <summary>
-        /// Triggers the "show" behavior for all menu elements asynchronously and waits for all animations to complete.
+        ///     Triggers the "show" behavior for all menu elements asynchronously and waits for all animations to complete.
         /// </summary>
         /// <return>
-        /// A UniTask that completes when all menu element tasks have finished executing.
+        ///     A UniTask that completes when all menu element tasks have finished executing.
         /// </return>
         public UniTask Show()
         {
@@ -114,10 +136,7 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// </summary>
         public void InstantShow()
         {
-            foreach (var menuElement in menuElements)
-            {
-                menuElement.OnShowInstant();
-            }
+            foreach (var menuElement in menuElements) menuElement.OnShowInstant();
         }
 
         /// <summary>
@@ -125,21 +144,12 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// </summary>
         public void InstantHide()
         {
-            foreach (var menuElement in menuElements)
-            {
-                menuElement.OnHideInstant();
-            }
+            foreach (var menuElement in menuElements) menuElement.OnHideInstant();
         }
 
-        /// <summary>
-        /// Sets up the menu sequencer by initializing all menu elements and calculating their animation times.
-        /// </summary>
-        public override void Setup()
-        {
-            GetAllMenuElements();
-            CalculateTimes();
-        }
+        #endregion
 
+        #region Editor
 
         /// <summary>
         ///     Get all menu elements
@@ -180,6 +190,8 @@ namespace Marmary.StateBehavior.Runtime.Menu
 #endif
             }
         }
+
+        #endregion
     }
 }
 #endif

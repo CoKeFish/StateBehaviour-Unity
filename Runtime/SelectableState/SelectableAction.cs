@@ -20,7 +20,6 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         [SerializeField] [PropertyOrder(-10)] protected TComponent target;
 
         #endregion
-        
     }
 }
 #endif

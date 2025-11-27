@@ -71,7 +71,6 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
                 .Permit(SelectableTrigger.PointerUp, SelectableState.Normal) // Released outside, no click
                 .OnEntry(ExecuteActions);
         }
-        
 
         #endregion
     }

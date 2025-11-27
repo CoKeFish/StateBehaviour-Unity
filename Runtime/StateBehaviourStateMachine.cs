@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Marmary.StateBehavior.Runtime
 {
     /// <summary>
-    /// Represents an abstract state machine that operates with states and triggers defined as enumerations.
+    ///     Represents an abstract state machine that operates with states and triggers defined as enumerations.
     /// </summary>
     /// <typeparam name="TState">The enumeration type representing the states.</typeparam>
     /// <typeparam name="TTrigger">The enumeration type representing the triggers.</typeparam>
@@ -15,10 +15,7 @@ namespace Marmary.StateBehavior.Runtime
         where TState : Enum
         where TTrigger : Enum
     {
-        /// <summary>
-        ///     List of actions to execute on state changes.
-        /// </summary>
-        private readonly List<IStateContract<TState>> _actions;
+        #region Fields
 
         /// <summary>
         ///     The animation element that handles events for selection states.
@@ -26,16 +23,27 @@ namespace Marmary.StateBehavior.Runtime
         private readonly Element<TState, TTrigger> _selectableElement;
 
         /// <summary>
+        ///     List of actions to execute on state changes.
+        /// </summary>
+        private readonly List<IStateContract<TState>> _actions;
+
+        /// <summary>
         ///     Collection of asynchronous tasks generated while executing the current state.
         /// </summary>
         private readonly List<UniTask> _executionTasks = new();
 
+        #endregion
+
+        #region Properties
 
         /// <summary>
         ///     Executes all actions or events configured for the current state of the state machine.
         /// </summary>
         public bool ShouldExecuteInstantly { get; set; }
 
+        #endregion
+
+        #region Constructors and Injected
 
         protected StateBehaviourStateMachine(TState initialState,
             GameObject gameObject,
@@ -54,23 +62,9 @@ namespace Marmary.StateBehavior.Runtime
                 action.Setup(gameObject);
         }
 
+        #endregion
 
-        /// <summary>
-        ///     Clears the list of tasks registered for the current execution batch.
-        /// </summary>
-        private void ResetExecutionTasks()
-        {
-            _executionTasks.Clear();
-        }
-
-        /// <summary>
-        ///     Adds a task to be tracked as part of the current execution batch.
-        /// </summary>
-        /// <param name="task">Task created while executing the state.</param>
-        private void AddExecutionTask(UniTask task)
-        {
-            _executionTasks.Add(task);
-        }
+        #region Methods
 
         /// <summary>
         ///     Fires a trigger forcing the next state execution to run instantly.
@@ -85,7 +79,7 @@ namespace Marmary.StateBehavior.Runtime
         }
 
         /// <summary>
-        /// Fires a trigger asynchronously, ensuring that the next state execution is not forced to run instantly.
+        ///     Fires a trigger asynchronously, ensuring that the next state execution is not forced to run instantly.
         /// </summary>
         /// <param name="trigger">The trigger to fire.</param>
         public void FireTriggerAsync(TTrigger trigger)
@@ -95,7 +89,7 @@ namespace Marmary.StateBehavior.Runtime
             StateMachine.Fire(trigger);
             ShouldExecuteInstantly = previousInstantSetting;
         }
-        
+
 
         /// <summary>
         ///     Retrieves a task that completes when all registered execution tasks finish.
@@ -127,40 +121,52 @@ namespace Marmary.StateBehavior.Runtime
             AnimationProcess(currentState);
         }
 
+
         /// <summary>
-        /// Executes animation tasks for the given state by processing all actions associated with the current state.
+        ///     Clears the list of tasks registered for the current execution batch.
+        /// </summary>
+        private void ResetExecutionTasks()
+        {
+            _executionTasks.Clear();
+        }
+
+        /// <summary>
+        ///     Adds a task to be tracked as part of the current execution batch.
+        /// </summary>
+        /// <param name="task">Task created while executing the state.</param>
+        private void AddExecutionTask(UniTask task)
+        {
+            _executionTasks.Add(task);
+        }
+
+        /// <summary>
+        ///     Executes animation tasks for the given state by processing all actions associated with the current state.
         /// </summary>
         /// <param name="currentState">The current state of the state machine for which the actions are being executed.</param>
         private void AnimationProcess(TState currentState)
         {
             var tasks = new List<UniTask>(_actions.Count);
-            foreach (var action in _actions)
-            {
-                tasks.Add(action.Set(currentState));
-            }
+            foreach (var action in _actions) tasks.Add(action.Set(currentState));
 
             var finalTask = AwaitActionsThenInvokeEvents(tasks, currentState);
             AddExecutionTask(finalTask);
         }
 
         /// <summary>
-        /// Executes instant processing for the specified state by applying all associated actions
-        /// and invoking relevant state events.
+        ///     Executes instant processing for the specified state by applying all associated actions
+        ///     and invoking relevant state events.
         /// </summary>
         /// <param name="currentState">The current state to process instantly.</param>
         private void InstantProcess(TState currentState)
         {
-            foreach (var action in _actions)
-            {
-                action.InstantSet(currentState);
-            }
+            foreach (var action in _actions) action.InstantSet(currentState);
 
             TriggerStateEvents(currentState);
             AddExecutionTask(UniTask.CompletedTask);
         }
 
         /// <summary>
-        /// Triggers the associated events for the specified state in the selectable element.
+        ///     Triggers the associated events for the specified state in the selectable element.
         /// </summary>
         /// <param name="state">The current state for which the events should be triggered.</param>
         private void TriggerStateEvents(TState state)
@@ -170,7 +176,7 @@ namespace Marmary.StateBehavior.Runtime
         }
 
         /// <summary>
-        /// Awaits the completion of the provided asynchronous tasks and then triggers state-specific events.
+        ///     Awaits the completion of the provided asynchronous tasks and then triggers state-specific events.
         /// </summary>
         /// <param name="tasks">A list of asynchronous tasks to be awaited.</param>
         /// <param name="state">The current state for which events will be triggered after task completion.</param>
@@ -180,5 +186,7 @@ namespace Marmary.StateBehavior.Runtime
             await UniTask.WhenAll(tasks);
             TriggerStateEvents(state);
         }
+
+        #endregion
     }
 }

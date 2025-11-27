@@ -19,8 +19,6 @@ namespace Marmary.StateBehavior.Runtime.Menu
     {
         #region Serialized Fields
 
-        #region Selectable Fields
-
         /// <summary>
         ///     First selectable of the menu when it is activated
         /// </summary>
@@ -55,106 +53,6 @@ namespace Marmary.StateBehavior.Runtime.Menu
         [SerializeField] [ChildGameObjectsOnly] [BoxGroup("Options")] [PropertySpace(SpaceAfter = 10, SpaceBefore = 0)]
         public Selectable defaultRightButton;
 
-        #endregion
-
-        #region Menu Events
-
-        /// <summary>
-        ///     Event called when the menu is shown
-        /// </summary>
-        [SerializeField] [FoldoutGroup("Events", false, 1)]
-        public UnityEvent onShow;
-
-        /// <summary>
-        ///     Event called when the menu is hidden
-        /// </summary>
-        [SerializeField] [FoldoutGroup("Events")]
-        public UnityEvent onHide;
-
-        /// <summary>
-        /// Event that is triggered when the hiding animation or process of the menu has completed.
-        /// </summary>
-        [SerializeField] [FoldoutGroup("Events")]
-        public UnityEvent onHideComplete;
-
-        /// <summary>
-        /// Event triggered upon the completion of the menu's show animation or process.
-        /// </summary>
-        [SerializeField] [FoldoutGroup("Events")]
-        public UnityEvent onShowComplete;
-
-        #endregion
-
-        #region Options
-
-        /// <summary>
-        ///     Indicates if the menu has a deactivation delay
-        /// </summary>
-        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useHideAnimation")]
-        public bool useHideAnimation;
-
-        /// <summary>
-        ///     Time to wait before deactivating the menu
-        /// </summary>
-        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useHideAnimation")] [ReadOnly]
-        private float delayBeforeDeactivating = 0.5f;
-
-        /// <summary>
-        ///     Indicates if the menu has an extra deactivation delay
-        /// </summary>
-        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useExtraDelayBeforeDeactivating")]
-        private bool useExtraDelayBeforeDeactivating;
-
-        /// <summary>
-        ///     Extra time to wait before deactivating the menu
-        /// </summary>
-        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useExtraDelayBeforeDeactivating")]
-        private float extraDelayBeforeDeactivating;
-
-        /// <summary>
-        ///     Indicates if the menu has an activation delay
-        /// </summary>
-        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useShowAnimation")]
-        public bool useShowAnimation = true;
-
-        /// <summary>
-        ///     Time to wait before activating the menu
-        /// </summary>
-        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useShowAnimation")] [ReadOnly]
-        private float delayBeforeActivating;
-
-        /// <summary>
-        ///     Indicates if the menu has an activation delay
-        /// </summary>
-        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useExtraActivationDelay")]
-        private bool useExtraActivationDelay;
-
-        /// <summary>
-        ///     Time to wait before activating the menu
-        /// </summary>
-        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useExtraActivationDelay")]
-        private float extraDelayBeforeActivating = 0.5f;
-
-        /// <summary>
-        ///     Indicates if the menu has an activation delay before selecting the first selectable
-        /// </summary>
-        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useSelectionTime")]
-        private bool useSelectionTime;
-
-        /// <summary>
-        ///     Time to wait before selecting the first selectable
-        /// </summary>
-        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useSelectionTime")]
-        private float timeToSelect;
-
-        /// <summary>
-        ///     Indicates the separation between elements
-        /// </summary>
-        [SerializeField] [BoxGroup("Options")] [TitleGroup("Options/Utilities")]
-        private float separation;
-
-        #endregion
-
 
         /// <summary>
         ///     The sequencer that controls the order of menu elements.
@@ -162,12 +60,6 @@ namespace Marmary.StateBehavior.Runtime.Menu
         [OdinSerialize] [NonSerialized] public MenuSequencer Sequencer;
 
         #endregion
-
-        [Button]
-        public void Hide()
-        {
-            InactivateMenu().Forget();
-        }
 
         #region Methods
 
@@ -284,6 +176,114 @@ namespace Marmary.StateBehavior.Runtime.Menu
             if (firstSelected && !EventSystem.current.currentSelectedGameObject)
                 firstSelected.Select();
         }
+
+        #endregion
+
+        #region Editor
+
+        [Button]
+        public void Hide()
+        {
+            InactivateMenu().Forget();
+        }
+
+        #endregion
+
+        #region Menu Events
+
+        /// <summary>
+        ///     Event called when the menu is shown
+        /// </summary>
+        [SerializeField] [FoldoutGroup("Events", false, 1)]
+        public UnityEvent onShow;
+
+        /// <summary>
+        ///     Event called when the menu is hidden
+        /// </summary>
+        [SerializeField] [FoldoutGroup("Events")]
+        public UnityEvent onHide;
+
+        /// <summary>
+        ///     Event that is triggered when the hiding animation or process of the menu has completed.
+        /// </summary>
+        [SerializeField] [FoldoutGroup("Events")]
+        public UnityEvent onHideComplete;
+
+        /// <summary>
+        ///     Event triggered upon the completion of the menu's show animation or process.
+        /// </summary>
+        [SerializeField] [FoldoutGroup("Events")]
+        public UnityEvent onShowComplete;
+
+        #endregion
+
+        #region Options
+
+        /// <summary>
+        ///     Indicates if the menu has a deactivation delay
+        /// </summary>
+        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useHideAnimation")]
+        public bool useHideAnimation;
+
+        /// <summary>
+        ///     Time to wait before deactivating the menu
+        /// </summary>
+        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useHideAnimation")] [ReadOnly]
+        private float delayBeforeDeactivating = 0.5f;
+
+        /// <summary>
+        ///     Indicates if the menu has an extra deactivation delay
+        /// </summary>
+        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useExtraDelayBeforeDeactivating")]
+        private bool useExtraDelayBeforeDeactivating;
+
+        /// <summary>
+        ///     Extra time to wait before deactivating the menu
+        /// </summary>
+        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useExtraDelayBeforeDeactivating")]
+        private float extraDelayBeforeDeactivating;
+
+        /// <summary>
+        ///     Indicates if the menu has an activation delay
+        /// </summary>
+        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useShowAnimation")]
+        public bool useShowAnimation = true;
+
+        /// <summary>
+        ///     Time to wait before activating the menu
+        /// </summary>
+        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useShowAnimation")] [ReadOnly]
+        private float delayBeforeActivating;
+
+        /// <summary>
+        ///     Indicates if the menu has an activation delay
+        /// </summary>
+        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useExtraActivationDelay")]
+        private bool useExtraActivationDelay;
+
+        /// <summary>
+        ///     Time to wait before activating the menu
+        /// </summary>
+        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useExtraActivationDelay")]
+        private float extraDelayBeforeActivating = 0.5f;
+
+        /// <summary>
+        ///     Indicates if the menu has an activation delay before selecting the first selectable
+        /// </summary>
+        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useSelectionTime")]
+        private bool useSelectionTime;
+
+        /// <summary>
+        ///     Time to wait before selecting the first selectable
+        /// </summary>
+        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useSelectionTime")]
+        private float timeToSelect;
+
+        /// <summary>
+        ///     Indicates the separation between elements
+        /// </summary>
+        [SerializeField] [BoxGroup("Options")] [TitleGroup("Options/Utilities")]
+        private float separation;
 
         #endregion
     }

@@ -8,27 +8,28 @@ using UnityEngine;
 namespace Marmary.StateBehavior.Runtime.SwitchState.Actions
 {
     /// <summary>
-    /// Represents the position to the right where an element can be hidden.
+    ///     Represents the position to the right where an element can be hidden.
     /// </summary>
     public enum Position
     {
         /// <summary>
-        /// Specifies the top position within the enum, indicating that the element should be hidden at the top of the screen.
+        ///     Specifies the top position within the enum, indicating that the element should be hidden at the top of the screen.
         /// </summary>
         Top,
 
         /// <summary>
-        /// Represents the bottom position where an element can be hidden.
+        ///     Represents the bottom position where an element can be hidden.
         /// </summary>
         Bottom,
 
         /// <summary>
-        /// Specifies the 'Left' position, representing the element being hidden to the left side of the screen.
+        ///     Specifies the 'Left' position, representing the element being hidden to the left side of the screen.
         /// </summary>
         Left,
 
         /// <summary>
-        /// Specifies the right position within the enum, indicating that the element should be hidden at the right of the screen.
+        ///     Specifies the right position within the enum, indicating that the element should be hidden at the right of the
+        ///     screen.
         /// </summary>
         Right
     }
@@ -84,8 +85,15 @@ namespace Marmary.StateBehavior.Runtime.SwitchState.Actions
                 ).Pause();
             Debug.LogWarning($"MovementSwitchAction: RectTransform not found on {gameObject.name}");
             return null;
-
         }
+
+#if UNITY_EDITOR
+        /// <inheritdoc />
+        protected override ScriptableObject CreateInstanceScriptableObject()
+        {
+            return ScriptableObject.CreateInstance<ActionDataMovementSwitch>();
+        }
+#endif
 
         /// <summary>
         ///     Gets the end position for hiding animation based on the configured hiding position.
@@ -122,14 +130,6 @@ namespace Marmary.StateBehavior.Runtime.SwitchState.Actions
         }
 
         #endregion
-
-#if UNITY_EDITOR
-        /// <inheritdoc />
-        protected override ScriptableObject CreateInstanceScriptableObject()
-        {
-            return ScriptableObject.CreateInstance<ActionDataMovementSwitch>();
-        }
-#endif
     }
 }
 #endif

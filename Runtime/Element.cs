@@ -15,23 +15,22 @@ namespace Marmary.StateBehavior.Runtime
     /// </summary>
     public abstract class Element<TState, TTrigger> : SerializedMonoBehaviour where TState : Enum where TTrigger : Enum
     {
+        #region Serialized Fields
+
         /// <summary>
-        /// The default delay, in seconds, before the element is shown.
-        /// This value is typically used to define the initial time interval
-        /// before triggering the visibility state of an element within a sequenced or state-driven context.
+        ///     The default delay, in seconds, before the element is shown.
+        ///     This value is typically used to define the initial time interval
+        ///     before triggering the visibility state of an element within a sequenced or state-driven context.
         /// </summary>
         public float defaultShowAfter = 0.5f;
 
         /// <summary>
-        /// The default time, in seconds, after which an element is hidden
-        /// automatically when no further interaction or action is performed.
-        /// This delay period can be used to configure behavior such as auto-hiding
-        /// menus, tooltips, or UI components after a predefined duration.
+        ///     The default time, in seconds, after which an element is hidden
+        ///     automatically when no further interaction or action is performed.
+        ///     This delay period can be used to configure behavior such as auto-hiding
+        ///     menus, tooltips, or UI components after a predefined duration.
         /// </summary>
         public float defaultHideAfter = 0.5f;
-        
-        
-        #region Serialized Fields
 
         /// <summary>
         ///     The state machine responsible for handling transitions and logic
@@ -42,23 +41,12 @@ namespace Marmary.StateBehavior.Runtime
         protected StateBehaviourStateMachine<TState, TTrigger> stateMachine;
 
         /// <summary>
-        /// A property that determines whether the state machine's transitions and associated actions
-        /// should be executed immediately upon triggering, bypassing any delays or intermediate steps.
+        ///     Determines whether actions should be executed immediately upon the start
+        ///     of the element's lifecycle. If set to true, the element will trigger its
+        ///     initial state logic and actions without waiting for any external input or
+        ///     triggers to occur.
         /// </summary>
-        public bool ExecuteInstantly
-        {
-            get => stateMachine.ShouldExecuteInstantly;
-            set => stateMachine.ShouldExecuteInstantly = value;
-        }
-
-        /// <summary>
-        /// Determines whether actions should be executed immediately upon the start
-        /// of the element's lifecycle. If set to true, the element will trigger its
-        /// initial state logic and actions without waiting for any external input or
-        /// triggers to occur.
-        /// </summary>
-        [SerializeField]
-        private bool executeInstantly;
+        [SerializeField] private bool executeInstantly;
 
 
         /// <summary>
@@ -81,31 +69,50 @@ namespace Marmary.StateBehavior.Runtime
 
         #endregion
 
+        #region Properties
 
         /// <summary>
-        /// Initializes the element's state machine and configurations during the
-        /// MonoBehaviour lifecycle's Awake phase. This method ensures that the
-        /// execution behavior aligns with the specified runtime configuration,
-        /// such as whether actions should execute instantly.
+        ///     A property that determines whether the state machine's transitions and associated actions
+        ///     should be executed immediately upon triggering, bypassing any delays or intermediate steps.
+        /// </summary>
+        public bool ExecuteInstantly
+        {
+            get => stateMachine.ShouldExecuteInstantly;
+            set => stateMachine.ShouldExecuteInstantly = value;
+        }
+
+        #endregion
+
+        #region Unity Event Functions
+
+        /// <summary>
+        ///     Initializes the element's state machine and configurations during the
+        ///     MonoBehaviour lifecycle's Awake phase. This method ensures that the
+        ///     execution behavior aligns with the specified runtime configuration,
+        ///     such as whether actions should execute instantly.
         /// </summary>
         protected virtual void Awake()
         {
             ExecuteInstantly = executeInstantly;
         }
 
+        #endregion
+
+        #region Methods
+
         /// <summary>
-        /// Executes a completion task that monitors the execution state of the
-        /// associated state machine. This method resolves when all pending
-        /// actions and transitions in the state machine have been completed.
+        ///     Executes a completion task that monitors the execution state of the
+        ///     associated state machine. This method resolves when all pending
+        ///     actions and transitions in the state machine have been completed.
         /// </summary>
         /// <returns>
-        /// A UniTask that completes when the state machine execution process has finished.
+        ///     A UniTask that completes when the state machine execution process has finished.
         /// </returns>
         public UniTask WhenTaskCompleted()
         {
             return stateMachine.WhenExecutionCompletes();
         }
-        
+
 
         /// <summary>
         ///     Triggers the selectable state machine optionally forcing instant execution.
@@ -131,6 +138,8 @@ namespace Marmary.StateBehavior.Runtime
         {
             stateMachine?.FireTrigger(trigger);
         }
+
+        #endregion
 
 #if UNITY_EDITOR
 

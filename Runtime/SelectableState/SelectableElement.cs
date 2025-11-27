@@ -26,7 +26,6 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         /// </summary>
         [SerializeField] private bool ignoreMouse;
 
-
         #endregion
 
         #region Unity Event Functions

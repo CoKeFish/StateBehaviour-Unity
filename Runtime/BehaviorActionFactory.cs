@@ -5,8 +5,8 @@ using DG.Tweening;
 namespace Marmary.StateBehavior.Runtime
 {
     /// <summary>
-    /// Represents a behavior type that executes a tween instantly,
-    /// bypassing any animation or delay.
+    ///     Represents a behavior type that executes a tween instantly,
+    ///     bypassing any animation or delay.
     /// </summary>
     [Serializable]
     public enum BehaviorActionTypes
@@ -22,8 +22,8 @@ namespace Marmary.StateBehavior.Runtime
         Simple,
 
         /// <summary>
-        /// Represents a behavior type that performs an action instantaneously
-        /// without any animation, transition, or delay.
+        ///     Represents a behavior type that performs an action instantaneously
+        ///     without any animation, transition, or delay.
         /// </summary>
         Instant,
 
@@ -59,28 +59,28 @@ namespace Marmary.StateBehavior.Runtime
                 case BehaviorActionTypes.None:
                     // No configuration needed
                     break;
-                    
+
                 case BehaviorActionTypes.Simple:
                     tweener.SetAutoKill(false)
                         .SetLoops(1, LoopType.Yoyo);
                     break;
-                    
+
                 case BehaviorActionTypes.Instant:
                     // Configure tween to execute instantly (duration 0)
                     tweener.SetAutoKill(false)
                         .Complete(true);
                     break;
-                    
+
                 case BehaviorActionTypes.Looping:
                     // Configure tween for infinite looping
                     tweener.SetAutoKill(false)
                         .SetLoops(-1, LoopType.Yoyo);
                     break;
-                    
+
                 case BehaviorActionTypes.Sequencer:
                     // Sequencer behavior will be implemented separately
                     break;
-                    
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }

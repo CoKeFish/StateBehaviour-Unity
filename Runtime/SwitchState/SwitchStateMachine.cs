@@ -5,16 +5,16 @@ using UnityEngine;
 namespace Marmary.StateBehavior.Runtime.SwitchState
 {
     /// <summary>
-    /// Defines a state machine responsible for managing state transitions,
-    /// supporting operations to switch states dynamically while executing
-    /// corresponding behaviors or animations.
+    ///     Defines a state machine responsible for managing state transitions,
+    ///     supporting operations to switch states dynamically while executing
+    ///     corresponding behaviors or animations.
     /// </summary>
     internal class SwitchStateMachine : StateBehaviourStateMachine<SwitchState, SwitchTrigger>
     {
         #region Constructors and Injected
 
         /// <summary>
-        /// Initializes a switch state machine with a specified initial state and associated configurations.
+        ///     Initializes a switch state machine with a specified initial state and associated configurations.
         /// </summary>
         /// <param name="initialState">The starting state for the state machine.</param>
         /// <param name="gameObject">The GameObject associated with this state machine.</param>
@@ -28,7 +28,6 @@ namespace Marmary.StateBehavior.Runtime.SwitchState
         }
 
         #endregion
-
 
         #region Methods
 

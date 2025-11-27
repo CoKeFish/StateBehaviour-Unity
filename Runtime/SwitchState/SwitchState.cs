@@ -34,4 +34,3 @@ namespace Marmary.StateBehavior.Runtime.SwitchState
     }
 }
 #endif
-
