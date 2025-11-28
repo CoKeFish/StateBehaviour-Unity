@@ -1,5 +1,7 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
+#nullable enable
 using System;
+using Ardalis.GuardClauses;
 using DG.Tweening;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -54,7 +56,7 @@ namespace Marmary.StateBehavior.Runtime
         [ShowIf(nameof(ShowEndValue))]
         [LabelWidth(140)]
         [Tooltip("The target value reached at the end of the animation.")]
-        public TValue endValue;
+        public TValue? endValue;
 
         #endregion
 
@@ -93,18 +95,16 @@ namespace Marmary.StateBehavior.Runtime
         #region Methods
 
         /// <summary>
-        ///     Applies the configuration to the supplied <see cref="Tweener" /> while considering the original value.
+        /// Applies the configuration to the supplied <see cref="Tweener" /> while considering the original and target values.
         /// </summary>
         /// <param name="tweener">Tween instance to configure.</param>
-        /// <param name="originalValue">Value captured from the source component.</param>
+        /// <param name="originalValue">The original value captured from the source component.</param>
+        /// <param name="externalEndValue">The target value to be applied to the configuration.</param>
         /// <returns>The configured tween instance.</returns>
-        public override Tweener ApplyData(Tweener tweener, TValue originalValue)
+        public override Tweener ApplyData(Tweener tweener, TValue originalValue, TValue? externalEndValue)
         {
-            if (tweener == null)
-            {
-                Debug.LogWarning("Tweener es nulo. No se puede aplicar ActionDataSimpleContainer.");
-                return null;
-            }
+            Guard.Against.Null(tweener,
+                "Tweener es nulo. No se puede aplicar ActionDataSimpleContainer.");
 
             var delay = useCustomDelay ? customDelay : tweener.Delay();
 
@@ -112,7 +112,8 @@ namespace Marmary.StateBehavior.Runtime
             tweener
                 .SetEase(easeShow)
                 .SetDelay(delay)
-                .ChangeEndValue(useOrigin ? originalValue : endValue, duration, true);
+                .ChangeEndValue(useOrigin ? originalValue : (externalEndValue == null) ? externalEndValue : endValue,
+                    duration, true);
 
             return tweener;
         }
@@ -121,14 +122,12 @@ namespace Marmary.StateBehavior.Runtime
         ///     Applies the configuration to the supplied <see cref="Tweener" /> without considering an original value.
         /// </summary>
         /// <param name="tweener">Tween instance to configure.</param>
+        /// <param name="externalEndValue"></param>
         /// <returns>The configured tween instance.</returns>
-        public override Tweener ApplyData(Tweener tweener)
+        public override Tweener ApplyData(Tweener tweener, TValue externalEndValue)
         {
-            if (tweener == null)
-            {
-                Debug.LogWarning("Tweener es nulo. No se puede aplicar ActionDataSimpleContainer.");
-                return null;
-            }
+            Guard.Against.Null(tweener,
+                "Tweener es nulo. No se puede aplicar ActionDataSimpleContainer.");
 
             var delay = useCustomDelay ? customDelay : tweener.Delay();
 
@@ -136,7 +135,7 @@ namespace Marmary.StateBehavior.Runtime
             tweener
                 .SetEase(easeShow)
                 .SetDelay(delay)
-                .ChangeEndValue(endValue, duration, true);
+                .ChangeEndValue( (externalEndValue == null) ? externalEndValue : endValue, duration, true);
 
             return tweener;
         }
