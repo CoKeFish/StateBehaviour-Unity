@@ -1,8 +1,8 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
-#nullable enable
 using System;
 using Ardalis.GuardClauses;
 using DG.Tweening;
+using LanguageExt;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -56,7 +56,7 @@ namespace Marmary.StateBehavior.Runtime
         [ShowIf(nameof(ShowEndValue))]
         [LabelWidth(140)]
         [Tooltip("The target value reached at the end of the animation.")]
-        public TValue? endValue;
+        public TValue endValue;
 
         #endregion
 
@@ -101,7 +101,7 @@ namespace Marmary.StateBehavior.Runtime
         /// <param name="originalValue">The original value captured from the source component.</param>
         /// <param name="externalEndValue">The target value to be applied to the configuration.</param>
         /// <returns>The configured tween instance.</returns>
-        public override Tweener ApplyData(Tweener tweener, TValue originalValue, TValue? externalEndValue)
+        public override Tweener ApplyData(Tweener tweener, TValue originalValue, Option<TValue> externalEndValue)
         {
             Guard.Against.Null(tweener,
                 "Tweener es nulo. No se puede aplicar ActionDataSimpleContainer.");
@@ -112,7 +112,7 @@ namespace Marmary.StateBehavior.Runtime
             tweener
                 .SetEase(easeShow)
                 .SetDelay(delay)
-                .ChangeEndValue(useOrigin ? originalValue : (externalEndValue == null) ? externalEndValue : endValue,
+                .ChangeEndValue(useOrigin ? originalValue : (externalEndValue.IsNone) ? externalEndValue : endValue,
                     duration, true);
 
             return tweener;
@@ -124,7 +124,7 @@ namespace Marmary.StateBehavior.Runtime
         /// <param name="tweener">Tween instance to configure.</param>
         /// <param name="externalEndValue"></param>
         /// <returns>The configured tween instance.</returns>
-        public override Tweener ApplyData(Tweener tweener, TValue externalEndValue)
+        public override Tweener ApplyData(Tweener tweener, Option<TValue> externalEndValue)
         {
             Guard.Against.Null(tweener,
                 "Tweener es nulo. No se puede aplicar ActionDataSimpleContainer.");
@@ -135,7 +135,7 @@ namespace Marmary.StateBehavior.Runtime
             tweener
                 .SetEase(easeShow)
                 .SetDelay(delay)
-                .ChangeEndValue( (externalEndValue == null) ? externalEndValue : endValue, duration, true);
+                .ChangeEndValue( (externalEndValue.IsNone) ? externalEndValue : endValue, duration, true);
 
             return tweener;
         }

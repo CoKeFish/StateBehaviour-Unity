@@ -2,6 +2,7 @@
 
 using System;
 using DG.Tweening;
+using LanguageExt;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -59,6 +60,9 @@ namespace Marmary.StateBehavior.Runtime.SwitchState.Actions
 
         #endregion
 
+
+        protected override Option<Vector3> GetEndValue() => GetEndPosition();
+        
         #region Methods
 
         /// <inheritdoc />

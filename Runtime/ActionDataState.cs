@@ -1,5 +1,6 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
 using DG.Tweening;
+using LanguageExt;
 
 namespace Marmary.StateBehavior.Runtime
 {
@@ -19,7 +20,7 @@ namespace Marmary.StateBehavior.Runtime
         /// <returns>The configured tween instance.</returns>
         public abstract Tweener ApplyData(Tweener tweener,
             TValue originalValue,
-            TValue externalEndValue);
+            Option<TValue> externalEndValue);
 
         /// <summary>
         ///     Applies the configuration to the provided tween without an original value.
@@ -27,7 +28,7 @@ namespace Marmary.StateBehavior.Runtime
         /// <param name="tweener">Tween instance to configure.</param>
         /// <param name="externalEndValue">The final value to be applied to the tween.</param>
         /// <returns>The configured tween instance.</returns>
-        public abstract Tweener ApplyData(Tweener tweener, TValue externalEndValue);
+        public abstract Tweener ApplyData(Tweener tweener, Option<TValue> externalEndValue);
 
         #endregion
     }
