@@ -81,19 +81,20 @@ namespace Marmary.StateBehavior.Runtime
             return completionTask.AsUniTask();
         }
 
-        #endregion
-
         /// <summary>
-        /// Retrieves the end value for the current state transition.
+        ///     Retrieves the end value for the current state transition.
         /// </summary>
         /// <returns>
-        /// The end value wrapped in an <see cref="Option{TValue}" />, or <see cref="Option{TValue}.None" /> if no value is defined.
+        ///     The end value wrapped in an <see cref="Option{TValue}" />, or <see cref="Option{TValue}.None" /> if no value is
+        ///     defined.
         /// </returns>
         protected virtual Option<TValue> GetEndValue()
         {
             return Option<TValue>.None;
         }
-        
+
+        #endregion
+
         #region IStateContract<TState> Members
 
         /// <summary>
@@ -114,7 +115,8 @@ namespace Marmary.StateBehavior.Runtime
         {
             Guard.Against.Null(tweener);
             BehaviorActionFactory.Set(data.StateActionDataContainers[state].behaviorActionType, tweener);
-            data.StateActionDataContainers[state].BehaviorActionData.ApplyData(tweener, originalValue, GetEndValue()).Restart();
+            data.StateActionDataContainers[state].BehaviorActionData.ApplyData(tweener, originalValue, GetEndValue())
+                .Restart();
             return AwaitTweenerCompletion();
         }
 

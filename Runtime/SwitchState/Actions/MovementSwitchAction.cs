@@ -60,10 +60,16 @@ namespace Marmary.StateBehavior.Runtime.SwitchState.Actions
 
         #endregion
 
-
-        protected override Option<Vector3> GetEndValue() => GetEndPosition();
-        
         #region Methods
+
+        /// <summary>
+        ///     Retrieves the end position value used during the transition.
+        /// </summary>
+        /// <returns>An optional value of type <see cref="Vector3" />, representing the target position for the transition.</returns>
+        protected override Option<Vector3> GetEndValue()
+        {
+            return GetEndPosition();
+        }
 
         /// <inheritdoc />
         protected override void InitializeStartValue(GameObject gameObject)

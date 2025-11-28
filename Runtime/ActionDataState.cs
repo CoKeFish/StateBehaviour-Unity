@@ -12,7 +12,7 @@ namespace Marmary.StateBehavior.Runtime
         #region Methods
 
         /// <summary>
-        /// Applies the configuration to the provided tween using an original value as reference and an end value.
+        ///     Applies the configuration to the provided tween using an original value as reference and an end value.
         /// </summary>
         /// <param name="tweener">Tween instance to configure.</param>
         /// <param name="originalValue">The initial value used as a reference.</param>

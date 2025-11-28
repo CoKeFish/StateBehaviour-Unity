@@ -1,11 +1,9 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Marmary.StateBehavior.Runtime.Menu
@@ -58,17 +56,25 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// <summary>
         ///     The sequencer that controls the order of menu elements.
         /// </summary>
-        [SerializeField] [HideLabel]
-        public MenuSequencer sequencer = new ();
+        [SerializeField] [HideLabel] public MenuSequencer sequencer = new();
 
         #endregion
 
+        [Button]
+        public void Setup()
+        {
+            sequencer.Setup(this);
+            sequencer.Setup();
+        }
+
+        #region Unity Event Functions
 
         public void Awake()
         {
-            sequencer.Setup( this);
+            sequencer.Setup(this);
         }
 
+        #endregion
 
         #region Methods
 
@@ -195,18 +201,11 @@ namespace Marmary.StateBehavior.Runtime.Menu
         {
             InactivateMenu().Forget();
         }
-        
+
         [Button]
         public void Show()
         {
             ActivateMenu().Forget();
-        }
-
-        [Button]
-        public void Setup()
-        {
-            sequencer.Setup(this);
-            sequencer.Setup();
         }
 
         #endregion

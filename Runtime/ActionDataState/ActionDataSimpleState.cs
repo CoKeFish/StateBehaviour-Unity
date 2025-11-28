@@ -95,7 +95,7 @@ namespace Marmary.StateBehavior.Runtime
         #region Methods
 
         /// <summary>
-        /// Applies the configuration to the supplied <see cref="Tweener" /> while considering the original and target values.
+        ///     Applies the configuration to the supplied <see cref="Tweener" /> while considering the original and target values.
         /// </summary>
         /// <param name="tweener">Tween instance to configure.</param>
         /// <param name="originalValue">The original value captured from the source component.</param>
@@ -108,12 +108,18 @@ namespace Marmary.StateBehavior.Runtime
 
             var delay = useCustomDelay ? customDelay : tweener.Delay();
 
+            var endValueToUse = useOrigin
+                ? originalValue
+                : externalEndValue.Match(
+                    v => v,
+                    () => endValue
+                );
+
             // Aplica easing, delay y duración
             tweener
                 .SetEase(easeShow)
                 .SetDelay(delay)
-                .ChangeEndValue(useOrigin ? originalValue : (externalEndValue.IsNone) ? externalEndValue : endValue,
-                    duration, true);
+                .ChangeEndValue(endValueToUse, duration, true);
 
             return tweener;
         }
@@ -131,11 +137,17 @@ namespace Marmary.StateBehavior.Runtime
 
             var delay = useCustomDelay ? customDelay : tweener.Delay();
 
+            var endValueToUse =
+                externalEndValue.Match(
+                    v => v,
+                    () => endValue
+                );
+
             // Aplica easing, delay y duración
             tweener
                 .SetEase(easeShow)
                 .SetDelay(delay)
-                .ChangeEndValue( (externalEndValue.IsNone) ? externalEndValue : endValue, duration, true);
+                .ChangeEndValue(endValueToUse, duration, true);
 
             return tweener;
         }

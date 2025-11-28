@@ -76,20 +76,16 @@ namespace Marmary.StateBehavior.Runtime.Menu
 
         #endregion
 
-        #region Constructors and Injected
-
         /// <summary>
-        /// Sets up the menu sequencer by initializing a component required for its operation.
+        ///     Sets up the menu sequencer by initializing a component required for its operation.
         /// </summary>
         /// <param name="component">
-        /// The component to be initialized and assigned to the sequencer for functional purposes.
+        ///     The component to be initialized and assigned to the sequencer for functional purposes.
         /// </param>
         public void Setup(Component component)
         {
             _component = component;
         }
-
-        #endregion
 
         /// <summary>
         ///     Sets up the menu sequencer by initializing all menu elements and calculating their animation times.
@@ -152,10 +148,6 @@ namespace Marmary.StateBehavior.Runtime.Menu
         {
             foreach (var menuElement in menuElements) menuElement.OnHideInstant();
         }
-
-        #endregion
-
-        #region Editor
 
         /// <summary>
         ///     Get all menu elements
