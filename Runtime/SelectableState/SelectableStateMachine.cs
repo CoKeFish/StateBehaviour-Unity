@@ -1,6 +1,7 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Marmary.StateBehavior.Runtime.SelectableState
 {
@@ -9,26 +10,45 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
     /// </summary>
     internal class SelectableStateMachine : StateBehaviourStateMachine<SelectableState, SelectableTrigger>
     {
+        /// <summary>
+        /// Represents an event that is invoked when a selectable UI element is clicked.
+        /// This variable is used to store a UnityEvent that triggers actions associated with the click event.
+        /// </summary>
+        private UnityEvent _onClick;
+        
         #region Constructors and Injected
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="SelectableStateMachine" /> class.
+        /// Represents a state machine for managing selectable states and their transitions.
         /// </summary>
         /// <param name="initialState">The initial state of the state machine.</param>
         /// <param name="gameObject">The GameObject associated with this state machine.</param>
-        /// <param name="actions">The list of actions to execute on state changes.</param>
-        /// <param name="selectableElement">The animation element for selection events.</param>
+        /// <param name="actions">The list of actions to execute during state transitions.</param>
+        /// <param name="selectableElement">The selectable element used for managing event-driven animations or transitions.</param>
+        /// <param name="onClick">The UnityEvent that is triggered when the selectable element is clicked.</param>
         public SelectableStateMachine(SelectableState initialState,
             GameObject gameObject,
             List<IStateContract<SelectableState>> actions,
-            SelectableElement selectableElement) : base(initialState, gameObject, actions, selectableElement)
+            SelectableElement selectableElement,
+            UnityEvent onClick)
+            : base(initialState, gameObject, actions, selectableElement)
         {
+            _onClick = onClick;
         }
 
         #endregion
 
         #region Methods
 
+        /// <summary>
+        /// Invokes the associated UnityEvent for the selectable element and executes state-related actions.
+        /// </summary>
+        private void OnClick()
+        {
+            _onClick.Invoke();
+            ExecuteActions();
+        }
+        
         /// <summary>
         ///     Configures the state machine with state transitions and entry actions.
         /// </summary>
@@ -49,7 +69,7 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
                 .Permit(SelectableTrigger.PointerDown, SelectableState.PressedInside)
                 .Permit(SelectableTrigger.Submit, SelectableState.PressedInside)
                 .Permit(SelectableTrigger.Cancel, SelectableState.Normal)
-                .OnEntryFrom(SelectableTrigger.PointerClick, ExecuteActions)
+                .OnEntryFrom(SelectableTrigger.PointerClick, OnClick)
                 .OnEntryFrom(SelectableTrigger.UnPressed, ExecuteActions)
                 .OnEntry(ExecuteActions);
 

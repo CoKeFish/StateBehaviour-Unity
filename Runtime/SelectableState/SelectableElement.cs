@@ -1,6 +1,7 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
 using Marmary.Libraries.UI.Events;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -26,6 +27,12 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         /// </summary>
         [SerializeField] private bool ignoreMouse;
 
+        /// <summary>
+        /// Represents the event triggered when the UI element is clicked.
+        /// This event is invoked to handle click interactions and associated logic for the selectable element.
+        /// </summary>
+        public UnityEvent onClick = new();
+
         #endregion
 
         #region Unity Event Functions
@@ -35,7 +42,7 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         /// </summary>
         protected override void Awake()
         {
-            stateMachine = new SelectableStateMachine(SelectableState.Normal, gameObject, actions, this);
+            stateMachine = new SelectableStateMachine(SelectableState.Normal, gameObject, actions, this, onClick);
             base.Awake();
         }
 

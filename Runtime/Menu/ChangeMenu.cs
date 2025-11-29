@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Marmary.StateBehavior.Runtime.Menu;
+using Marmary.StateBehavior.Runtime.SelectableState;
 using Marmary.StateBehavior.Runtime.SwitchState;
 using UnityEngine;
 using VContainer;
@@ -30,7 +31,7 @@ namespace Marmary.Libraries.UI.Menu.Components
         /// <summary>
         ///     The selectable animation button
         /// </summary>
-        private MenuElement _menuElement;
+        private SelectableElement _selectableElement;
 
         #endregion
 
@@ -51,8 +52,8 @@ namespace Marmary.Libraries.UI.Menu.Components
         /// </summary>
         private void Start()
         {
-            _menuElement = GetComponent<MenuElement>();
-            _menuElement.Events[SwitchState.Hide].AddListener(OnChangeMenu);
+            _selectableElement = GetComponent<SelectableElement>();
+            _selectableElement.onClick.AddListener(OnChangeMenu);
         }
 
         #endregion
