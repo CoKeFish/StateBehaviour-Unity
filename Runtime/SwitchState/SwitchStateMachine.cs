@@ -34,12 +34,12 @@ namespace Marmary.StateBehavior.Runtime.SwitchState
         /// <inheritdoc />
         protected sealed override void ConfigureStateMachine()
         {
-            StateMachine.Configure(SwitchState.Show)
+            stateMachine.Configure(SwitchState.Show)
                 .Permit(SwitchTrigger.OnHide, SwitchState.Hide)
                 .PermitReentry(SwitchTrigger.OnShow)
                 .OnEntry(ExecuteActions);
 
-            StateMachine.Configure(SwitchState.Hide)
+            stateMachine.Configure(SwitchState.Hide)
                 .Permit(SwitchTrigger.OnShow, SwitchState.Show)
                 .PermitReentry(SwitchTrigger.OnHide)
                 .OnEntry(ExecuteActions);

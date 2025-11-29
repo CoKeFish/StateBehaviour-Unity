@@ -74,7 +74,7 @@ namespace Marmary.StateBehavior.Runtime
         {
             var previousInstantSetting = ShouldExecuteInstantly;
             ShouldExecuteInstantly = true;
-            StateMachine.Fire(trigger);
+            stateMachine.Fire(trigger);
             ShouldExecuteInstantly = previousInstantSetting;
         }
 
@@ -86,7 +86,7 @@ namespace Marmary.StateBehavior.Runtime
         {
             var previousInstantSetting = ShouldExecuteInstantly;
             ShouldExecuteInstantly = false;
-            StateMachine.Fire(trigger);
+            stateMachine.Fire(trigger);
             ShouldExecuteInstantly = previousInstantSetting;
         }
 
@@ -110,7 +110,7 @@ namespace Marmary.StateBehavior.Runtime
 
             if (_actions.IsNullOrEmpty()) return;
 
-            var currentState = StateMachine.State;
+            var currentState = stateMachine.State;
 
             if (ShouldExecuteInstantly)
             {

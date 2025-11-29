@@ -35,14 +35,14 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         /// <inheritdoc />
         protected sealed override void ConfigureStateMachine()
         {
-            StateMachine.Configure(SelectableState.Normal)
+            stateMachine.Configure(SelectableState.Normal)
                 .Ignore(SelectableTrigger.PointerClick)
                 .Ignore(SelectableTrigger.UnPressed)
                 .Permit(SelectableTrigger.PointerEnter, SelectableState.Highlighted)
                 .Permit(SelectableTrigger.Select, SelectableState.Highlighted)
                 .OnEntry(ExecuteActions);
 
-            StateMachine.Configure(SelectableState.Highlighted)
+            stateMachine.Configure(SelectableState.Highlighted)
                 .PermitReentry(SelectableTrigger.PointerClick)
                 .Permit(SelectableTrigger.PointerExit, SelectableState.Normal)
                 .Permit(SelectableTrigger.Deselect, SelectableState.Normal)
@@ -53,7 +53,7 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
                 .OnEntryFrom(SelectableTrigger.UnPressed, ExecuteActions)
                 .OnEntry(ExecuteActions);
 
-            StateMachine.Configure(SelectableState.PressedInside)
+            stateMachine.Configure(SelectableState.PressedInside)
                 .Ignore(SelectableTrigger.Cancel)
                 .Permit(SelectableTrigger.PointerExit, SelectableState.PressedOutside)
                 .Permit(SelectableTrigger.Deselect, SelectableState.PressedOutside)
@@ -63,7 +63,7 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
 
             // You can trigger your click event in OnExit or in a specific handler here
 
-            StateMachine.Configure(SelectableState.PressedOutside)
+            stateMachine.Configure(SelectableState.PressedOutside)
                 .Permit(SelectableTrigger.Cancel, SelectableState.Normal)
                 .Permit(SelectableTrigger.UnPressed, SelectableState.Normal)
                 .Permit(SelectableTrigger.PointerEnter, SelectableState.PressedInside)
