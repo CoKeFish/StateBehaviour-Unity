@@ -55,6 +55,8 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
             stateMachine.Configure(SelectableState.Normal)
                 .Ignore(SelectableTrigger.PointerClick)
                 .Ignore(SelectableTrigger.UnPressed)
+                .Ignore(SelectableTrigger.PointerDown)
+                .Ignore(SelectableTrigger.PointerUp)
                 .Permit(SelectableTrigger.PointerEnter, SelectableState.Highlighted)
                 .Permit(SelectableTrigger.Select, SelectableState.Highlighted)
                 .OnEntry(ExecuteActions);
