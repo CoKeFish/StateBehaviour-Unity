@@ -60,6 +60,11 @@ namespace Marmary.StateBehavior.Runtime.Menu
 
         #endregion
 
+        /// <summary>
+        /// Configures the menu by initializing its sequencer.
+        /// 1- Calls the sequencer's setup method with the current menu instance.
+        /// 2- Invokes the default setup method of the sequencer for any additional initialization.
+        /// </summary>
         [Button]
         public void Setup()
         {
@@ -69,6 +74,12 @@ namespace Marmary.StateBehavior.Runtime.Menu
 
         #region Unity Event Functions
 
+        /// <summary>
+        /// Initializes the Menu component during the Awake lifecycle method.
+        /// It performs the following actions:
+        /// 1. Configures required dependencies by setting up the MenuSequencer.
+        /// 2. Ensures any necessary initialization logic is performed to prepare the menu for activation.
+        /// </summary>
         public void Awake()
         {
             sequencer.Setup(this);
@@ -196,12 +207,23 @@ namespace Marmary.StateBehavior.Runtime.Menu
 
         #region Editor
 
+        /// <summary>
+        /// Hides the menu.
+        /// 1- Deactivates the menu functionality.
+        /// 2- Initiates the menu inactivation process asynchronously.
+        /// </summary>
         [Button]
         public void Hide()
         {
             InactivateMenu().Forget();
         }
 
+        /// <summary>
+        /// Displays the menu by activating it.
+        /// 1- Triggers the activation process for the menu.
+        /// 2- Ensures that all necessary elements and animations related to showing the menu are executed.
+        /// 3- Calls the internal method to handle asynchronous activation logic.
+        /// </summary>
         [Button]
         public void Show()
         {

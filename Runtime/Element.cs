@@ -23,7 +23,7 @@ namespace Marmary.StateBehavior.Runtime
         ///     the state machine context of an element, providing mechanisms such as
         ///     custom delay configuration.
         /// </summary>
-        [OdinSerialize] [NonSerialized] public TimeWrapper Time;
+        public TimeWrapper Time;
 
         /// <summary>
         ///     The state machine responsible for handling transitions and logic

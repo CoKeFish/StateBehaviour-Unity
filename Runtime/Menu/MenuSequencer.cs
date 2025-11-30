@@ -157,6 +157,8 @@ namespace Marmary.StateBehavior.Runtime.Menu
             menuElements = _component.GetComponentsInChildren<SwitchElement>();
 #if UNITY_EDITOR
             EditorUtility.SetDirty(_component);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(_component);
+
 #endif
         }
 
@@ -177,7 +179,9 @@ namespace Marmary.StateBehavior.Runtime.Menu
                 menuElement.Time.customDelay = delayBeforeDeactivating;
                 delayBeforeDeactivating += separation;
 #if UNITY_EDITOR
-                EditorUtility.SetDirty(_component);
+                EditorUtility.SetDirty(menuElement);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(menuElement);
+
 #endif
             }
         }
