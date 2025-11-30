@@ -18,15 +18,17 @@ namespace Marmary.StateBehavior.Runtime
         #region Methods
 
         /// <summary>
-        ///     Applies the behaviour for the supplied state.
+        ///     Assigns a value or performs an operation to modify the state or behavior of an object or property asynchronously.
         /// </summary>
-        /// <param name="state">State to activate.</param>
-        public UniTask Set(TState state);
+        /// <param name="state">The new state to be set or applied to the object or property.</param>
+        /// <param name="timeWrapper">An instance containing timing information for the operation.</param>
+        /// <returns>A UniTask representing the asynchronous operation.</returns>
+        public UniTask Set(TState state, TimeWrapper timeWrapper);
 
         /// <summary>
-        ///     Applies the behaviour for the supplied state instantly without animation.
+        ///     Applies the specified state immediately, bypassing any animations or transitions.
         /// </summary>
-        /// <param name="state">State to activate.</param>
+        /// <param name="state">The state to be applied.</param>
         public void InstantSet(TState state);
 
         #endregion

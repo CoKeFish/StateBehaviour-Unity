@@ -168,16 +168,14 @@ namespace Marmary.StateBehavior.Runtime.Menu
         public void CalculateTimes()
         {
             var delayBeforeDeactivating = 0f;
-            var delayBeforeActivating = 0f;
 
             if (menuElements == null) return;
 
             foreach (var menuElement in menuElements)
             {
-                menuElement.defaultHideAfter = delayBeforeDeactivating;
-                menuElement.defaultShowAfter = delayBeforeActivating;
+                menuElement.Time.useCustomDelay = true;
+                menuElement.Time.customDelay = delayBeforeDeactivating;
                 delayBeforeDeactivating += separation;
-                delayBeforeActivating += separation;
 #if UNITY_EDITOR
                 EditorUtility.SetDirty(_component);
 #endif

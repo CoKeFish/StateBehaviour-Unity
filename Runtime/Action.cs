@@ -108,15 +108,17 @@ namespace Marmary.StateBehavior.Runtime
         }
 
         /// <summary>
-        ///     Sets the behavior action for the specified state and applies the corresponding data to the existing tweener.
+        ///     Configures the behavior action for a specified state and applies the relevant data to the existing tweener.
         /// </summary>
-        /// <param name="state">The state for which the behavior action is to be configured.</param>
-        public virtual UniTask Set(TState state)
+        /// <param name="state">The state for which the behavior action is being set.</param>
+        /// <param name="timeWrapper">The wrapper containing timing-related information for the operation.</param>
+        /// <returns>A task that completes when the tweener has finished its operation.</returns>
+        public virtual UniTask Set(TState state, TimeWrapper timeWrapper)
         {
             Guard.Against.Null(tweener);
             BehaviorActionFactory.Set(data.StateActionDataContainers[state].behaviorActionType, tweener);
-            data.StateActionDataContainers[state].BehaviorActionData.ApplyData(tweener, originalValue, GetEndValue())
-                .Restart();
+            data.StateActionDataContainers[state].BehaviorActionData
+                .ApplyData(tweener, originalValue, GetEndValue(), timeWrapper);
             return AwaitTweenerCompletion();
         }
 
@@ -129,7 +131,8 @@ namespace Marmary.StateBehavior.Runtime
         {
             Guard.Against.Null(tweener);
             BehaviorActionFactory.Set(BehaviorActionTypes.Instant, tweener);
-            data.StateActionDataContainers[state].BehaviorActionData.ApplyData(tweener, originalValue).Restart();
+            data.StateActionDataContainers[state].BehaviorActionData
+                .ApplyDataInstant(tweener, originalValue, GetEndValue()).Restart();
         }
 
         #endregion

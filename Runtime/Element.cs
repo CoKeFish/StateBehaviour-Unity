@@ -18,19 +18,12 @@ namespace Marmary.StateBehavior.Runtime
         #region Serialized Fields
 
         /// <summary>
-        ///     The default delay, in seconds, before the element is shown.
-        ///     This value is typically used to define the initial time interval
-        ///     before triggering the visibility state of an element within a sequenced or state-driven context.
+        ///     The time-related wrapper object used to control and handle scheduling
+        ///     and delays for state transitions, actions, and event execution within
+        ///     the state machine context of an element, providing mechanisms such as
+        ///     custom delay configuration.
         /// </summary>
-        public float defaultShowAfter = 0.5f;
-
-        /// <summary>
-        ///     The default time, in seconds, after which an element is hidden
-        ///     automatically when no further interaction or action is performed.
-        ///     This delay period can be used to configure behavior such as auto-hiding
-        ///     menus, tooltips, or UI components after a predefined duration.
-        /// </summary>
-        public float defaultHideAfter = 0.5f;
+        [OdinSerialize] [NonSerialized] public TimeWrapper Time;
 
         /// <summary>
         ///     The state machine responsible for handling transitions and logic

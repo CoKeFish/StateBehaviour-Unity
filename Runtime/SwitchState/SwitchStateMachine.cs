@@ -14,16 +14,18 @@ namespace Marmary.StateBehavior.Runtime.SwitchState
         #region Constructors and Injected
 
         /// <summary>
-        ///     Initializes a switch state machine with a specified initial state and associated configurations.
+        ///     Represents a state machine for managing switch states and transitions within a specified context.
         /// </summary>
-        /// <param name="initialState">The starting state for the state machine.</param>
+        /// <param name="initialState">The initial state of the switch state machine.</param>
         /// <param name="gameObject">The GameObject associated with this state machine.</param>
-        /// <param name="actions">A collection of actions triggered during state transitions.</param>
-        /// <param name="switchElement">The interactive element that operates with the state machine.</param>
+        /// <param name="actions">A list of state contracts representing actions triggered during state transitions.</param>
+        /// <param name="switchElement">The interactive element tied to the state machine.</param>
+        /// <param name="timeWrapper">An instance managing time-related operations for the state machine.</param>
         public SwitchStateMachine(SwitchState initialState,
             GameObject gameObject,
             List<IStateContract<SwitchState>> actions,
-            SwitchElement switchElement) : base(initialState, gameObject, actions, switchElement)
+            SwitchElement switchElement,
+            TimeWrapper timeWrapper) : base(initialState, gameObject, actions, switchElement, timeWrapper)
         {
         }
 

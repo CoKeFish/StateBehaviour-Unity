@@ -10,28 +10,34 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
     /// </summary>
     internal class SelectableStateMachine : StateBehaviourStateMachine<SelectableState, SelectableTrigger>
     {
+        #region Fields
+
         /// <summary>
-        /// Represents an event that is invoked when a selectable UI element is clicked.
-        /// This variable is used to store a UnityEvent that triggers actions associated with the click event.
+        ///     Represents an event that is invoked when a selectable UI element is clicked.
+        ///     This variable is used to store a UnityEvent that triggers actions associated with the click event.
         /// </summary>
-        private UnityEvent _onClick;
-        
+        private readonly UnityEvent _onClick;
+
+        #endregion
+
         #region Constructors and Injected
 
         /// <summary>
-        /// Represents a state machine for managing selectable states and their transitions.
+        ///     Represents a state machine responsible for handling selectable states and their transitions.
         /// </summary>
-        /// <param name="initialState">The initial state of the state machine.</param>
-        /// <param name="gameObject">The GameObject associated with this state machine.</param>
-        /// <param name="actions">The list of actions to execute during state transitions.</param>
-        /// <param name="selectableElement">The selectable element used for managing event-driven animations or transitions.</param>
-        /// <param name="onClick">The UnityEvent that is triggered when the selectable element is clicked.</param>
+        /// <param name="initialState">The initial state assigned to the state machine.</param>
+        /// <param name="gameObject">The GameObject to which the state machine is associated.</param>
+        /// <param name="actions">A collection of actions to execute during state changes.</param>
+        /// <param name="selectableElement">The UI element that triggers or reacts to state transitions.</param>
+        /// <param name="timeWrapper">The time-related utility that aids in managing timing during transitions.</param>
+        /// <param name="onClick">The UnityEvent that is invoked when a selectable element is clicked.</param>
         public SelectableStateMachine(SelectableState initialState,
             GameObject gameObject,
             List<IStateContract<SelectableState>> actions,
             SelectableElement selectableElement,
+            TimeWrapper timeWrapper,
             UnityEvent onClick)
-            : base(initialState, gameObject, actions, selectableElement)
+            : base(initialState, gameObject, actions, selectableElement, timeWrapper)
         {
             _onClick = onClick;
         }
@@ -40,15 +46,6 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
 
         #region Methods
 
-        /// <summary>
-        /// Invokes the associated UnityEvent for the selectable element and executes state-related actions.
-        /// </summary>
-        private void OnClick()
-        {
-            _onClick.Invoke();
-            ExecuteActions();
-        }
-        
         /// <summary>
         ///     Configures the state machine with state transitions and entry actions.
         /// </summary>
@@ -90,6 +87,19 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
                 .Permit(SelectableTrigger.Select, SelectableState.PressedInside)
                 .Permit(SelectableTrigger.PointerUp, SelectableState.Normal) // Released outside, no click
                 .OnEntry(ExecuteActions);
+        }
+
+        #endregion
+
+        #region Event Functions
+
+        /// <summary>
+        ///     Invokes the associated UnityEvent for the selectable element and executes state-related actions.
+        /// </summary>
+        private void OnClick()
+        {
+            _onClick.Invoke();
+            ExecuteActions();
         }
 
         #endregion

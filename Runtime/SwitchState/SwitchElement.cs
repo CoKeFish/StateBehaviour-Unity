@@ -13,7 +13,7 @@ namespace Marmary.StateBehavior.Runtime.SwitchState
         /// </summary>
         protected override void Awake()
         {
-            stateMachine = new SwitchStateMachine(SwitchState.Show, gameObject, actions, this);
+            stateMachine = new SwitchStateMachine(SwitchState.Show, gameObject, actions, this, Time);
             base.Awake();
         }
 

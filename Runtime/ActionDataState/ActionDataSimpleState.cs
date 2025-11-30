@@ -17,37 +17,18 @@ namespace Marmary.StateBehavior.Runtime
         #region Serialized Fields
 
         /// <summary>
-        ///     Indicates whether a custom delay should be applied before the tween starts.
+        ///     Represents a customizable timing configuration used to control delay,
+        ///     duration, and easing behavior for tweened state actions.
         /// </summary>
-        [Title("Timing Settings")]
-        [LabelWidth(140)]
-        [Tooltip("If true, a custom delay will be applied before showing.")]
-        public bool useCustomDelay;
-
-        /// <summary>
-        ///     Specifies the custom delay to use when <see cref="useCustomDelay" /> is enabled.
-        /// </summary>
-        [ShowIf(nameof(useCustomDelay))] [LabelWidth(140)]
-        public float customDelay;
-
-        /// <summary>
-        ///     Duration of the tween in seconds.
-        /// </summary>
-        [LabelWidth(140)] public float duration = 0.5f;
-
-        /// <summary>
-        ///     Easing function applied to the tween over time.
-        /// </summary>
-        [LabelWidth(140)] [Tooltip("Ease curve used by the animation.")]
-        public Ease easeShow = Ease.OutQuad;
+        public TimeWrapper time = new();
 
         /// <summary>
         ///     Determines whether the original value should be used instead of the configured target.
         /// </summary>
-        [ShowIf(nameof(_isDefaultState))]
         [Title("Value Settings")]
         [LabelWidth(140)]
         [Tooltip("If true, uses the original value instead of setting a target.")]
+        [DisableIf(nameof(_isDefaultState))]
         public bool useOrigin;
 
         /// <summary>
@@ -65,7 +46,7 @@ namespace Marmary.StateBehavior.Runtime
         /// <summary>
         ///     Indicates whether this configuration belongs to the default enum state.
         /// </summary>
-        private bool _isDefaultState;
+        private readonly bool _isDefaultState;
 
         #endregion
 
@@ -95,18 +76,24 @@ namespace Marmary.StateBehavior.Runtime
         #region Methods
 
         /// <summary>
-        ///     Applies the configuration to the supplied <see cref="Tweener" /> while considering the original and target values.
+        ///     Applies the configuration to the supplied tweener while considering the original and target values.
         /// </summary>
-        /// <param name="tweener">Tween instance to configure.</param>
+        /// <param name="tweener">The tween instance to configure.</param>
         /// <param name="originalValue">The original value captured from the source component.</param>
-        /// <param name="externalEndValue">The target value to be applied to the configuration.</param>
+        /// <param name="externalEndValue">The optional external target value to apply to the configuration.</param>
+        /// <param name="timeWrapper">The wrapper object used to manage time-related configurations.</param>
         /// <returns>The configured tween instance.</returns>
-        public override Tweener ApplyData(Tweener tweener, TValue originalValue, Option<TValue> externalEndValue)
+        public override Tweener ApplyData(Tweener tweener,
+            TValue originalValue,
+            Option<TValue> externalEndValue,
+            TimeWrapper timeWrapper)
         {
             Guard.Against.Null(tweener,
                 "Tweener es nulo. No se puede aplicar ActionDataSimpleContainer.");
 
-            var delay = useCustomDelay ? customDelay : tweener.Delay();
+            var delay = time.useCustomDelay ? time.customDelay : timeWrapper.customDelay;
+            var duration = time.useCustomDuration ? time.customDelay : timeWrapper.duration;
+            var ease = time.useCustomEase ? time.ease : timeWrapper.ease;
 
             var endValueToUse = useOrigin
                 ? originalValue
@@ -117,37 +104,43 @@ namespace Marmary.StateBehavior.Runtime
 
             // Aplica easing, delay y duración
             tweener
-                .SetEase(easeShow)
+                .SetEase(ease)
                 .SetDelay(delay)
-                .ChangeEndValue(endValueToUse, duration, true);
+                .ChangeEndValue(endValueToUse, duration, true)
+                .Restart(true, delay);
 
             return tweener;
         }
 
         /// <summary>
-        ///     Applies the configuration to the supplied <see cref="Tweener" /> without considering an original value.
+        ///     Applies a configuration to the specified tweener instance for instant changes.
         /// </summary>
-        /// <param name="tweener">Tween instance to configure.</param>
-        /// <param name="externalEndValue"></param>
-        /// <returns>The configured tween instance.</returns>
-        public override Tweener ApplyData(Tweener tweener, Option<TValue> externalEndValue)
+        /// <param name="tweener">The tween instance to which the configuration will be applied.</param>
+        /// <param name="originalValue">The original value of the property being tweened.</param>
+        /// <param name="externalEndValue">An optional external value to override the default target end value.</param>
+        /// <returns>The configured tweener instance.</returns>
+        public override Tweener ApplyDataInstant(Tweener tweener,
+            TValue originalValue,
+            Option<TValue> externalEndValue)
         {
             Guard.Against.Null(tweener,
                 "Tweener es nulo. No se puede aplicar ActionDataSimpleContainer.");
 
-            var delay = useCustomDelay ? customDelay : tweener.Delay();
+            const float delay = 0f;
+            const float duration = 0f;
 
-            var endValueToUse =
-                externalEndValue.Match(
+            var endValueToUse = useOrigin
+                ? originalValue
+                : externalEndValue.Match(
                     v => v,
                     () => endValue
                 );
 
             // Aplica easing, delay y duración
             tweener
-                .SetEase(easeShow)
                 .SetDelay(delay)
-                .ChangeEndValue(endValueToUse, duration, true);
+                .ChangeEndValue(endValueToUse, duration, true)
+                .Restart();
 
             return tweener;
         }

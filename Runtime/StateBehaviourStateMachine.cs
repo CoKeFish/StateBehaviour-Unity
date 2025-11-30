@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Sirenix.Utilities;
 using UnityEngine;
@@ -21,6 +22,12 @@ namespace Marmary.StateBehavior.Runtime
         ///     The animation element that handles events for selection states.
         /// </summary>
         private readonly Element<TState, TTrigger> _selectableElement;
+
+        /// <summary>
+        ///     Provides timing configurations and functionality to control execution delays
+        ///     in the state behavior state machine.
+        /// </summary>
+        private readonly TimeWrapper _timeWrapper;
 
         /// <summary>
         ///     List of actions to execute on state changes.
@@ -48,11 +55,13 @@ namespace Marmary.StateBehavior.Runtime
         protected StateBehaviourStateMachine(TState initialState,
             GameObject gameObject,
             List<IStateContract<TState>> actions,
-            Element<TState, TTrigger> selectableElement)
+            Element<TState, TTrigger> selectableElement,
+            TimeWrapper timeWrapper)
             : base(initialState)
         {
             _actions = actions;
             _selectableElement = selectableElement;
+            _timeWrapper = timeWrapper;
 
             ConfigureStateMachine();
 
@@ -118,7 +127,7 @@ namespace Marmary.StateBehavior.Runtime
                 return;
             }
 
-            AnimationProcess(currentState);
+            AnimationProcess(currentState, _timeWrapper);
         }
 
 
@@ -140,13 +149,14 @@ namespace Marmary.StateBehavior.Runtime
         }
 
         /// <summary>
-        ///     Executes animation tasks for the given state by processing all actions associated with the current state.
+        ///     Executes animation tasks for the specified state based on the associated actions.
         /// </summary>
-        /// <param name="currentState">The current state of the state machine for which the actions are being executed.</param>
-        private void AnimationProcess(TState currentState)
+        /// <param name="currentState">The current state of the state machine for which animations will be processed.</param>
+        /// <param name="timeWrapper">An instance of the time wrapper used to manage timing during animation execution.</param>
+        private void AnimationProcess(TState currentState, TimeWrapper timeWrapper)
         {
             var tasks = new List<UniTask>(_actions.Count);
-            foreach (var action in _actions) tasks.Add(action.Set(currentState));
+            tasks.AddRange(Enumerable.Select(_actions, action => action.Set(currentState, timeWrapper)));
 
             var finalTask = AwaitActionsThenInvokeEvents(tasks, currentState);
             AddExecutionTask(finalTask);
