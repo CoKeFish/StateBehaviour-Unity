@@ -6,9 +6,9 @@ namespace Marmary.StateBehavior.Runtime.SwitchState.Actions
     /// <summary>
     ///     Action data for MovementSwitchAction that animates RectTransform movement for show and hide transitions.
     /// </summary>
-    [CreateAssetMenu(fileName = "ActionDataMovementSwitch",
-        menuName = "StateBehavior/SwitchState/ActionDataMovementSwitch")]
-    public class ActionDataMovementSwitch : ActionDataSwitch<Vector3>
+    [CreateAssetMenu(fileName = "RectTransformMovementDataSwitchAction",
+        menuName = "StateBehavior/SwitchState/RectTransformMovementDataSwitchAction")]
+    public class RectTransformMovementDataSwitchAction : ActionDataSwitch<Vector3>
     {
     }
 }

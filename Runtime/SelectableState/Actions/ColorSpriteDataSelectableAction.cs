@@ -6,10 +6,10 @@ namespace Marmary.StateBehavior.Runtime.SelectableState.Actions
     /// <summary>
     ///     Scriptable object that stores color targets for sprite-based selectable actions.
     /// </summary>
-    [CreateAssetMenu(fileName = "ColorSpriteSelectableActionData",
-        menuName = "StateBehavior/Actions/ColorSpriteSelectableActionData",
+    [CreateAssetMenu(fileName = "ColorSpriteDataSelectableAction",
+        menuName = "StateBehavior/Actions/ColorSpriteDataSelectableAction",
         order = 1)]
-    public class ColorSpriteSelectableActionData : ActionDataSelectable<Color>
+    public class ColorSpriteDataSelectableAction : ActionDataSelectable<Color>
     {
     }
 }

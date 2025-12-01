@@ -40,7 +40,9 @@ namespace Marmary.StateBehavior.Runtime.SwitchState.Actions
     ///     Moves elements in and out of screen based on configured hiding position.
     /// </summary>
     [Serializable]
-    public class MovementSwitchAction : SwitchAction<RectTransform, Vector3>
+    public class
+        RectTransformMovementAction<TState, TActionData> : Action<TState, Vector3, RectTransform, TActionData>
+        where TState : Enum where TActionData : ActionData<TState, Vector3>
     {
         #region Serialized Fields
 
@@ -97,13 +99,6 @@ namespace Marmary.StateBehavior.Runtime.SwitchState.Actions
             return null;
         }
 
-#if UNITY_EDITOR
-        /// <inheritdoc />
-        protected override ScriptableObject CreateInstanceScriptableObject()
-        {
-            return ScriptableObject.CreateInstance<ActionDataMovementSwitch>();
-        }
-#endif
 
         /// <summary>
         ///     Gets the end position for hiding animation based on the configured hiding position.

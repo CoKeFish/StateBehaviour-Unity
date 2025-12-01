@@ -1,27 +1,39 @@
-﻿#if STATE_BEHAVIOR_ENABLED && DEFINICION_TexAnimator
-// TODO: Revisar este archivo cuando se implemente la característica
+﻿#if STATE_BEHAVIOR_ENABLED
 using System;
 using DG.Tweening;
+using Febucci.UI;
+using Marmary.StateBehavior.Runtime.SelectableState;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Scrips.StateBehavior
+namespace Marmary.StateBehavior.Runtime.Actions
 {
     /// <summary>
     ///     Animates TextAnimator components by tweaking tagged behaviour parameters for each state.
     /// </summary>
     [Serializable]
-    public class AnimationFontSelectableAction : SelectableAction<TextAnimator_TMP, float>
+    public class AnimationFontAction<TState, TActionData> : Action<TState, float, TextAnimator_TMP, TActionData>
+        where TState : Enum where TActionData : ActionData<TState, float>
     {
+        #region Serialized Fields
+
         /// <summary>
         ///     The tag to use for the animation, see Febucci documentation for more info
         /// </summary>
         [SerializeField] [Required] private string tag = "Wave";
 
+        #endregion
+
+        #region Fields
+
         /// <summary>
         ///     Stores the cached amount applied to the animation tag.
         /// </summary>
         private float _amount;
+
+        #endregion
+
+        #region Properties
 
         /// <summary>
         ///     Gets or sets the animated amount and updates the underlying tag.
@@ -36,27 +48,19 @@ namespace Scrips.StateBehavior
             }
         }
 
+        #endregion
+
+        #region Methods
+
         /// <inheritdoc />
         protected override Tweener CreateTweener(GameObject gameObject)
         {
-            if (useCustomTarget)
-            {
-                return DOTween.To(
-                    () => Amount,
-                    x => Amount = x,
-                    originalValue,
-                    0f // duración temporal
-                ).Pause();
-            }
-            else
-            {
-                return DOTween.To(
-                    () => Amount,
-                    x => Amount = x,
-                    originalValue,
-                    0f // duración temporal
-                ).Pause();
-            }
+            return DOTween.To(
+                () => Amount,
+                x => Amount = x,
+                originalValue,
+                0f // duración temporal
+            ).Pause();
         }
 
         /// <inheritdoc />
@@ -65,13 +69,7 @@ namespace Scrips.StateBehavior
             originalValue = Amount;
         }
 
-#if UNITY_EDITOR
-        /// <inheritdoc />
-        protected override ScriptableObject CreateInstanceScriptableObject()
-        {
-            return ScriptableObject.CreateInstance<AnimationFontSelectableActionData>();
-        }
-#endif
+        #endregion
     }
 
 

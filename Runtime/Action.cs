@@ -1,7 +1,5 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+
 using System;
 using Ardalis.GuardClauses;
 using Cysharp.Threading.Tasks;
@@ -10,7 +8,10 @@ using LanguageExt;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
+#if UNITY_EDITOR
+using UnityEditor;
 using Object = UnityEngine.Object;
+#endif
 
 namespace Marmary.StateBehavior.Runtime
 {
@@ -18,7 +19,8 @@ namespace Marmary.StateBehavior.Runtime
     ///     Base action that binds a <see cref="ActionData{TState, TValue}" /> asset and exposes creation utilities in-editor.
     /// </summary>
     [Serializable]
-    public abstract class Action<TState, TValue> : IStateContract<TState> where TState : Enum
+    public abstract class Action<TState, TValue, TComponent, TActionData> : IStateContract<TState>
+        where TState : Enum where TActionData : ActionData<TState, TValue>
     {
         #region Serialized Fields
 
@@ -26,7 +28,12 @@ namespace Marmary.StateBehavior.Runtime
         ///     Scriptable object containing the configuration for each selectable state.
         /// </summary>
         [FormerlySerializedAs("Data")] [InlineEditor]
-        public ActionData<TState, TValue> data;
+        public TActionData data;
+
+        /// <summary>
+        ///     Target component affected by the tween.
+        /// </summary>
+        [SerializeField] protected TComponent target;
 
         #endregion
 
@@ -41,15 +48,6 @@ namespace Marmary.StateBehavior.Runtime
         ///     Tween instance reused across state changes.
         /// </summary>
         protected Tweener tweener;
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        ///     Determines whether the action needs an ActionData asset.
-        /// </summary>
-        private bool NeedsActionData => data == null;
 
         #endregion
 
@@ -139,11 +137,21 @@ namespace Marmary.StateBehavior.Runtime
 
 
 #if UNITY_EDITOR
+
+
+        /// <summary>
+        ///     Determines whether the action needs an ActionData asset.
+        /// </summary>
+        private bool NeedsActionData => data == null;
+
         /// <summary>
         ///     Creates the backing <see cref="ScriptableObject" /> used by this action.
         /// </summary>
         /// <returns>Newly created scriptable object.</returns>
-        protected abstract ScriptableObject CreateInstanceScriptableObject();
+        protected ScriptableObject CreateInstanceScriptableObject()
+        {
+            return ScriptableObject.CreateInstance<TActionData>();
+        }
 
 
         /// <summary>
@@ -171,7 +179,7 @@ namespace Marmary.StateBehavior.Runtime
                 AssetDatabase.Refresh();
 
                 // Asignar automáticamente el ScriptableObject creado al campo data
-                if (asset is ActionData<TState, TValue> actionData)
+                if (asset is TActionData actionData)
                 {
                     // Registrar el cambio en el sistema de Undo y marcar el objeto como modificado
                     var selectedObject = Selection.activeGameObject;

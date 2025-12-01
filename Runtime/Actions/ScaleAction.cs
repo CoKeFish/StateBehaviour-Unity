@@ -1,13 +1,15 @@
 #if STATE_BEHAVIOR_ENABLED
+using System;
 using DG.Tweening;
 using UnityEngine;
 
-namespace Marmary.StateBehavior.Runtime.SelectableState.Actions
+namespace Marmary.StateBehavior.Runtime.Actions
 {
     /// <summary>
     ///     Tweens the local scale of a <see cref="RectTransform" /> in response to selectable state changes.
     /// </summary>
-    public class ScaleSelectableAction : SelectableAction<RectTransform, Vector3>
+    public abstract class ScaleAction<TState, TActionData> : Action<TState, Vector3, RectTransform, TActionData>
+        where TState : Enum where TActionData : ActionData<TState, Vector3>
     {
         #region Methods
 
@@ -27,14 +29,6 @@ namespace Marmary.StateBehavior.Runtime.SelectableState.Actions
         {
             originalValue = gameObject.transform.localScale;
         }
-
-#if UNITY_EDITOR
-        /// <inheritdoc />
-        protected override ScriptableObject CreateInstanceScriptableObject()
-        {
-            return ScriptableObject.CreateInstance<ScaleSelectableActionData>();
-        }
-#endif
 
         #endregion
     }

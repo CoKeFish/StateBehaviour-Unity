@@ -10,7 +10,6 @@ namespace Marmary.StateBehavior.Runtime
     ///     Commonly used for defining parameters such as delays, durations, or intervals in various operations.
     /// </summary>
     [Serializable]
-    [HideLabel]
     [HideReferenceObjectPicker]
     public class TimeWrapper
     {

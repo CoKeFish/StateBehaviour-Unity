@@ -6,10 +6,10 @@ namespace Marmary.StateBehavior.Runtime.SelectableState.Actions
     /// <summary>
     ///     Scriptable object containing per-state scale targets for selectable elements.
     /// </summary>
-    [CreateAssetMenu(fileName = "ScaleSelectableActionData",
-        menuName = "StateBehavior/Actions/ScaleSelectableActionData",
+    [CreateAssetMenu(fileName = "ScaleDataSelectableAction",
+        menuName = "StateBehavior/Actions/ScaleDataSelectableAction",
         order = 1)]
-    public class ScaleSelectableActionData : ActionDataSelectable<Vector3>
+    public class ScaleDataSelectableAction : ActionDataSelectable<Vector3>
     {
     }
 }

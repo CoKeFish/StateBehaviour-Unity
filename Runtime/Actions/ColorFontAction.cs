@@ -1,14 +1,16 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
+using System;
 using DG.Tweening;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
-namespace Marmary.StateBehavior.Runtime.SelectableState.Actions
+namespace Marmary.StateBehavior.Runtime.Actions
 {
     /// <summary>
-    ///     Animates the color of a <see cref="UnityEngine.UI.Image" /> component when selectable states change.
+    ///     Animates the text color of a <see cref="TextMeshProUGUI" /> when selectable states change.
     /// </summary>
-    public class ColorSpriteSelectableAction : SelectableAction<Image, Color>
+    public abstract class ColorFontAction<TState, TActionData> : Action<TState, Color, TextMeshProUGUI, TActionData>
+        where TState : Enum where TActionData : ActionData<TState, Color>
     {
         #region Methods
 
@@ -28,14 +30,6 @@ namespace Marmary.StateBehavior.Runtime.SelectableState.Actions
         {
             originalValue = target.color;
         }
-
-#if UNITY_EDITOR
-        /// <inheritdoc />
-        protected override ScriptableObject CreateInstanceScriptableObject()
-        {
-            return ScriptableObject.CreateInstance<ColorSpriteSelectableActionData>();
-        }
-#endif
 
         #endregion
     }
