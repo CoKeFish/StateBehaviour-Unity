@@ -1,12 +1,15 @@
 #if STATE_BEHAVIOR_ENABLED
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Marmary.StateBehavior.Runtime.SwitchState;
 using Sirenix.OdinInspector;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Marmary.StateBehavior.Runtime.Menu
 {
@@ -17,37 +20,13 @@ namespace Marmary.StateBehavior.Runtime.Menu
     [Serializable]
     public class MenuSequencer : SequencerBase<SwitchState.SwitchState, SwitchTrigger, SwitchElement>
     {
-        #region SequencerOperation enum
-
-        /// <summary>
-        ///     Specifies the operation of hiding elements in a sequence within the MenuSequencer.
-        ///     Used to make menu elements invisible or removed from view during sequencing.
-        /// </summary>
-        public enum SequencerOperation
-        {
-            /// <summary>
-            ///     Represents the operation to display menu elements in a sequence.
-            ///     When applied, the sequencer transitions the elements to a visible state.
-            /// </summary>
-            Show,
-
-
-            /// <summary>
-            ///     Represents the operation of hiding elements in a sequence within the MenuSequencer.
-            ///     This operation is used to make menu elements invisible or removed from view during the sequencing process.
-            /// </summary>
-            Hide
-        }
-
-        #endregion
-
         #region Serialized Fields
 
         /// <summary>
         ///     The menu elements represent the elements of the menu that will be animated
         ///     It not necessarily has to be the children of the menu, it can be any game object
         /// </summary>
-        [SerializeField] [BoxGroup("Menu")] private SwitchElement[] menuElements;
+        [SerializeField] [BoxGroup("Menu")] private List<SwitchElement> menuElements;
 
 
         /// <summary>
@@ -93,6 +72,7 @@ namespace Marmary.StateBehavior.Runtime.Menu
         public override void Setup()
         {
             GetAllMenuElements();
+            menuElements = GetSortedElements(menuElements);
             CalculateTimes();
         }
 
@@ -154,8 +134,9 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// </summary>
         public void GetAllMenuElements()
         {
-            menuElements = _component.GetComponentsInChildren<SwitchElement>();
+            menuElements = _component.GetComponentsInChildren<SwitchElement>().ToList();
 #if UNITY_EDITOR
+
             EditorUtility.SetDirty(_component);
             PrefabUtility.RecordPrefabInstancePropertyModifications(_component);
 
@@ -175,8 +156,8 @@ namespace Marmary.StateBehavior.Runtime.Menu
 
             foreach (var menuElement in menuElements)
             {
-                menuElement.Time.useCustomDelay = true;
-                menuElement.Time.customDelay = delayBeforeDeactivating;
+                menuElement.time.useCustomDelay = true;
+                menuElement.time.customDelay = delayBeforeDeactivating;
                 delayBeforeDeactivating += separation;
 #if UNITY_EDITOR
                 EditorUtility.SetDirty(menuElement);

@@ -3,38 +3,12 @@
 using System;
 using DG.Tweening;
 using LanguageExt;
+using Marmary.Utils.Runtime;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Marmary.StateBehavior.Runtime.SwitchState.Actions
 {
-    /// <summary>
-    ///     Represents the position to the right where an element can be hidden.
-    /// </summary>
-    public enum Position
-    {
-        /// <summary>
-        ///     Specifies the top position within the enum, indicating that the element should be hidden at the top of the screen.
-        /// </summary>
-        Top,
-
-        /// <summary>
-        ///     Represents the bottom position where an element can be hidden.
-        /// </summary>
-        Bottom,
-
-        /// <summary>
-        ///     Specifies the 'Left' position, representing the element being hidden to the left side of the screen.
-        /// </summary>
-        Left,
-
-        /// <summary>
-        ///     Specifies the right position within the enum, indicating that the element should be hidden at the right of the
-        ///     screen.
-        /// </summary>
-        Right
-    }
-
     /// <summary>
     ///     Switch action that animates RectTransform movement for show and hide transitions.
     ///     Moves elements in and out of screen based on configured hiding position.

@@ -1,5 +1,5 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
-using Marmary.Libraries.UI.Events;
+using Marmary.Utils.Runtime.Events;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -43,7 +43,7 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         /// </summary>
         protected override void Awake()
         {
-            stateMachine = new SelectableStateMachine(SelectableState.Normal, gameObject, actions, this, Time, onClick);
+            stateMachine = new SelectableStateMachine(SelectableState.Normal, gameObject, actions, this, time, onClick);
             base.Awake();
         }
 

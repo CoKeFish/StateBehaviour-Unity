@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Marmary.Utils.Runtime;
 using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -14,7 +17,7 @@ namespace Marmary.StateBehavior.Runtime.Menu
     ///     it contains the menu elements and the logic of showing and hiding the menu
     /// </summary>
     [DisallowMultipleComponent]
-    public class Menu : MonoBehaviour
+    public class Menu : SerializedMonoBehaviour
     {
         #region Serialized Fields
 
@@ -28,29 +31,15 @@ namespace Marmary.StateBehavior.Runtime.Menu
         [PropertySpace(SpaceAfter = 10)]
         public Selectable firstSelected;
 
-        /// <summary>
-        ///     Default down button of the menu when the event system is null and down button is pressed
-        /// </summary>
-        [SerializeField] [ChildGameObjectsOnly] [BoxGroup("Options")]
-        public Selectable defaultDownButton;
 
         /// <summary>
-        ///     Default up button of the menu when the event system is null and up button is pressed
+        ///     A dictionary that maps positions (e.g., Top, Bottom, Left, Right) to their corresponding default selectable
+        ///     elements.
+        ///     This allows specific UI elements to be associated with directional positions within the menu, enabling customized
+        ///     navigation behavior.
         /// </summary>
-        [SerializeField] [ChildGameObjectsOnly] [BoxGroup("Options")]
-        public Selectable defaultUpButton;
-
-        /// <summary>
-        ///     Default left button of the menu when the event system is null and left button is pressed
-        /// </summary>
-        [SerializeField] [ChildGameObjectsOnly] [BoxGroup("Options")]
-        public Selectable defaultLeftButton;
-
-        /// <summary>
-        ///     Default right button of the menu when the event system is null and right button is pressed
-        /// </summary>
-        [SerializeField] [ChildGameObjectsOnly] [BoxGroup("Options")] [PropertySpace(SpaceAfter = 10, SpaceBefore = 0)]
-        public Selectable defaultRightButton;
+        [OdinSerialize] [ShowInInspector] [BoxGroup("Options")]
+        public Dictionary<Position, Selectable> DefaultSelectables = new();
 
 
         /// <summary>
@@ -61,9 +50,9 @@ namespace Marmary.StateBehavior.Runtime.Menu
         #endregion
 
         /// <summary>
-        /// Configures the menu by initializing its sequencer.
-        /// 1- Calls the sequencer's setup method with the current menu instance.
-        /// 2- Invokes the default setup method of the sequencer for any additional initialization.
+        ///     Configures the menu by initializing its sequencer.
+        ///     1- Calls the sequencer's setup method with the current menu instance.
+        ///     2- Invokes the default setup method of the sequencer for any additional initialization.
         /// </summary>
         [Button]
         public void Setup()
@@ -75,10 +64,10 @@ namespace Marmary.StateBehavior.Runtime.Menu
         #region Unity Event Functions
 
         /// <summary>
-        /// Initializes the Menu component during the Awake lifecycle method.
-        /// It performs the following actions:
-        /// 1. Configures required dependencies by setting up the MenuSequencer.
-        /// 2. Ensures any necessary initialization logic is performed to prepare the menu for activation.
+        ///     Initializes the Menu component during the Awake lifecycle method.
+        ///     It performs the following actions:
+        ///     1. Configures required dependencies by setting up the MenuSequencer.
+        ///     2. Ensures any necessary initialization logic is performed to prepare the menu for activation.
         /// </summary>
         public void Awake()
         {
@@ -208,9 +197,9 @@ namespace Marmary.StateBehavior.Runtime.Menu
         #region Editor
 
         /// <summary>
-        /// Hides the menu.
-        /// 1- Deactivates the menu functionality.
-        /// 2- Initiates the menu inactivation process asynchronously.
+        ///     Hides the menu.
+        ///     1- Deactivates the menu functionality.
+        ///     2- Initiates the menu inactivation process asynchronously.
         /// </summary>
         [Button]
         public void Hide()
@@ -219,10 +208,10 @@ namespace Marmary.StateBehavior.Runtime.Menu
         }
 
         /// <summary>
-        /// Displays the menu by activating it.
-        /// 1- Triggers the activation process for the menu.
-        /// 2- Ensures that all necessary elements and animations related to showing the menu are executed.
-        /// 3- Calls the internal method to handle asynchronous activation logic.
+        ///     Displays the menu by activating it.
+        ///     1- Triggers the activation process for the menu.
+        ///     2- Ensures that all necessary elements and animations related to showing the menu are executed.
+        ///     3- Calls the internal method to handle asynchronous activation logic.
         /// </summary>
         [Button]
         public void Show()

@@ -3,16 +3,20 @@ using System.Collections.Generic;
 using Ardalis.GuardClauses;
 using Cysharp.Threading.Tasks;
 using DTT.ExtendedDebugLogs;
+using Marmary.Utils.Runtime;
+using Marmary.Utils.Runtime.Structure;
+using Marmary.Utils.Runtime.UI;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using VContainer;
 
 namespace Marmary.StateBehavior.Runtime.Menu
 {
-    /// <inheritdoc />
     /// <summary>
-    ///     Class that manages all the menus in the scene and the transitions between them
+    ///     Manages the lifecycle and behavior of menus in the application.
+    ///     Provides functionality to activate, deactivate, and switch between menus.
     /// </summary>
-    public class MenuManager : MonoBehaviour
+    public class MenuManager : MonoBehaviour, IDefaultSelectable
     {
         #region Serialized Fields
 
@@ -70,14 +74,18 @@ namespace Marmary.StateBehavior.Runtime.Menu
         #region Properties
 
         /// <summary>
-        ///     The menu that is active when the game starts
-        /// </summary>
-        public Menu DefaultMenu => defaultMenu;
-
-        /// <summary>
         ///     The menu that is currently active
         /// </summary>
-        public static Menu CurrentActiveMenu { get; private set; }
+        private static Menu CurrentActiveMenu { get; set; }
+
+        #endregion
+
+        #region Constructors and Injected
+
+        /// <summary>
+        ///     Instance of an event bus used for publishing and subscribing to events within the application.
+        /// </summary>
+        [Inject] private IEventBus _eventBus;
 
         #endregion
 
@@ -115,8 +123,15 @@ namespace Marmary.StateBehavior.Runtime.Menu
             {
                 DebugEx.LogException(e);
             }
+
+            _eventBus.Publish(new SendMenuManagerEvent(this));
         }
 
+        /// <summary>
+        ///     Handles the cleanup process when the MenuManager is destroyed.
+        ///     This method is automatically called by Unity when the associated GameObject is destroyed.
+        ///     Specifically, it ensures that the reference to the currently active menu is cleared.
+        /// </summary>
         private void OnDestroy()
         {
             CurrentActiveMenu = null;
@@ -242,6 +257,21 @@ namespace Marmary.StateBehavior.Runtime.Menu
         }
 
 #endif
+
+        #endregion
+
+        #region IDefaultSelectable Members
+
+        /// <summary>
+        ///     Sets the default selectable UI element based on the given position
+        ///     within the currently active menu. If a selectable is found, it is
+        ///     set as the currently selected UI element.
+        /// </summary>
+        /// <param name="position">The position that determines which selectable element is to be activated.</param>
+        public void SetDefaultSelectable(Position position)
+        {
+            if (CurrentActiveMenu.DefaultSelectables.TryGetValue(position, out var selectable)) selectable.Select();
+        }
 
         #endregion
     }

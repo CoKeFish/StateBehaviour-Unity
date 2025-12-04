@@ -1,12 +1,18 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
+
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
+#if UNITY_EDITOR
+using System.Reflection;
+using UnityEditor;
+using Sirenix.OdinInspector.Editor;
+#endif
 
 namespace Marmary.StateBehavior.Runtime
 {
@@ -23,7 +29,7 @@ namespace Marmary.StateBehavior.Runtime
         ///     the state machine context of an element, providing mechanisms such as
         ///     custom delay configuration.
         /// </summary>
-        public TimeWrapper Time;
+        [FormerlySerializedAs("Time")] public TimeWrapper time;
 
         /// <summary>
         ///     The state machine responsible for handling transitions and logic
@@ -45,7 +51,11 @@ namespace Marmary.StateBehavior.Runtime
         /// <summary>
         ///     List of actions bound to the element for each state.
         /// </summary>
-        [SerializeReference] protected List<IStateContract<TState>> actions = new();
+#if UNITY_EDITOR
+        [OnCollectionChanged("OnActionsChanged")]
+#endif
+        [SerializeReference]
+        protected List<IStateContract<TState>> actions = new();
 
         /// <summary>
         ///     Asset collection used to build the actions list.
@@ -136,6 +146,110 @@ namespace Marmary.StateBehavior.Runtime
 #if UNITY_EDITOR
 
         #region Editor Utilities
+
+        /// <summary>
+        ///     Handles changes to the actions collection, ensuring that any newly added or inserted
+        ///     actions are properly configured with the relevant target. This method is automatically
+        ///     invoked when the actions list is modified.
+        /// </summary>
+        /// <param name="info">
+        ///     Details about the change in the collection, including the type of change,
+        ///     the affected element, and its position within the collection.
+        /// </param>
+        private void OnActionsChanged(CollectionChangeInfo info)
+        {
+            // Solo nos interesan elementos añadidos/insertados
+            if (info.ChangeType != CollectionChangeType.Add &&
+                info.ChangeType != CollectionChangeType.Insert)
+                return;
+
+            if (info.Value is not IStateContract<TState> action)
+                return;
+
+            AssignTargetByReflection(action);
+        }
+
+        /// <summary>
+        ///     Assigns a target component to the specified action using reflection. The method identifies a field named "target"
+        ///     within the action, determines its type, and attempts to find a matching component in the current GameObject or its
+        ///     immediate children. If a matching component is found, it is assigned to the identified "target" field.
+        /// </summary>
+        /// <param name="action">
+        ///     The action instance for which the target component needs to be assigned. This action must contain
+        ///     a field named "target" with the type of the required component.
+        /// </param>
+        private void AssignTargetByReflection(IStateContract<TState> action)
+        {
+            object actionObj = action;
+            var actionType = actionObj.GetType();
+
+            // Buscar el campo "target" (protected TComponent target;)
+            var targetField = actionType.GetField(
+                "target",
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
+            );
+
+            if (targetField == null)
+            {
+                Debug.LogWarning(
+                    $"[Element] La acción '{actionType.Name}' no tiene campo 'target'.");
+                return;
+            }
+
+            var targetType = targetField.FieldType;
+
+            // Buscar componente del tipo correcto en este GO y sus hijos inmediatos
+            var target = FindTargetComponentForType(targetType);
+            if (target == null)
+            {
+                Debug.LogWarning(
+                    $"[Element] No se encontró componente de tipo '{targetType.Name}' en '{gameObject.name}' ni en sus hijos inmediatos.");
+                return;
+            }
+
+            targetField.SetValue(actionObj, target);
+
+            Debug.Log(
+                $"[Element] Auto-asignado target a '{target.GetType().Name}' " +
+                $"(targetFieldType: '{targetType.Name}') " +
+                $"para acción '{actionType.Name}' en '{gameObject.name}'");
+
+            EditorUtility.SetDirty(this);
+        }
+
+        /// <summary>
+        ///     Searches for a component of the specified type within the current GameObject
+        ///     or its immediate children. If a component of the desired type exists on the
+        ///     current GameObject, it is returned. If not, the search continues in the
+        ///     GameObject's immediate children (non-recursive).
+        /// </summary>
+        /// <param name="targetType">
+        ///     The type of the component being searched for. This must be a valid
+        ///     type that corresponds to a Unity component.
+        /// </param>
+        /// <returns>
+        ///     The first component of the specified type found on the current GameObject
+        ///     or its immediate children, or null if no such component exists.
+        /// </returns>
+        private Component FindTargetComponentForType(Type targetType)
+        {
+            // 1) Mismo GameObject
+            var direct = GetComponent(targetType);
+            if (direct != null)
+                return direct;
+
+            // 2) Hijos inmediatos (no recursivo)
+            for (var i = 0; i < transform.childCount; i++)
+            {
+                var child = transform.GetChild(i);
+                var c = child.GetComponent(targetType);
+                if (c != null)
+                    return c;
+            }
+
+            return null;
+        }
+
 
         /// <summary>
         ///     Synchronises the actions list using the linked <see cref="ActionDataCollection" />.
