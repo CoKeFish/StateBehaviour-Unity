@@ -69,8 +69,7 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
                 .Permit(SelectableTrigger.Submit, SelectableState.PressedInside)
                 .Permit(SelectableTrigger.Cancel, SelectableState.Normal)
                 .OnEntryFrom(SelectableTrigger.PointerClick, OnClick)
-                .OnEntryFrom(SelectableTrigger.Submit, OnClick)
-                .OnEntryFrom(SelectableTrigger.UnPressed, ExecuteActions)
+                .OnEntryFrom(SelectableTrigger.UnPressed, OnClick)
                 .OnEntry(ExecuteActions);
 
             stateMachine.Configure(SelectableState.PressedInside)
