@@ -7,7 +7,6 @@ using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 #if UNITY_EDITOR
 using System.Reflection;
 using UnityEditor;
@@ -29,7 +28,7 @@ namespace Marmary.StateBehavior.Runtime
         ///     the state machine context of an element, providing mechanisms such as
         ///     custom delay configuration.
         /// </summary>
-        [FormerlySerializedAs("Time")] public TimeWrapper time;
+        public TimeWrapper time;
 
         /// <summary>
         ///     The state machine responsible for handling transitions and logic
