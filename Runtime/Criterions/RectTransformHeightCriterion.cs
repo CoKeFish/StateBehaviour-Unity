@@ -24,15 +24,6 @@ namespace Marmary.StateBehavior.Runtime.Criterions
             if (elements == null || elements.Count == 0)
                 return new List<TElement>();
 
-            foreach (var e in elements)
-            {
-                var rt = e.GetComponent<RectTransform>();
-                if (rt != null)
-                    Debug.Log($"Elemento: {e.name}, Posición Y: {rt.position.y}");
-                else
-                    Debug.Log($"Elemento: {e.name}, sin RectTransform.");
-            }
-
             return elements
                 .OrderByDescending(e => e.GetComponent<RectTransform>().position.y)
                 .ToList();
