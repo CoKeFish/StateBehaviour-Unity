@@ -16,6 +16,7 @@ namespace Marmary.StateBehavior.Runtime.Menu
     ///     Manages the lifecycle and behavior of menus in the application.
     ///     Provides functionality to activate, deactivate, and switch between menus.
     /// </summary>
+    [IgnoreUnityLifecycle]
     public class MenuManager : MonoBehaviour, IDefaultSelectable
     {
         #region Serialized Fields
@@ -113,18 +114,18 @@ namespace Marmary.StateBehavior.Runtime.Menu
         ///     2- Activate the default menu and set it as the current active menu
         /// </summary>
         /// <exception cref="Exception"></exception>
-        private async void Start()
+        public async void Start()
         {
             try
             {
                 await Init();
+
+                _eventBus.Publish(new SendMenuManagerEvent(this));
             }
             catch (Exception e)
             {
                 DebugEx.LogException(e);
             }
-
-            _eventBus.Publish(new SendMenuManagerEvent(this));
         }
 
         /// <summary>

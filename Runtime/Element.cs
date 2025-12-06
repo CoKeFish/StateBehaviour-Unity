@@ -2,9 +2,12 @@
 
 using System;
 using System.Collections.Generic;
+using Ardalis.GuardClauses;
 using Cysharp.Threading.Tasks;
+using Marmary.Utils.Runtime.Structure.FlowControl;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
+using Sirenix.Utilities;
 using UnityEngine;
 using UnityEngine.Events;
 #if UNITY_EDITOR
@@ -18,7 +21,8 @@ namespace Marmary.StateBehavior.Runtime
     /// <summary>
     ///     Base MonoBehaviour responsible for orchestrating state-driven actions.
     /// </summary>
-    public abstract class Element<TState, TTrigger> : SerializedMonoBehaviour where TState : Enum where TTrigger : Enum
+    public abstract class Element<TState, TTrigger> : SerializedMonoBehaviour, IInitialize
+        where TState : Enum where TTrigger : Enum
     {
         #region Serialized Fields
 
@@ -84,21 +88,6 @@ namespace Marmary.StateBehavior.Runtime
 
         #endregion
 
-        #region Unity Event Functions
-
-        /// <summary>
-        ///     Initializes the element's state machine and configurations during the
-        ///     MonoBehaviour lifecycle's Awake phase. This method ensures that the
-        ///     execution behavior aligns with the specified runtime configuration,
-        ///     such as whether actions should execute instantly.
-        /// </summary>
-        protected virtual void Awake()
-        {
-            ExecuteInstantly = executeInstantly;
-        }
-
-        #endregion
-
         #region Methods
 
         /// <summary>
@@ -122,8 +111,7 @@ namespace Marmary.StateBehavior.Runtime
         /// <param name="forceInstantExecution">Whether the transition should use instant execution.</param>
         protected void TriggerState(TTrigger trigger, bool forceInstantExecution)
         {
-            if (stateMachine == null)
-                return;
+            Guard.Against.Null(stateMachine, "State machine is null.");
 
             if (forceInstantExecution)
                 stateMachine.FireTriggerInstant(trigger);
@@ -137,7 +125,27 @@ namespace Marmary.StateBehavior.Runtime
         /// <param name="trigger">Trigger to fire.</param>
         protected void TriggerState(TTrigger trigger)
         {
-            stateMachine?.FireTrigger(trigger);
+            Guard.Against.Null(stateMachine, "State machine is null.");
+
+            stateMachine.FireTrigger(trigger);
+        }
+
+        #endregion
+
+        #region IInitialize Members
+
+        /// <summary>
+        ///     Configures the initial state of the object by applying relevant setup operations.
+        ///     This method is invoked to ensure that all essential properties and settings
+        ///     are correctly initialized before the object is used.
+        /// </summary>
+        public virtual void Initialize()
+        {
+            ExecuteInstantly = executeInstantly;
+            if (actions.IsNullOrEmpty()) return;
+
+            foreach (var action in actions)
+                action.Setup(gameObject);
         }
 
         #endregion

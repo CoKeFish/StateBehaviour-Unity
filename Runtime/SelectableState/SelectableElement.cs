@@ -36,15 +36,15 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
 
         #endregion
 
-        #region Unity Event Functions
+        #region Methods
 
         /// <summary>
         ///     Initializes the SelectableElement by creating and configuring the internal SelectableStateMachine instance.
         /// </summary>
-        protected override void Awake()
+        public override void Initialize()
         {
-            stateMachine = new SelectableStateMachine(SelectableState.Normal, gameObject, actions, this, time, onClick);
-            base.Awake();
+            stateMachine = new SelectableStateMachine(SelectableState.Normal, actions, this, time, onClick);
+            base.Initialize();
         }
 
         #endregion

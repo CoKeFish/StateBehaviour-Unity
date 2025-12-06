@@ -6,15 +6,15 @@ namespace Marmary.StateBehavior.Runtime.SwitchState
     /// </summary>
     public abstract class SwitchElement : Element<SwitchState, SwitchTrigger>
     {
-        #region Unity Event Functions
+        #region Methods
 
         /// <summary>
         ///     Builds the switch state machine.
         /// </summary>
-        protected override void Awake()
+        public override void Initialize()
         {
-            stateMachine = new SwitchStateMachine(SwitchState.Show, gameObject, actions, this, time);
-            base.Awake();
+            stateMachine = new SwitchStateMachine(SwitchState.Show, actions, this, time);
+            base.Initialize();
         }
 
         #endregion

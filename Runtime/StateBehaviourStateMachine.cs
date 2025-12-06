@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Sirenix.Utilities;
-using UnityEngine;
 
 namespace Marmary.StateBehavior.Runtime
 {
@@ -53,7 +52,6 @@ namespace Marmary.StateBehavior.Runtime
         #region Constructors and Injected
 
         protected StateBehaviourStateMachine(TState initialState,
-            GameObject gameObject,
             List<IStateContract<TState>> actions,
             Element<TState, TTrigger> selectableElement,
             TimeWrapper timeWrapper)
@@ -64,11 +62,6 @@ namespace Marmary.StateBehavior.Runtime
             _timeWrapper = timeWrapper;
 
             ConfigureStateMachine();
-
-            if (actions.IsNullOrEmpty()) return;
-
-            foreach (var action in actions)
-                action.Setup(gameObject);
         }
 
         #endregion

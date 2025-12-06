@@ -1,6 +1,5 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.Events;
 
 namespace Marmary.StateBehavior.Runtime.SelectableState
@@ -26,18 +25,16 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         ///     Represents a state machine responsible for handling selectable states and their transitions.
         /// </summary>
         /// <param name="initialState">The initial state assigned to the state machine.</param>
-        /// <param name="gameObject">The GameObject to which the state machine is associated.</param>
         /// <param name="actions">A collection of actions to execute during state changes.</param>
         /// <param name="selectableElement">The UI element that triggers or reacts to state transitions.</param>
         /// <param name="timeWrapper">The time-related utility that aids in managing timing during transitions.</param>
         /// <param name="onClick">The UnityEvent that is invoked when a selectable element is clicked.</param>
         public SelectableStateMachine(SelectableState initialState,
-            GameObject gameObject,
             List<IStateContract<SelectableState>> actions,
             SelectableElement selectableElement,
             TimeWrapper timeWrapper,
             UnityEvent onClick)
-            : base(initialState, gameObject, actions, selectableElement, timeWrapper)
+            : base(initialState, actions, selectableElement, timeWrapper)
         {
             _onClick = onClick;
         }
