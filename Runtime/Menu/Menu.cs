@@ -22,7 +22,7 @@ namespace Marmary.StateBehavior.Runtime.Menu
     ///     it contains the menu elements and the logic of showing and hiding the menu
     /// </summary>
     [DisallowMultipleComponent]
-    public class Menu : SerializedMonoBehaviour, IInitialize
+    public class Menu : SerializedMonoBehaviour, IInitialize, ISetup
     {
         #region Serialized Fields
 
@@ -137,20 +137,6 @@ namespace Marmary.StateBehavior.Runtime.Menu
         [SerializeField] [BoxGroup("Options")] private bool recalculateInRuntime;
 
         #endregion
-
-        /// <summary>
-        ///     Configures the menu by initializing its sequencer.
-        ///     1- Calls the sequencer's setup method with the current menu instance.
-        ///     2- Invokes the default setup method of the sequencer for any additional initialization.
-        /// </summary>
-        [Button]
-        public void Setup()
-        {
-            GetAllMenuElements();
-            ElementSequencer<SwitchState.SwitchState, SwitchTrigger, MenuElement>.SetSortedElements(
-                menuElements.ToList(), new RectTransformHeightCriterion<MenuElement>(),
-                separation);
-        }
 
         #region Methods
 
@@ -378,6 +364,26 @@ namespace Marmary.StateBehavior.Runtime.Menu
                 ElementSequencer<SwitchState.SwitchState, SwitchTrigger, MenuElement>.SetSortedElements(
                     menuElements.ToList(), new RectTransformHeightCriterion<MenuElement>(),
                     separation);
+
+            foreach (var menuElement in menuElements) menuElement.Initialize();
+        }
+
+        #endregion
+
+        #region ISetup Members
+
+        /// <summary>
+        ///     Configures the menu by initializing its sequencer.
+        ///     1- Calls the sequencer's setup method with the current menu instance.
+        ///     2- Invokes the default setup method of the sequencer for any additional initialization.
+        /// </summary>
+        [Button]
+        public void Setup()
+        {
+            GetAllMenuElements();
+            ElementSequencer<SwitchState.SwitchState, SwitchTrigger, MenuElement>.SetSortedElements(
+                menuElements.ToList(), new RectTransformHeightCriterion<MenuElement>(),
+                separation);
         }
 
         #endregion

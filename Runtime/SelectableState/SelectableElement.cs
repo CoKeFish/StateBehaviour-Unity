@@ -43,8 +43,8 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         /// </summary>
         public override void Initialize()
         {
-            stateMachine = new SelectableStateMachine(SelectableState.Normal, actions, this, time, onClick);
             base.Initialize();
+            stateMachine = new SelectableStateMachine(SelectableState.Normal, actions, this, time, onClick);
         }
 
         #endregion

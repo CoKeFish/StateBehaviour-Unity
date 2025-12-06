@@ -1,9 +1,11 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
 
+
 using System;
 using System.Collections.Generic;
 using Ardalis.GuardClauses;
 using Cysharp.Threading.Tasks;
+using DTT.ExtendedDebugLogs;
 using Marmary.Utils.Runtime.Structure.FlowControl;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
@@ -15,6 +17,7 @@ using System.Reflection;
 using UnityEditor;
 using Sirenix.OdinInspector.Editor;
 #endif
+
 
 namespace Marmary.StateBehavior.Runtime
 {
@@ -142,7 +145,11 @@ namespace Marmary.StateBehavior.Runtime
         public virtual void Initialize()
         {
             ExecuteInstantly = executeInstantly;
-            if (actions.IsNullOrEmpty()) return;
+            if (actions.IsNullOrEmpty())
+            {
+                DebugEx.LogWarning("Cannot initialize element: the actions list is null or empty.");
+                return;
+            }
 
             foreach (var action in actions)
                 action.Setup(gameObject);
