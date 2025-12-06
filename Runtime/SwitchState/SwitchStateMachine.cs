@@ -22,7 +22,9 @@ namespace Marmary.StateBehavior.Runtime.SwitchState
         public SwitchStateMachine(SwitchState initialState,
             List<IStateContract<SwitchState>> actions,
             SwitchElement switchElement,
-            TimeWrapper timeWrapper) : base(initialState, actions, switchElement, timeWrapper)
+            TimeWrapper timeWrapper,
+            bool executeInstantly) 
+            : base(initialState, actions, switchElement, timeWrapper, executeInstantly)
         {
         }
 

@@ -51,7 +51,7 @@ namespace Marmary.StateBehavior.Runtime
         ///     initial state logic and actions without waiting for any external input or
         ///     triggers to occur.
         /// </summary>
-        [SerializeField] private bool executeInstantly;
+        [SerializeField] protected bool executeInstantly;
 
 
         /// <summary>
@@ -74,20 +74,6 @@ namespace Marmary.StateBehavior.Runtime
         /// </summary>
         [SerializeReference] [OdinSerialize] [NonSerialized]
         public Dictionary<TState, UnityEvent> Events = new();
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        ///     A property that determines whether the state machine's transitions and associated actions
-        ///     should be executed immediately upon triggering, bypassing any delays or intermediate steps.
-        /// </summary>
-        public bool ExecuteInstantly
-        {
-            get => stateMachine.ShouldExecuteInstantly;
-            set => stateMachine.ShouldExecuteInstantly = value;
-        }
 
         #endregion
 
@@ -144,7 +130,6 @@ namespace Marmary.StateBehavior.Runtime
         /// </summary>
         public virtual void Initialize()
         {
-            ExecuteInstantly = executeInstantly;
             if (actions.IsNullOrEmpty())
             {
                 DebugEx.LogWarning("Cannot initialize element: the actions list is null or empty.");

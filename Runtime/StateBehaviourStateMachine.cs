@@ -45,7 +45,7 @@ namespace Marmary.StateBehavior.Runtime
         /// <summary>
         ///     Executes all actions or events configured for the current state of the state machine.
         /// </summary>
-        public bool ShouldExecuteInstantly { get; set; }
+        public bool ShouldExecuteInstantly;
 
         #endregion
 
@@ -54,12 +54,14 @@ namespace Marmary.StateBehavior.Runtime
         protected StateBehaviourStateMachine(TState initialState,
             List<IStateContract<TState>> actions,
             Element<TState, TTrigger> selectableElement,
-            TimeWrapper timeWrapper)
+            TimeWrapper timeWrapper,
+            bool executeInstantly = false)
             : base(initialState)
         {
             _actions = actions;
             _selectableElement = selectableElement;
             _timeWrapper = timeWrapper;
+            ShouldExecuteInstantly = executeInstantly;
 
             ConfigureStateMachine();
         }

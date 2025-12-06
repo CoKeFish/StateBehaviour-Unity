@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using Ardalis.GuardClauses;
 using Cysharp.Threading.Tasks;
 using DTT.ExtendedDebugLogs;
+using I2.Loc;
 using Marmary.Utils.Runtime;
 using Marmary.Utils.Runtime.Structure;
+using Marmary.Utils.Runtime.Structure.FlowControl;
 using Marmary.Utils.Runtime.UI;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -17,7 +19,7 @@ namespace Marmary.StateBehavior.Runtime.Menu
     ///     Provides functionality to activate, deactivate, and switch between menus.
     /// </summary>
     [IgnoreUnityLifecycle]
-    public class MenuManager : MonoBehaviour, IDefaultSelectable
+    public class MenuManager : MonoBehaviour, IDefaultSelectable, IInitialize
     {
         #region Serialized Fields
 
@@ -90,23 +92,33 @@ namespace Marmary.StateBehavior.Runtime.Menu
 
         #endregion
 
-
-        /// <summary>
-        ///     Method responsible for initializing the menus in the scene collection.
-        ///     Waits for one frame before starting the initialization operations.
-        /// </summary>
-        /// <param>The scene collection being initialized.</param>
-        /// <returns>An IEnumerator to handle the initialization coroutine.</returns>
-        private async UniTask Init()
+        public void localizationEvent()
         {
-            // Wait for one frame to ensure all menus are loaded and ready
+            DebugEx.Log("localizationEvent");
+        }
+        
+        public async UniTask WaitForLocalizationToApply()
+        {
+            var tcs = new UniTaskCompletionSource();
+
+            void Handler()
+            {
+                tcs.TrySetResult();
+                LocalizationManager.OnLocalizeEvent -= Handler;
+            }
+
+            LocalizationManager.OnLocalizeEvent += Handler;
+
+            // Esperar un frame por seguridad
             await UniTask.Yield();
 
-            SetupAllMenus();
-
-            await ActivateDefaultMenuAtStartup();
+            // Esperar realmente al evento
+            await tcs.Task;
         }
 
+
+
+        
         #region Unity Event Functions
 
         /// <summary>
@@ -116,9 +128,15 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// <exception cref="Exception"></exception>
         public async void Start()
         {
+            LocalizationManager.OnLocalizeEvent += localizationEvent;
             try
             {
-                await Init();
+                await  WaitForLocalizationToApply();
+                await UniTask.Yield();
+
+                Initialize();
+
+                await ActivateDefaultMenuAtStartup();
 
                 _eventBus.Publish(new SendMenuManagerEvent(this));
             }
@@ -223,10 +241,11 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// <summary>
         ///     Setup all menus, hide them and inactivate them
         /// </summary>
-        private void SetupAllMenus()
+        public void Initialize()
         {
             foreach (var menu in allMenus)
             {
+                menu.Initialize();
                 menu.InstantHide();
                 menu.gameObject.SetActive(false);
             }

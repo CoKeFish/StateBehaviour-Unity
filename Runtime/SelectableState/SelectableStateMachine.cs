@@ -22,17 +22,19 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         #region Constructors and Injected
 
         /// <summary>
-        ///     Represents a state machine responsible for handling selectable states and their transitions.
+        /// Represents a state machine responsible for managing the transitions and behaviors of selectable states.
         /// </summary>
-        /// <param name="initialState">The initial state assigned to the state machine.</param>
-        /// <param name="actions">A collection of actions to execute during state changes.</param>
-        /// <param name="selectableElement">The UI element that triggers or reacts to state transitions.</param>
-        /// <param name="timeWrapper">The time-related utility that aids in managing timing during transitions.</param>
-        /// <param name="onClick">The UnityEvent that is invoked when a selectable element is clicked.</param>
+        /// <param name="initialState">The initial selectable state of the state machine.</param>
+        /// <param name="actions">A collection of state-related actions to be executed during transitions.</param>
+        /// <param name="selectableElement">The UI element associated with this state machine, used to trigger or respond to state changes.</param>
+        /// <param name="timeWrapper">An abstraction for managing and tracking timing during state transitions.</param>
+        /// <param name="executeInstantly">Determines whether transitions occur immediately upon a state change.</param>
+        /// <param name="onClick">The UnityEvent invoked when the selectable element is clicked.</param>
         public SelectableStateMachine(SelectableState initialState,
             List<IStateContract<SelectableState>> actions,
             SelectableElement selectableElement,
             TimeWrapper timeWrapper,
+            bool executeInstantly,
             UnityEvent onClick)
             : base(initialState, actions, selectableElement, timeWrapper)
         {

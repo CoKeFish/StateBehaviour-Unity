@@ -1,4 +1,5 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
+using Marmary.Utils.Runtime;
 using Marmary.Utils.Runtime.Events;
 using UnityEngine;
 using UnityEngine.Events;
@@ -44,7 +45,21 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         public override void Initialize()
         {
             base.Initialize();
-            stateMachine = new SelectableStateMachine(SelectableState.Normal, actions, this, time, onClick);
+            stateMachine = new SelectableStateMachine(SelectableState.Normal, actions, this, time, executeInstantly, onClick);
+        }
+
+        /// <summary>
+        /// Invoked when the MonoBehaviour becomes active and is started.
+        /// This method initializes the SelectableElement by calling the <c>Initialize</c> method.
+        /// </summary>
+        /// <remarks>
+        /// The <c>Start</c> method is marked with the <c>IgnoreUnityLifecycle</c> attribute to indicate
+        /// that its execution should not be treated as part of the standard Unity lifecycle for custom purposes.
+        /// </remarks>
+        [IgnoreUnityLifecycle]
+        protected void Start()
+        {
+            Initialize();
         }
 
         #endregion
