@@ -91,32 +91,7 @@ namespace Marmary.StateBehavior.Runtime.Menu
         [Inject] private IEventBus _eventBus;
 
         #endregion
-
-        public void localizationEvent()
-        {
-            DebugEx.Log("localizationEvent");
-        }
         
-        public async UniTask WaitForLocalizationToApply()
-        {
-            var tcs = new UniTaskCompletionSource();
-
-            void Handler()
-            {
-                tcs.TrySetResult();
-                LocalizationManager.OnLocalizeEvent -= Handler;
-            }
-
-            LocalizationManager.OnLocalizeEvent += Handler;
-
-            // Esperar un frame por seguridad
-            await UniTask.Yield();
-
-            // Esperar realmente al evento
-            await tcs.Task;
-        }
-
-
 
         
         #region Unity Event Functions
@@ -128,11 +103,9 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// <exception cref="Exception"></exception>
         public async void Start()
         {
-            LocalizationManager.OnLocalizeEvent += localizationEvent;
             try
             {
-                await  WaitForLocalizationToApply();
-                await UniTask.Yield();
+                await UniTask.DelayFrame(2);
 
                 Initialize();
 
