@@ -4,7 +4,7 @@ using Marmary.Utils.Editor.ModuleSymbols;
 using UnityEditor;
 
 //TODO: Check namespace name rule
-namespace Marmary.StateBehavior
+namespace Marmary.StateBehavior.Editor
 {
 #if MODULE_SYMBOLS_SYSTEM_ENABLED
 
