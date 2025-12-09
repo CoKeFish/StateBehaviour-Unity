@@ -6,7 +6,7 @@ using LanguageExt;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Marmary.StateBehavior.Runtime
+namespace Marmary.StateBehavior.Runtime.ActionDataState
 {
     /// <summary>
     ///     Simple state configuration that controls timing, easing and value blending for tweened actions.

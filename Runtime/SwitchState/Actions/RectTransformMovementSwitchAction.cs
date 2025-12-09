@@ -1,4 +1,6 @@
-﻿namespace Marmary.StateBehavior.Runtime.SwitchState.Actions
+﻿using Marmary.StateBehavior.Runtime.Actions;
+
+namespace Marmary.StateBehavior.Runtime.SwitchState.Actions
 {
     /// <summary>
     ///     A specialized RectTransform movement action for handling state transitions

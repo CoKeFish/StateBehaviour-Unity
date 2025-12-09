@@ -7,7 +7,7 @@ using Marmary.Utils.Runtime;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Marmary.StateBehavior.Runtime.SwitchState.Actions
+namespace Marmary.StateBehavior.Runtime.Actions
 {
     /// <summary>
     ///     Switch action that animates RectTransform movement for show and hide transitions.

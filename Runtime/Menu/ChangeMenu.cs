@@ -1,10 +1,10 @@
 using Cysharp.Threading.Tasks;
-using Marmary.StateBehavior.Runtime.Menu;
 using Marmary.StateBehavior.Runtime.SelectableState;
+using Marmary.Utils.Runtime;
 using UnityEngine;
 using VContainer;
 
-namespace Marmary.Libraries.UI.Menu.Components
+namespace Marmary.StateBehavior.Runtime.Menu
 {
     /// <summary>
     ///     Only changes the menu
@@ -49,6 +49,7 @@ namespace Marmary.Libraries.UI.Menu.Components
         /// <summary>
         ///     Gets the selectable animation button and adds the listener
         /// </summary>
+        [IgnoreUnityLifecycle]
         private void Start()
         {
             _selectableElement = GetComponent<SelectableElement>();

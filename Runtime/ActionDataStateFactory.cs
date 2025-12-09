@@ -1,5 +1,6 @@
 ﻿#if STATE_BEHAVIOR_ENABLED
 using System;
+using Marmary.StateBehavior.Runtime.ActionDataState;
 
 namespace Marmary.StateBehavior.Runtime
 {
