@@ -1,6 +1,6 @@
 {
   "name": "com.marmary.statebehavior",
-  "version": "1.18.2",
+  "version": "1.18.3",
   "displayName": "Marmary State Behavior",
   "description": "State behavior system for Unity with state machines and interactive elements support.",
   "unity": "2020.3",
