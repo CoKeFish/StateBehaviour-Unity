@@ -51,6 +51,7 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         /// <inheritdoc />
         protected sealed override void ConfigureStateMachine()
         {
+            ExecuteActions(true);
             stateMachine.Configure(SelectableState.Normal)
                 .Ignore(SelectableTrigger.PointerClick)
                 .Ignore(SelectableTrigger.UnPressed)

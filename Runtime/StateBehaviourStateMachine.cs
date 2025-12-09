@@ -124,6 +124,28 @@ namespace Marmary.StateBehavior.Runtime
 
             AnimationProcess(currentState, _timeWrapper);
         }
+        
+        
+        /// <summary>
+        ///     Executes the configured actions and events for the current state.
+        /// </summary>
+        protected void ExecuteActions(bool instantExecution)
+        {
+            ResetExecutionTasks();
+
+            if (_actions.IsNullOrEmpty()) return;
+
+            var currentState = stateMachine.State;
+
+            if (instantExecution)
+            {
+                InstantProcess(currentState);
+                return;
+            }
+
+            AnimationProcess(currentState, _timeWrapper);
+        }
+
 
 
         /// <summary>
