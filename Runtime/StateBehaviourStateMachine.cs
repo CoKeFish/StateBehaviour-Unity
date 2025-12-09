@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Sirenix.Utilities;
+using UnityEngine.Events;
 
 namespace Marmary.StateBehavior.Runtime
 {
@@ -17,11 +18,7 @@ namespace Marmary.StateBehavior.Runtime
     {
         #region Fields
 
-        /// <summary>
-        ///     The animation element that handles events for selection states.
-        /// </summary>
-        private readonly Element<TState, TTrigger> _selectableElement;
-
+    
         /// <summary>
         ///     Provides timing configurations and functionality to control execution delays
         ///     in the state behavior state machine.
@@ -45,7 +42,14 @@ namespace Marmary.StateBehavior.Runtime
         /// <summary>
         ///     Executes all actions or events configured for the current state of the state machine.
         /// </summary>
-        public bool ShouldExecuteInstantly;
+        private bool _shouldExecuteInstantly;
+
+        /// <summary>
+        /// Stores a mapping between states and their corresponding UnityEvent objects.
+        /// These events are triggered when transitioning to specific states
+        /// within the state machine, enabling state-based behavior customization.
+        /// </summary>
+        private readonly Dictionary<TState,UnityEvent> _events;
 
         #endregion
 
@@ -53,15 +57,15 @@ namespace Marmary.StateBehavior.Runtime
 
         protected StateBehaviourStateMachine(TState initialState,
             List<IStateContract<TState>> actions,
-            Element<TState, TTrigger> selectableElement,
+            Dictionary<TState,UnityEvent> events,
             TimeWrapper timeWrapper,
             bool executeInstantly = false)
             : base(initialState)
         {
             _actions = actions;
-            _selectableElement = selectableElement;
+            _events = events;
             _timeWrapper = timeWrapper;
-            ShouldExecuteInstantly = executeInstantly;
+            _shouldExecuteInstantly = executeInstantly;
 
             ConfigureStateMachine();
         }
@@ -76,10 +80,10 @@ namespace Marmary.StateBehavior.Runtime
         /// <param name="trigger">The trigger to fire.</param>
         public void FireTriggerInstant(TTrigger trigger)
         {
-            var previousInstantSetting = ShouldExecuteInstantly;
-            ShouldExecuteInstantly = true;
+            var previousInstantSetting = _shouldExecuteInstantly;
+            _shouldExecuteInstantly = true;
             stateMachine.Fire(trigger);
-            ShouldExecuteInstantly = previousInstantSetting;
+            _shouldExecuteInstantly = previousInstantSetting;
         }
 
         /// <summary>
@@ -88,10 +92,10 @@ namespace Marmary.StateBehavior.Runtime
         /// <param name="trigger">The trigger to fire.</param>
         public void FireTriggerAsync(TTrigger trigger)
         {
-            var previousInstantSetting = ShouldExecuteInstantly;
-            ShouldExecuteInstantly = false;
+            var previousInstantSetting = _shouldExecuteInstantly;
+            _shouldExecuteInstantly = false;
             stateMachine.Fire(trigger);
-            ShouldExecuteInstantly = previousInstantSetting;
+            _shouldExecuteInstantly = previousInstantSetting;
         }
 
 
@@ -116,7 +120,7 @@ namespace Marmary.StateBehavior.Runtime
 
             var currentState = stateMachine.State;
 
-            if (ShouldExecuteInstantly)
+            if (_shouldExecuteInstantly)
             {
                 InstantProcess(currentState);
                 return;
@@ -198,8 +202,8 @@ namespace Marmary.StateBehavior.Runtime
         /// <param name="state">The current state for which the events should be triggered.</param>
         private void TriggerStateEvents(TState state)
         {
-            if (_selectableElement.Events.ContainsKey(state))
-                _selectableElement.Events[state]?.Invoke();
+            if (_events.ContainsKey(state))
+                _events[state]?.Invoke();
         }
 
         /// <summary>

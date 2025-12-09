@@ -22,21 +22,21 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         #region Constructors and Injected
 
         /// <summary>
-        /// Represents a state machine responsible for managing the transitions and behaviors of selectable states.
+        /// Represents a state machine responsible for managing transitions and actions tied to selectable states within a user interface context.
         /// </summary>
-        /// <param name="initialState">The initial selectable state of the state machine.</param>
-        /// <param name="actions">A collection of state-related actions to be executed during transitions.</param>
-        /// <param name="selectableElement">The UI element associated with this state machine, used to trigger or respond to state changes.</param>
-        /// <param name="timeWrapper">An abstraction for managing and tracking timing during state transitions.</param>
-        /// <param name="executeInstantly">Determines whether transitions occur immediately upon a state change.</param>
-        /// <param name="onClick">The UnityEvent invoked when the selectable element is clicked.</param>
+        /// <param name="initialState">The initial selectable state of the state machine, indicating its starting behavior.</param>
+        /// <param name="actions">A list of state-specific contracts defining actions to execute during state transitions.</param>
+        /// <param name="events">A dictionary mapping each selectable state to its corresponding UnityEvent, triggered during state changes.</param>
+        /// <param name="timeWrapper">An object managing timing-related functionality, enabling precise state transition control.</param>
+        /// <param name="executeInstantly">Specifies whether the state transitions should occur instantaneously or over a duration.</param>
+        /// <param name="onClick">The UnityEvent that is invoked when the associated UI element is clicked by the user.</param>
         public SelectableStateMachine(SelectableState initialState,
             List<IStateContract<SelectableState>> actions,
-            SelectableElement selectableElement,
+            Dictionary<SelectableState, UnityEvent> events,
             TimeWrapper timeWrapper,
             bool executeInstantly,
             UnityEvent onClick)
-            : base(initialState, actions, selectableElement, timeWrapper)
+            : base(initialState, actions, events, timeWrapper)
         {
             _onClick = onClick;
         }

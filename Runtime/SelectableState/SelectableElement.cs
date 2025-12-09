@@ -45,7 +45,7 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         public override void Initialize()
         {
             base.Initialize();
-            stateMachine = new SelectableStateMachine(SelectableState.Normal, actions, this, time, executeInstantly, onClick);
+            stateMachine = new SelectableStateMachine(SelectableState.Normal, actions, Events, time, executeInstantly, onClick);
         }
 
         /// <summary>

@@ -14,7 +14,7 @@ namespace Marmary.StateBehavior.Runtime.SwitchState
         public override void Initialize()
         {
             base.Initialize();
-            stateMachine = new SwitchStateMachine(SwitchState.Show, actions, this, time, executeInstantly);
+            stateMachine = new SwitchStateMachine(SwitchState.Show, actions, Events, time, executeInstantly);
         }
 
         #endregion
