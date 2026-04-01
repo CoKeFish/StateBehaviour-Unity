@@ -1,4 +1,5 @@
-﻿using Marmary.StateBehavior.Runtime.Actions;
+﻿using System;
+using Marmary.StateBehavior.Runtime.Actions;
 
 namespace Marmary.StateBehavior.Runtime.SelectableState.Actions
 {
@@ -14,6 +15,7 @@ namespace Marmary.StateBehavior.Runtime.SelectableState.Actions
     /// <seealso cref="SelectableState" />
     /// <seealso cref="AnimationFontAction{TState,TActionData}" />
     /// <seealso cref="AnimationFontDataSelectableAction" />
+    [Serializable]
     public class AnimationFontSelectableAction : AnimationFontAction<SelectableState, AnimationFontDataSelectableAction>
     {
     }
