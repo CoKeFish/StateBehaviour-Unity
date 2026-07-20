@@ -1,4 +1,5 @@
-﻿using Marmary.StateBehavior.Runtime.Actions;
+﻿using System;
+using Marmary.StateBehavior.Runtime.Actions;
 
 namespace Marmary.StateBehavior.Runtime.SwitchState.Actions
 {
@@ -15,6 +16,7 @@ namespace Marmary.StateBehavior.Runtime.SwitchState.Actions
     ///     This class is designed to manage the movement of RectTransform elements
     ///     during transitions between "Show" and "Hide" states in a UI context.
     /// </example>
+    [Serializable]
     public class
         RectTransformMovementSwitchAction : RectTransformMovementAction<SwitchState,
         RectTransformMovementDataSwitchAction>

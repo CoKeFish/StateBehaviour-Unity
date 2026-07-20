@@ -1,4 +1,5 @@
-﻿using Marmary.StateBehavior.Runtime.Actions;
+﻿using System;
+using Marmary.StateBehavior.Runtime.Actions;
 using TMPro;
 
 namespace Marmary.StateBehavior.Runtime.SelectableState.Actions
@@ -17,6 +18,7 @@ namespace Marmary.StateBehavior.Runtime.SelectableState.Actions
     ///     Utilize this action in scenarios where the visual feedback of selectable UI elements
     ///     must be enhanced by dynamically changing the font color based on state changes.
     /// </remarks>
+    [Serializable]
     public class ColorFontSelectableAction : ColorFontAction<SelectableState, ColorFontDataSelectableAction>
     {
     }

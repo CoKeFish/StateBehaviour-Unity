@@ -1,4 +1,5 @@
-﻿using Marmary.StateBehavior.Runtime.Actions;
+﻿using System;
+using Marmary.StateBehavior.Runtime.Actions;
 
 namespace Marmary.StateBehavior.Runtime.SelectableState.Actions
 {
@@ -10,6 +11,7 @@ namespace Marmary.StateBehavior.Runtime.SelectableState.Actions
     ///     This class extends the behavior of <see cref="ScaleAction{SelectableState,ScaleDataSelectableAction}" />
     ///     by introducing state-driven scaling for UI elements.
     /// </remarks>
+    [Serializable]
     public class ScaleSelectableAction : ScaleAction<SelectableState, ScaleDataSelectableAction>
     {
     }

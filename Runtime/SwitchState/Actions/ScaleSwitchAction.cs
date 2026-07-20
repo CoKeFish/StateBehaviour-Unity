@@ -1,4 +1,5 @@
-﻿using Marmary.StateBehavior.Runtime.Actions;
+﻿using System;
+using Marmary.StateBehavior.Runtime.Actions;
 using UnityEngine;
 
 namespace Marmary.StateBehavior.Runtime.SwitchState.Actions
@@ -9,6 +10,7 @@ namespace Marmary.StateBehavior.Runtime.SwitchState.Actions
     ///     Utilizes scale tweening to transition between states defined in <see cref="SwitchState" />,
     ///     with configuration data provided by <see cref="ScaleDataSwitchAction" />.
     /// </summary>
+    [Serializable]
     public class ScaleSwitchAction : ScaleAction<SwitchState, ScaleDataSwitchAction>
     {
     }

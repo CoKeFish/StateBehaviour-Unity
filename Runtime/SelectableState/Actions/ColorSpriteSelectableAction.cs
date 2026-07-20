@@ -1,4 +1,5 @@
-﻿using Marmary.StateBehavior.Runtime.Actions;
+﻿using System;
+using Marmary.StateBehavior.Runtime.Actions;
 
 namespace Marmary.StateBehavior.Runtime.SelectableState.Actions
 {
@@ -15,6 +16,7 @@ namespace Marmary.StateBehavior.Runtime.SelectableState.Actions
     /// <seealso cref="ColorSpriteAction{TState, TActionData}" />
     /// <seealso cref="ColorSpriteDataSelectableAction" />
     /// <seealso cref="Marmary.StateBehavior.Runtime.SelectableState.SelectableState" />
+    [Serializable]
     public class ColorSpriteSelectableAction : ColorSpriteAction<SelectableState, ColorSpriteDataSelectableAction>
     {
     }
