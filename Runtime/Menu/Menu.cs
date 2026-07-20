@@ -44,14 +44,24 @@ namespace Marmary.StateBehavior.Runtime.Menu
         public float separation;
 
         /// <summary>
-        ///     First selectable of the menu when it is activated
+        ///     First selectable of the menu when it is activated.
+        ///     Ignored (and hidden in the inspector) while <see cref="initialFocus" /> is assigned,
+        ///     since that one takes priority.
         /// </summary>
         [SerializeField]
-        [RequiredIn(PrefabKind.InstanceInScene)]
+        [HideIf(nameof(initialFocus))]
         [ChildGameObjectsOnly]
         [BoxGroup("Options")]
         [PropertySpace(SpaceAfter = 10)]
         public Selectable firstSelected;
+
+        /// <summary>
+        ///     Optional element that receives the menu's initial focus in its own way (e.g. a list
+        ///     widget that focuses its selected item instead of its frame). Takes priority over
+        ///     <see cref="firstSelected" /> when assigned.
+        /// </summary>
+        [OdinSerialize] [ShowInInspector] [BoxGroup("Options")]
+        public IInitialFocus initialFocus;
 
 
         /// <summary>
@@ -211,12 +221,19 @@ namespace Marmary.StateBehavior.Runtime.Menu
         }
 
         /// <summary>
-        ///     Forces selection of <see cref="firstSelected" />; when it is not assigned, falls back to
-        ///     the first active and interactable Selectable in the menu so focus-based navigation
-        ///     (keyboard/gamepad) always has an entry point into the menu.
+        ///     Gives this menu the initial focus. Order: <see cref="initialFocus" /> (an element
+        ///     that knows how to receive the focus itself) wins; otherwise
+        ///     <see cref="firstSelected" />; otherwise the first active and interactable
+        ///     Selectable — so focus-based navigation (keyboard/gamepad) always has an entry point.
         /// </summary>
         internal void SelectFirst()
         {
+            if (initialFocus != null)
+            {
+                initialFocus.Focus();
+                return;
+            }
+
             if (firstSelected)
             {
                 firstSelected.Select();
