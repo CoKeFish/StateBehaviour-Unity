@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using Ardalis.GuardClauses;
 using Cysharp.Threading.Tasks;
 using DTT.ExtendedDebugLogs;
@@ -9,17 +10,33 @@ using Marmary.Utils.Runtime.Structure.FlowControl;
 using Marmary.Utils.Runtime.UI;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
 using VContainer;
 
 namespace Marmary.StateBehavior.Runtime.Menu
 {
     /// <summary>
     ///     Manages the lifecycle and behavior of menus in the application.
-    ///     Provides functionality to activate, deactivate, and switch between menus.
+    ///     Owns the navigation state: the current menu, the stack of menus set aside by popups,
+    ///     the transition-in-progress flag and the input/concurrency policies.
     /// </summary>
     [IgnoreUnityLifecycle]
     public class MenuManager : MonoBehaviour, IDefaultSelectable, IInitialize
     {
+        /// <summary>
+        ///     What to do when a menu transition is requested while another one is still running.
+        /// </summary>
+        private enum TransitionConflictPolicy
+        {
+            /// <summary>The new request is discarded with a warning.</summary>
+            Ignore,
+
+            /// <summary>The new request waits for the running transition to finish, then runs.</summary>
+            WaitAndRun
+        }
+
         #region Serialized Fields
 
         /// <summary>
@@ -38,11 +55,14 @@ namespace Marmary.StateBehavior.Runtime.Menu
         private Menu defaultMenu;
 
         /// <summary>
-        ///     Indicates if the current active menu should be activated after it is hidden
+        ///     If true, the outgoing menu finishes hiding before the incoming menu starts showing;
+        ///     if false both animations run in parallel.
         /// </summary>
-        [SerializeField] [BoxGroup("Options", ShowLabel = false)] [TitleGroup("Options/Options")]
-        private bool activeAfterHiding;
-
+        [SerializeField]
+        [FormerlySerializedAs("activeAfterHiding")]
+        [BoxGroup("Options", ShowLabel = false)]
+        [TitleGroup("Options/Options")]
+        private bool sequentialTransitions;
 
         /// <summary>
         ///     Indicates if the first menu should be animated at start
@@ -62,23 +82,64 @@ namespace Marmary.StateBehavior.Runtime.Menu
         [TitleGroup("Options/Options")]
         private float delayBeforeFirstMenu;
 
+        /// <summary>
+        ///     If true, the incoming menu's input gate stays closed until its show sequence completes;
+        ///     if false, input is accepted as soon as the menu becomes active.
+        /// </summary>
+        [SerializeField] [BoxGroup("Options", ShowLabel = false)] [TitleGroup("Options/Options")]
+        private bool blockInputDuringTransitions = true;
+
+        /// <summary>
+        ///     Policy applied when a transition is requested while another one is still running.
+        /// </summary>
+        [SerializeField] [BoxGroup("Options", ShowLabel = false)] [TitleGroup("Options/Options")]
+        private TransitionConflictPolicy conflictPolicy = TransitionConflictPolicy.Ignore;
+
+        /// <summary>
+        ///     If true, popping a menu restores the selectable that was focused when it was stacked;
+        ///     if false (or the selectable is gone), the menu's first selectable is selected instead.
+        /// </summary>
+        [SerializeField] [BoxGroup("Options", ShowLabel = false)] [TitleGroup("Options/Options")]
+        private bool useRestoreSelectionOnPop = true;
+
         #endregion
 
         #region Fields
 
         /// <summary>
-        ///     Queue of menus that have been activated
+        ///     Menus set aside by <see cref="PushMenu" />, with the selection to restore on pop.
         /// </summary>
-        private readonly Queue<Menu> _menuQueue = new();
+        private readonly MenuStack _menuStack = new();
+
+        /// <summary>
+        ///     The menu that is currently active. Assigned at the START of a transition, so it is
+        ///     never stale while animations are running.
+        /// </summary>
+        private Menu _currentMenu;
+
+        /// <summary>
+        ///     True while a menu transition (activate/deactivate sequence) is running.
+        /// </summary>
+        private bool _isTransitioning;
+
+        /// <summary>
+        ///     Cancels startup delays and conflict waits when this manager is destroyed.
+        /// </summary>
+        private CancellationToken _destroyToken;
 
         #endregion
 
         #region Properties
 
         /// <summary>
-        ///     The menu that is currently active
+        ///     The menu that is currently active (may be null before startup completes).
         /// </summary>
-        private static Menu CurrentActiveMenu { get; set; }
+        public Menu CurrentMenu => _currentMenu;
+
+        /// <summary>
+        ///     True while a menu transition is running.
+        /// </summary>
+        public bool IsTransitioning => _isTransitioning;
 
         #endregion
 
@@ -90,21 +151,26 @@ namespace Marmary.StateBehavior.Runtime.Menu
         [Inject] private IEventBus _eventBus;
 
         #endregion
-        
 
-        
         #region Unity Event Functions
 
         /// <summary>
-        ///     1- Setup all menus
+        ///     Caches the destroy cancellation token before any async flow starts.
+        /// </summary>
+        private void Awake()
+        {
+            _destroyToken = this.GetCancellationTokenOnDestroy();
+        }
+
+        /// <summary>
+        ///     1- Setup all menus (hidden and input-gated)
         ///     2- Activate the default menu and set it as the current active menu
         /// </summary>
-        /// <exception cref="Exception"></exception>
-        public async void Start()
+        private async void Start()
         {
             try
             {
-                await UniTask.DelayFrame(2);
+                await UniTask.DelayFrame(2, cancellationToken: _destroyToken);
 
                 Initialize();
 
@@ -112,20 +178,14 @@ namespace Marmary.StateBehavior.Runtime.Menu
 
                 _eventBus.Publish(new SendMenuManagerEvent(this));
             }
+            catch (OperationCanceledException)
+            {
+                // Destroyed during startup (e.g. scene change) — nothing to clean up.
+            }
             catch (Exception e)
             {
                 DebugEx.LogException(e);
             }
-        }
-
-        /// <summary>
-        ///     Handles the cleanup process when the MenuManager is destroyed.
-        ///     This method is automatically called by Unity when the associated GameObject is destroyed.
-        ///     Specifically, it ensures that the reference to the currently active menu is cleared.
-        /// </summary>
-        private void OnDestroy()
-        {
-            CurrentActiveMenu = null;
         }
 
         #endregion
@@ -133,85 +193,153 @@ namespace Marmary.StateBehavior.Runtime.Menu
         #region Methods
 
         /// <summary>
-        ///     Activate the given menu and inactivate the current active menu
+        ///     Replaces the current menu with the given one, hiding the current menu.
         /// </summary>
-        /// <param name="menu">parameter for the inspector using UnityEvents</param>
-        /// <param name="animate"> Indicates if the menu should be animated when it is activated</param>
-        /// <param name="stack"> Indicates if the current active menu should be stacked in the queue</param>
-        public async UniTask SetMenuActive(Menu menu, bool animate, bool stack)
+        /// <param name="menu">The menu to activate.</param>
+        /// <param name="animate">Indicates if the transition should be animated.</param>
+        public async UniTask SetMenuActive(Menu menu, bool animate)
         {
-            Guard.Against.Null(menu, "Menu cannot be null");
+            Guard.Against.Null(menu);
 
-            if (menu == CurrentActiveMenu)
-                //DebugEx.LogWarning("The menu is already active", UITag.Menu);
-                return;
+            if (menu == _currentMenu) return;
 
-            if (stack)
+            if (_menuStack.Contains(menu))
             {
-                CurrentActiveMenu.DisabledInteractables();
-                _menuQueue.Enqueue(CurrentActiveMenu);
-            }
-
-
-            if (!animate)
-            {
-                if (!stack)
-                    CurrentActiveMenu?.InstantHide();
-                menu.InstantShow();
-                CurrentActiveMenu = menu;
-            }
-
-
-            if (activeAfterHiding)
-            {
-                if (!stack)
-                    await (CurrentActiveMenu?.InactivateMenu() ?? UniTask.CompletedTask);
-
-                await menu.ActivateMenu();
-                CurrentActiveMenu = menu;
-
+                DebugEx.LogWarning($"SetMenuActive ignored: '{menu.name}' is stacked; pop it instead", UITag.Menu);
                 return;
             }
 
-            var tasks = new List<UniTask>();
+            if (!await TryBeginTransition()) return;
 
-            if (!stack)
-                tasks.Add(CurrentActiveMenu?.InactivateMenu() ?? UniTask.CompletedTask);
+            var previous = _currentMenu;
+            _currentMenu = menu;
 
-            tasks.Add(menu.ActivateMenu());
+            try
+            {
+                previous?.SetInteractable(false);
 
-            await UniTask.WhenAll(tasks);
-            CurrentActiveMenu = menu;
+                if (!animate)
+                {
+                    previous?.InstantHide();
+                    menu.InstantShow();
+                    menu.SetInteractable(true);
+                    menu.SelectFirst();
+                }
+                else if (sequentialTransitions)
+                {
+                    await (previous?.InactivateMenu() ?? UniTask.CompletedTask);
+                    await menu.ActivateMenu(blockInputDuringTransitions);
+                }
+                else
+                {
+                    var hide = previous?.InactivateMenu() ?? UniTask.CompletedTask;
+                    var show = menu.ActivateMenu(blockInputDuringTransitions);
+                    await UniTask.WhenAll(hide, show);
+                }
+            }
+            finally
+            {
+                _isTransitioning = false;
+            }
         }
 
-
         /// <summary>
-        ///     Set the popup menu inactive and the current active menu active
+        ///     Activates the given menu on top of the current one (e.g. a popup): the current menu stays
+        ///     visible but input-gated, and is stacked together with the current selection so
+        ///     <see cref="PopMenu" /> can restore both.
         /// </summary>
-        internal void SetPopupInactive()
+        /// <param name="menu">The menu to activate on top.</param>
+        /// <param name="animate">Indicates if the incoming menu should animate its show sequence.</param>
+        public async UniTask PushMenu(Menu menu, bool animate)
         {
-            if (_menuQueue.Count == 0) return;
+            Guard.Against.Null(menu);
 
-            CurrentActiveMenu = _menuQueue.Dequeue();
-            CurrentActiveMenu.ActiveInteractables();
-            CurrentActiveMenu.firstSelected.Select();
+            if (menu == _currentMenu || _menuStack.Contains(menu))
+            {
+                DebugEx.LogWarning($"PushMenu ignored: '{menu.name}' is already active or stacked", UITag.Menu);
+                return;
+            }
+
+            if (!await TryBeginTransition()) return;
+
+            var previous = _currentMenu;
+            _currentMenu = menu;
+
+            try
+            {
+                var eventSystem = EventSystem.current;
+                var lastSelected = eventSystem ? eventSystem.currentSelectedGameObject : null;
+                _menuStack.Push(previous, lastSelected);
+
+                previous?.SetInteractable(false);
+
+                if (animate)
+                {
+                    await menu.ActivateMenu(blockInputDuringTransitions);
+                }
+                else
+                {
+                    menu.InstantShow();
+                    menu.SetInteractable(true);
+                    menu.SelectFirst();
+                }
+            }
+            finally
+            {
+                _isTransitioning = false;
+            }
         }
 
         /// <summary>
-        ///     Activate the default menu and set it as the current active menu
+        ///     Deactivates the current (pushed) menu and restores the most recently stacked menu,
+        ///     reopening its input gate and restoring its selection.
         /// </summary>
-        private async UniTask ActivateDefaultMenuAtStartup()
+        /// <param name="animate">Indicates if the outgoing menu should animate its hide sequence.</param>
+        /// <param name="hideCurrent">
+        ///     If false, the outgoing menu is assumed to be hidden already by an external system
+        ///     (e.g. a UIWidgets popup that closed itself) and only the navigation state is restored.
+        /// </param>
+        public async UniTask PopMenu(bool animate = false, bool hideCurrent = true)
         {
-            //DebugEx.Log("Default Menu: " + defaultMenu.name, UITag.Menu);
+            if (_menuStack.Count == 0)
+            {
+                DebugEx.LogWarning("PopMenu ignored: the menu stack is empty", UITag.Menu);
+                return;
+            }
 
-            await UniTask.Delay(TimeSpan.FromSeconds(delayBeforeFirstMenu));
+            if (!await TryBeginTransition()) return;
 
-            await SetMenuActive(defaultMenu, animateFirstMenuAtStart, false);
+            var closing = _currentMenu;
+            var entry = _menuStack.Pop();
+            _currentMenu = entry.Menu;
+
+            try
+            {
+                closing?.SetInteractable(false);
+
+                if (hideCurrent && closing != null)
+                {
+                    if (animate)
+                        await closing.InactivateMenu();
+                    else
+                        closing.InstantHide();
+                }
+
+                if (entry.Menu != null)
+                {
+                    entry.Menu.SetInteractable(true);
+                    RestoreSelection(entry);
+                }
+            }
+            finally
+            {
+                _isTransitioning = false;
+            }
         }
 
-
         /// <summary>
-        ///     Setup all menus, hide them and inactivate them
+        ///     Setup all menus: initialized, hidden and input-gated so nothing is clickable
+        ///     until the manager activates the default menu.
         /// </summary>
         public void Initialize()
         {
@@ -219,8 +347,65 @@ namespace Marmary.StateBehavior.Runtime.Menu
             {
                 menu.Initialize();
                 menu.InstantHide();
-                menu.gameObject.SetActive(false);
+                menu.SetInteractable(false);
             }
+        }
+
+        /// <summary>
+        ///     Activate the default menu and set it as the current active menu
+        /// </summary>
+        private async UniTask ActivateDefaultMenuAtStartup()
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(delayBeforeFirstMenu), cancellationToken: _destroyToken);
+
+            await SetMenuActive(defaultMenu, animateFirstMenuAtStart);
+        }
+
+        /// <summary>
+        ///     Applies <see cref="conflictPolicy" /> when a transition is already running.
+        ///     Returns true when the caller may proceed (and marks the transition as started).
+        /// </summary>
+        private async UniTask<bool> TryBeginTransition()
+        {
+            if (_isTransitioning)
+            {
+                switch (conflictPolicy)
+                {
+                    case TransitionConflictPolicy.Ignore:
+                        DebugEx.LogWarning("Menu transition ignored: another transition is running", UITag.Menu);
+                        return false;
+
+                    case TransitionConflictPolicy.WaitAndRun:
+                        // Note: with more than two competing calls the wake-up order is not FIFO.
+                        await UniTask.WaitUntil(() => !_isTransitioning, cancellationToken: _destroyToken);
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(conflictPolicy));
+                }
+            }
+
+            _isTransitioning = true;
+            return true;
+        }
+
+        /// <summary>
+        ///     Restores the selection stored in the given stack entry, falling back to the menu's
+        ///     first selectable when the stored one is gone, inactive or not interactable.
+        /// </summary>
+        private void RestoreSelection(in MenuStack.Entry entry)
+        {
+            if (useRestoreSelectionOnPop && entry.LastSelected && entry.LastSelected.activeInHierarchy)
+            {
+                var selectable = entry.LastSelected.GetComponent<Selectable>();
+                if (selectable && selectable.IsInteractable())
+                {
+                    selectable.Select();
+                    return;
+                }
+            }
+
+            entry.Menu.SelectFirst();
         }
 
         #endregion
@@ -241,11 +426,6 @@ namespace Marmary.StateBehavior.Runtime.Menu
             allMenus.AddRange(Resources.FindObjectsOfTypeAll<Menu>());
 
             allMenus = allMenus.FindAll(static menu => !string.IsNullOrEmpty(menu.gameObject.scene.name));
-            //DebugEx.Log("All menus in the scene: " + allMenus.Count, UITag.Menu);
-            foreach (var menu in allMenus)
-            {
-                //DebugEx.Log("Menu: " + menu.name + " Scene: " + menu.gameObject.scene.name, UITag.MenuDebug);
-            }
         }
 
 #endif
@@ -256,13 +436,17 @@ namespace Marmary.StateBehavior.Runtime.Menu
 
         /// <summary>
         ///     Sets the default selectable UI element based on the given position
-        ///     within the currently active menu. If a selectable is found, it is
-        ///     set as the currently selected UI element.
+        ///     within the currently active menu. Ignored while no menu is active or a
+        ///     transition is running.
         /// </summary>
         /// <param name="position">The position that determines which selectable element is to be activated.</param>
         public void SetDefaultSelectable(Position position)
         {
-            if (CurrentActiveMenu.DefaultSelectables.TryGetValue(position, out var selectable)) selectable.Select();
+            if (_currentMenu == null || _isTransitioning) return;
+
+            if (!_currentMenu.DefaultSelectables.TryGetValue(position, out var selectable)) return;
+
+            if (selectable && selectable.gameObject.activeInHierarchy) selectable.Select();
         }
 
         #endregion

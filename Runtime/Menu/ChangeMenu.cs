@@ -16,7 +16,7 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// <summary>
         ///     The menu to change to
         /// </summary>
-        [SerializeField] private StateBehavior.Runtime.Menu.Menu menu;
+        [SerializeField] private Menu menu;
 
         /// <summary>
         ///     Indicates if the menu should be animated when it is changed
@@ -65,7 +65,7 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// </summary>
         private void OnChangeMenu()
         {
-            _menuManager.SetMenuActive(menu, animate, false).Forget();
+            _menuManager.SetMenuActive(menu, animate).Forget();
         }
 
         #endregion

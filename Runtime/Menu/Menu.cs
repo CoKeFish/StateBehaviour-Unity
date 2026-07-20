@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Marmary.StateBehavior.Runtime.Criterions;
 using Marmary.StateBehavior.Runtime.SwitchState;
@@ -8,7 +9,9 @@ using Marmary.Utils.Runtime;
 using Marmary.Utils.Runtime.Structure.FlowControl;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -62,24 +65,10 @@ namespace Marmary.StateBehavior.Runtime.Menu
 
 
         /// <summary>
-        ///     Represents a list of asynchronous tasks that are executed as part of the menu sequencing operations,
-        ///     such as showing or hiding menu elements.
-        ///     This collection is used to aggregate tasks and ensure their completion before progressing further.
-        /// </summary>
-        private List<UniTask> _tasks = new();
-
-
-        /// <summary>
         ///     Indicates if the menu has a deactivation delay
         /// </summary>
         [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useHideAnimation")]
         public bool useHideAnimation;
-
-        /// <summary>
-        ///     Time to wait before deactivating the menu
-        /// </summary>
-        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useHideAnimation")] [ReadOnly]
-        private float delayBeforeDeactivating = 0.5f;
 
         /// <summary>
         ///     Indicates if the menu has an extra deactivation delay
@@ -98,12 +87,6 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// </summary>
         [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useShowAnimation")]
         public bool useShowAnimation = true;
-
-        /// <summary>
-        ///     Time to wait before activating the menu
-        /// </summary>
-        [SerializeField] [BoxGroup("Options")] [ToggleGroup("Options/useShowAnimation")] [ReadOnly]
-        private float delayBeforeActivating;
 
         /// <summary>
         ///     Indicates if the menu has an activation delay
@@ -138,88 +121,110 @@ namespace Marmary.StateBehavior.Runtime.Menu
 
         #endregion
 
+        #region Fields
+
+        /// <summary>
+        ///     Input gate of the menu. Obtained (or added) at runtime in <see cref="Initialize" /> so
+        ///     existing prefabs and scenes do not need a manual CanvasGroup.
+        /// </summary>
+        private CanvasGroup _canvasGroup;
+
+        /// <summary>
+        ///     Cancels pending activation/deactivation delays when the menu is destroyed.
+        /// </summary>
+        private CancellationToken _destroyToken;
+
+        #endregion
+
         #region Methods
 
         /// <summary>
         ///     Activate the menu
-        ///     1- Activate the menu
+        ///     1- Activate the menu game object (input gated unless <paramref name="blockInputUntilComplete" /> is false)
         ///     2- Show the menu elements (animations)
-        ///     3- Make all selectables in the menu interactable
-        ///     4- Select the first selectable if there is one and event system is null
+        ///     3- Select the first selectable if there is one and nothing is selected
+        ///     4- Open the input gate
         /// </summary>
-        internal async UniTask ActivateMenu()
+        /// <param name="blockInputUntilComplete">
+        ///     If true the input gate stays closed until the show sequence finishes; if false it opens immediately.
+        /// </param>
+        internal async UniTask ActivateMenu(bool blockInputUntilComplete = true)
         {
             gameObject.SetActive(true);
+            SetInteractable(!blockInputUntilComplete);
             onShow.Invoke();
-            //Show the menu elements (animations) and wait for them to finish for selecting the first selectable
-            if (useExtraActivationDelay)
+
+            if (useShowAnimation)
             {
-                await UniTask.Delay(TimeSpan.FromSeconds(extraDelayBeforeActivating));
+                if (useExtraActivationDelay)
+                    await UniTask.Delay(TimeSpan.FromSeconds(extraDelayBeforeActivating),
+                        cancellationToken: _destroyToken);
                 await ShowElements();
             }
             else
             {
-                if (useShowAnimation)
-                    await ShowElements();
-                else
-                    InstantShow();
+                InstantShowElements();
             }
 
             await SelectFirstDelay();
 
-            ActiveInteractables();
+            SetInteractable(true);
             onShowComplete.Invoke();
         }
 
         /// <summary>
         ///     Inactivate the menu
-        ///     1- Make all selectables in the menu uninteractable
+        ///     1- Close the input gate
         ///     2- Hide the menu elements (animations)
-        ///     3- Deactivate the menu after the animations
+        ///     3- Deactivate the menu game object
         /// </summary>
         internal async UniTask InactivateMenu()
         {
-            DisabledInteractables();
+            SetInteractable(false);
             onHide.Invoke();
 
             if (useHideAnimation)
             {
                 if (useExtraDelayBeforeDeactivating)
-                    await UniTask.Delay(TimeSpan.FromSeconds(extraDelayBeforeDeactivating));
+                    await UniTask.Delay(TimeSpan.FromSeconds(extraDelayBeforeDeactivating),
+                        cancellationToken: _destroyToken);
                 await HideElements();
-
-
-                //Deactivate the menu after the animations
-                gameObject.SetActive(false);
             }
             else
             {
-                InstantHide();
+                InstantHideElements();
             }
 
+            gameObject.SetActive(false);
             onHideComplete.Invoke();
         }
 
         /// <summary>
-        ///     Make all selectables in the menu interactable
+        ///     Opens or closes the input gate of the menu. Closing it blocks pointer raycasts and, combined with
+        ///     <see cref="SelectableState.SelectableElement" /> respecting interactability, submit/keyboard input too.
         /// </summary>
-        internal void ActiveInteractables()
+        internal void SetInteractable(bool value)
         {
-            //Get all selectables in the menu
-            var selectables = GetComponentsInChildren<Selectable>();
-            //Interactable = true
-            foreach (var selectable in selectables) selectable.interactable = true;
+            EnsureCanvasGroup();
+            _canvasGroup.interactable = value;
+            _canvasGroup.blocksRaycasts = value;
         }
 
+        /// <summary>
+        ///     Forces selection of <see cref="firstSelected" /> if it is assigned.
+        /// </summary>
+        internal void SelectFirst()
+        {
+            if (firstSelected) firstSelected.Select();
+        }
 
         /// <summary>
-        ///     Make all selectables in the menu uninteractable
+        ///     Gets the CanvasGroup used as input gate, adding one at runtime if the menu has none.
         /// </summary>
-        internal void DisabledInteractables()
+        private void EnsureCanvasGroup()
         {
-            //Get all seleccatables in the menu and make them uninteractable
-            var selectables = GetComponentsInChildren<Selectable>();
-            foreach (var selectable in selectables) selectable.interactable = false;
+            if (_canvasGroup) return;
+            if (!TryGetComponent(out _canvasGroup)) _canvasGroup = gameObject.AddComponent<CanvasGroup>();
         }
 
         /// <summary>
@@ -249,7 +254,6 @@ namespace Marmary.StateBehavior.Runtime.Menu
         {
             menuElements = GetComponentsInChildren<MenuElement>().ToList();
 #if UNITY_EDITOR
-
             EditorUtility.SetDirty(this);
             PrefabUtility.RecordPrefabInstancePropertyModifications(this);
 
@@ -264,13 +268,14 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// </returns>
         private UniTask HideElements()
         {
+            var tasks = new List<UniTask>(menuElements.Count);
             foreach (var menuElement in menuElements)
             {
                 menuElement.OnHide();
-                _tasks.Add(menuElement.WhenTaskCompleted());
+                tasks.Add(menuElement.WhenTaskCompleted());
             }
 
-            return UniTask.WhenAll(_tasks);
+            return UniTask.WhenAll(tasks);
         }
 
         /// <summary>
@@ -281,13 +286,14 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// </return>
         private UniTask ShowElements()
         {
+            var tasks = new List<UniTask>(menuElements.Count);
             foreach (var menuElement in menuElements)
             {
                 menuElement.OnShow();
-                _tasks.Add(menuElement.WhenTaskCompleted());
+                tasks.Add(menuElement.WhenTaskCompleted());
             }
 
-            return UniTask.WhenAll(_tasks);
+            return UniTask.WhenAll(tasks);
         }
 
 
@@ -313,9 +319,9 @@ namespace Marmary.StateBehavior.Runtime.Menu
         private async UniTask SelectFirstDelay()
         {
             if (useSelectionTime)
-                await UniTask.Delay(TimeSpan.FromSeconds(timeToSelect));
+                await UniTask.Delay(TimeSpan.FromSeconds(timeToSelect), cancellationToken: _destroyToken);
 
-            if (firstSelected && !EventSystem.current.currentSelectedGameObject)
+            if (firstSelected && (!EventSystem.current || !EventSystem.current.currentSelectedGameObject))
                 firstSelected.Select();
         }
 
@@ -358,6 +364,8 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// </summary>
         public void Initialize()
         {
+            _destroyToken = this.GetCancellationTokenOnDestroy();
+            EnsureCanvasGroup();
             GetAllMenuElements();
 
             if (recalculateInRuntime)
