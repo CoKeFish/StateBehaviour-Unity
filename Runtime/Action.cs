@@ -101,8 +101,12 @@ namespace Marmary.StateBehavior.Runtime
         /// <param name="gameObject">Game object hosting the component.</param>
         public void Setup(GameObject gameObject)
         {
+            // A re-Setup (e.g. re-Initialize of the owning Element) must not leak the previous tween:
+            // tweens are created with SetAutoKill(false) and never die on their own.
+            tweener?.Kill();
             InitializeStartValue(gameObject);
             tweener = CreateTweener(gameObject);
+            tweener.SetLink(gameObject);
         }
 
         /// <summary>
@@ -137,8 +141,6 @@ namespace Marmary.StateBehavior.Runtime
 
 
 #if UNITY_EDITOR
-
-
         /// <summary>
         ///     Determines whether the action needs an ActionData asset.
         /// </summary>

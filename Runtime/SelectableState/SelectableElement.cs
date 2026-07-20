@@ -30,10 +30,43 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         [SerializeField] private bool ignoreMouse;
 
         /// <summary>
+        ///     When enabled, action triggers (click, press, submit, hover) are ignored while the underlying
+        ///     <see cref="Selectable" /> is not interactable — including gates from parent CanvasGroups.
+        /// </summary>
+        [SerializeField] private bool respectInteractable = true;
+
+        /// <summary>
         ///     Represents the event triggered when the UI element is clicked.
         ///     This event is invoked to handle click interactions and associated logic for the selectable element.
         /// </summary>
         public UnityEvent onClick = new();
+
+        #endregion
+
+        #region Fields
+
+        /// <summary>
+        ///     Cached sibling <see cref="Selectable" /> used to evaluate interactability.
+        /// </summary>
+        private Selectable _selectable;
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        ///     Whether input triggers should currently be processed.
+        ///     <see cref="Selectable.IsInteractable" /> already accounts for parent CanvasGroups.
+        /// </summary>
+        private bool InputAllowed
+        {
+            get
+            {
+                if (!respectInteractable) return true;
+                if (!_selectable) _selectable = GetComponent<Selectable>();
+                return _selectable && _selectable.IsInteractable();
+            }
+        }
 
         #endregion
 
@@ -45,7 +78,8 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         public override void Initialize()
         {
             base.Initialize();
-            stateMachine = new SelectableStateMachine(SelectableState.Normal, actions, Events, time, executeInstantly, onClick);
+            stateMachine = new SelectableStateMachine(SelectableState.Normal, actions, Events, time, executeInstantly,
+                onClick);
         }
 
         /// <summary>
@@ -59,6 +93,7 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         [IgnoreUnityLifecycle]
         protected void Start()
         {
+            _selectable = GetComponent<Selectable>();
             Initialize();
         }
 
@@ -101,6 +136,8 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         /// <param name="eventData">The data associated with the pointer click event.</param>
         public virtual void OnPointerClick(PointerEventData eventData)
         {
+            if (!InputAllowed) return;
+
             TriggerState(SelectableTrigger.PointerClick);
         }
 
@@ -115,6 +152,8 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         /// <param name="eventData"></param>
         public void OnPointerDown(PointerEventData eventData)
         {
+            if (!InputAllowed) return;
+
             TriggerState(SelectableTrigger.PointerDown);
         }
 
@@ -130,6 +169,7 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         public virtual void OnPointerEnter(PointerEventData eventData)
         {
             if (ignoreMouse) return;
+            if (!InputAllowed) return;
 
             gameObject.GetComponent<Selectable>().Select();
         }
@@ -161,6 +201,8 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         /// <param name="eventData"></param>
         public void OnPointerUp(PointerEventData eventData)
         {
+            if (!InputAllowed) return;
+
             TriggerState(SelectableTrigger.PointerUp);
         }
 
@@ -187,6 +229,8 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         /// <param name="eventData"></param>
         public virtual void OnSubmit(BaseEventData eventData)
         {
+            if (!InputAllowed) return;
+
             TriggerState(SelectableTrigger.Submit);
         }
 
@@ -201,6 +245,8 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         /// <param name="eventData">The event data associated with the pointer action.</param>
         public void OnUnPressed(PointerEventData eventData)
         {
+            if (!InputAllowed) return;
+
             TriggerState(SelectableTrigger.UnPressed);
         }
 
