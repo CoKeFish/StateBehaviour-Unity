@@ -211,11 +211,25 @@ namespace Marmary.StateBehavior.Runtime.Menu
         }
 
         /// <summary>
-        ///     Forces selection of <see cref="firstSelected" /> if it is assigned.
+        ///     Forces selection of <see cref="firstSelected" />; when it is not assigned, falls back to
+        ///     the first active and interactable Selectable in the menu so focus-based navigation
+        ///     (keyboard/gamepad) always has an entry point into the menu.
         /// </summary>
         internal void SelectFirst()
         {
-            if (firstSelected) firstSelected.Select();
+            if (firstSelected)
+            {
+                firstSelected.Select();
+                return;
+            }
+
+            foreach (var selectable in GetComponentsInChildren<Selectable>())
+            {
+                if (!selectable.IsInteractable()) continue;
+
+                selectable.Select();
+                return;
+            }
         }
 
         /// <summary>
@@ -321,8 +335,23 @@ namespace Marmary.StateBehavior.Runtime.Menu
             if (useSelectionTime)
                 await UniTask.Delay(TimeSpan.FromSeconds(timeToSelect), cancellationToken: _destroyToken);
 
-            if (firstSelected && (!EventSystem.current || !EventSystem.current.currentSelectedGameObject))
-                firstSelected.Select();
+            // Keep a selection the user can actually use; a missing selection — or one stranded in
+            // an input-gated menu (e.g. the menu behind a popup) — is replaced by this menu's first.
+            if (CurrentSelectionIsUsable()) return;
+
+            SelectFirst();
+        }
+
+        /// <summary>
+        ///     Whether the EventSystem currently has a selection that can receive input.
+        /// </summary>
+        private static bool CurrentSelectionIsUsable()
+        {
+            var eventSystem = EventSystem.current;
+            if (!eventSystem || !eventSystem.currentSelectedGameObject) return false;
+
+            var selectable = eventSystem.currentSelectedGameObject.GetComponent<Selectable>();
+            return selectable && selectable.IsInteractable();
         }
 
         #endregion

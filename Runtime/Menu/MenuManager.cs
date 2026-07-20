@@ -4,6 +4,7 @@ using System.Threading;
 using Ardalis.GuardClauses;
 using Cysharp.Threading.Tasks;
 using DTT.ExtendedDebugLogs;
+using Marmary.LogSystem.Runtime;
 using Marmary.Utils.Runtime;
 using Marmary.Utils.Runtime.Structure;
 using Marmary.Utils.Runtime.Structure.FlowControl;
@@ -14,6 +15,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using VContainer;
+using ILogger = Serilog.ILogger;
 
 namespace Marmary.StateBehavior.Runtime.Menu
 {
@@ -150,6 +152,12 @@ namespace Marmary.StateBehavior.Runtime.Menu
         /// </summary>
         [Inject] private IEventBus _eventBus;
 
+        /// <summary>
+        ///     Log pipeline configured by the DI container (sinks, routes and levels live in LoggingSettings).
+        ///     Null when the scene runs without a scope, hence the ?. at every call site.
+        /// </summary>
+        [Inject] private ILogger _logger;
+
         #endregion
 
         #region Unity Event Functions
@@ -177,6 +185,8 @@ namespace Marmary.StateBehavior.Runtime.Menu
                 await ActivateDefaultMenuAtStartup();
 
                 _eventBus.Publish(new SendMenuManagerEvent(this));
+
+                _logger?.Log($"MenuManager ready, default menu: {defaultMenu.name}", UITag.Menu);
             }
             catch (OperationCanceledException)
             {
@@ -184,7 +194,7 @@ namespace Marmary.StateBehavior.Runtime.Menu
             }
             catch (Exception e)
             {
-                DebugEx.LogException(e);
+                _logger?.WithUnityTag(UITag.Menu).Error(e, "MenuManager startup failed");
             }
         }
 
@@ -205,7 +215,7 @@ namespace Marmary.StateBehavior.Runtime.Menu
 
             if (_menuStack.Contains(menu))
             {
-                DebugEx.LogWarning($"SetMenuActive ignored: '{menu.name}' is stacked; pop it instead", UITag.Menu);
+                _logger?.LogWarning($"SetMenuActive ignored: '{menu.name}' is stacked; pop it instead", UITag.Menu);
                 return;
             }
 
@@ -236,6 +246,9 @@ namespace Marmary.StateBehavior.Runtime.Menu
                     var show = menu.ActivateMenu(blockInputDuringTransitions);
                     await UniTask.WhenAll(hide, show);
                 }
+
+                _logger?.Log($"Menu activated: {menu.name} (replaced {(previous ? previous.name : "none")})",
+                    UITag.Menu);
             }
             finally
             {
@@ -256,7 +269,7 @@ namespace Marmary.StateBehavior.Runtime.Menu
 
             if (menu == _currentMenu || _menuStack.Contains(menu))
             {
-                DebugEx.LogWarning($"PushMenu ignored: '{menu.name}' is already active or stacked", UITag.Menu);
+                _logger?.LogWarning($"PushMenu ignored: '{menu.name}' is already active or stacked", UITag.Menu);
                 return;
             }
 
@@ -283,6 +296,8 @@ namespace Marmary.StateBehavior.Runtime.Menu
                     menu.SetInteractable(true);
                     menu.SelectFirst();
                 }
+
+                _logger?.Log($"Menu pushed: {menu.name} over {(previous ? previous.name : "none")}", UITag.Menu);
             }
             finally
             {
@@ -303,7 +318,7 @@ namespace Marmary.StateBehavior.Runtime.Menu
         {
             if (_menuStack.Count == 0)
             {
-                DebugEx.LogWarning("PopMenu ignored: the menu stack is empty", UITag.Menu);
+                _logger?.LogWarning("PopMenu ignored: the menu stack is empty", UITag.Menu);
                 return;
             }
 
@@ -330,6 +345,8 @@ namespace Marmary.StateBehavior.Runtime.Menu
                     entry.Menu.SetInteractable(true);
                     RestoreSelection(entry);
                 }
+
+                _logger?.Log($"Menu popped: back to {(entry.Menu ? entry.Menu.name : "none")}", UITag.Menu);
             }
             finally
             {
@@ -372,7 +389,7 @@ namespace Marmary.StateBehavior.Runtime.Menu
                 switch (conflictPolicy)
                 {
                     case TransitionConflictPolicy.Ignore:
-                        DebugEx.LogWarning("Menu transition ignored: another transition is running", UITag.Menu);
+                        _logger?.LogWarning("Menu transition ignored: another transition is running", UITag.Menu);
                         return false;
 
                     case TransitionConflictPolicy.WaitAndRun:
@@ -444,9 +461,16 @@ namespace Marmary.StateBehavior.Runtime.Menu
         {
             if (_currentMenu == null || _isTransitioning) return;
 
-            if (!_currentMenu.DefaultSelectables.TryGetValue(position, out var selectable)) return;
+            if (_currentMenu.DefaultSelectables.TryGetValue(position, out var selectable)
+                && selectable && selectable.gameObject.activeInHierarchy)
+            {
+                selectable.Select();
+                return;
+            }
 
-            if (selectable && selectable.gameObject.activeInHierarchy) selectable.Select();
+            // Gamepad/keyboard recovery: without a default wired for this direction, focus the
+            // menu's first selectable so directional input never dead-ends.
+            _currentMenu.SelectFirst();
         }
 
         #endregion
