@@ -361,14 +361,15 @@ namespace Marmary.StateBehavior.Runtime.Menu
 
         /// <summary>
         ///     Whether the EventSystem currently has a selection that can receive input.
+        ///     Judged at the EventSystem protocol level (see <see cref="FocusProtocol" />), so
+        ///     selections held by non-Selectable widgets (e.g. list items) are respected too.
         /// </summary>
         private static bool CurrentSelectionIsUsable()
         {
             var eventSystem = EventSystem.current;
             if (!eventSystem || !eventSystem.currentSelectedGameObject) return false;
 
-            var selectable = eventSystem.currentSelectedGameObject.GetComponent<Selectable>();
-            return selectable && selectable.IsInteractable();
+            return FocusProtocol.IsUsable(eventSystem.currentSelectedGameObject);
         }
 
         #endregion

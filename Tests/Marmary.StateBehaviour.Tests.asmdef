@@ -3,6 +3,8 @@
   "rootNamespace": "Marmary.StateBehavior.Tests",
   "references": [
     "Marmary.StateBehaviour",
+    "Marmary.Utils",
+    "UniTask",
     "UnityEngine.TestRunner",
     "UnityEditor.TestRunner"
   ],

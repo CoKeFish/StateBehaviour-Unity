@@ -2,7 +2,6 @@
 using Marmary.Utils.Runtime;
 using Marmary.Utils.Runtime.Events;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -17,7 +16,7 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
     ///     cancellation, and state transitions.
     /// </remarks>
     [RequireComponent(typeof(Selectable))]
-    public abstract class SelectableElement : Element<SelectableState, SelectableTrigger>
+    public abstract class SelectableElement : SelectableStateElement
         , IPointerEnterHandler, IPointerExitHandler,
         IPointerDownHandler, IPointerClickHandler, ISelectHandler, IDeselectHandler,
         IPointerUpHandler, ISubmitHandler, ICancelHandler, IUnPressedHandler
@@ -34,12 +33,6 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         ///     <see cref="Selectable" /> is not interactable — including gates from parent CanvasGroups.
         /// </summary>
         [SerializeField] private bool respectInteractable = true;
-
-        /// <summary>
-        ///     Represents the event triggered when the UI element is clicked.
-        ///     This event is invoked to handle click interactions and associated logic for the selectable element.
-        /// </summary>
-        public UnityEvent onClick = new();
 
         #endregion
 
@@ -71,16 +64,6 @@ namespace Marmary.StateBehavior.Runtime.SelectableState
         #endregion
 
         #region Methods
-
-        /// <summary>
-        ///     Initializes the SelectableElement by creating and configuring the internal SelectableStateMachine instance.
-        /// </summary>
-        public override void Initialize()
-        {
-            base.Initialize();
-            stateMachine = new SelectableStateMachine(SelectableState.Normal, actions, Events, time, executeInstantly,
-                onClick);
-        }
 
         /// <summary>
         /// Invoked when the MonoBehaviour becomes active and is started.
